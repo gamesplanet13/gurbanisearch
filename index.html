@@ -202,11 +202,20 @@ async function loadJson(url){const r=await fetch(url);if(!r.ok)throw Error('Bani
 $('search').onclick=async()=>{const q=$('query').value.trim();if(!q)return;status('Searching…');$('results').hidden=false;$('results').replaceChildren();try{const d=await loadJson('https://api.banidb.com/v2/search/'+encodeURIComponent(q)+'?searchtype='+$('searchType').value+'&source=all&results=40');const arr=verses(d);for(const x of arr){const b=document.createElement('button');b.className='item';b.textContent=verse(x)||('Shabad '+sid(x));b.onclick=()=>openShabad(x);$('results').append(b)}status(arr.length+' matching results')}catch(e){status('Search unavailable: '+e.message+' (check browser API/CORS access)')}};
 $('query').onkeydown=e=>{if(e.key==='Enter')$('search').click()};
 $('keyboard').onchange=()=>{$('query').lang=$('keyboard').value;const m={en:'7',pa:'0',hi:'2'};$('searchType').value=m[$('keyboard').value];$('query').focus()};
-let readingAng=null,readingTitle='',shabadAng=null;
+let readingAng=null,readingTitle='',shabadAng=null,sukhmaniSalokStarts=[];
+function salokIndices(items){return items.map((v,i)=>(/^\s*ਸਲੋਕੁ\s*[॥|]/.test(verse(v))?i:-1)).filter(i=>i>=0)}
+function activeSalokNumber(){if(!sukhmaniSalokStarts.length)return 0;let number=0;for(let i=0;i<sukhmaniSalokStarts.length;i++)if(sukhmaniSalokStarts[i]<=active)number=i+1;return number||1}
+function renderReadingNavigator(){const isSukhmani=readingTitle.startsWith('ਸੁਖਮਨੀ'),isAng=!!readingAng;$('readingNavigator').hidden=!(isSukhmani||isAng);$('sukhmaniNavigation').hidden=!isSukhmani;$('sehajNavigation').hidden=!isAng;$('readingKindLabel').textContent=isSukhmani?'Sukhmani Sahib · 24 Saloks':isAng?'Sehaj Path · Ang '+readingAng:'';if(isSukhmani){const n=activeSalokNumber();$('salokPosition').textContent=n?('Salok '+n+' / '+sukhmaniSalokStarts.length):'';$('salokNumber').value=n||1}if(isAng)$('angInput').value=readingAng}
+function openSalokNumber(n){if(!readingTitle.startsWith('ਸੁਖਮਨੀ'))return status('Open Sukhmani Sahib first');const k=Number(n);if(!Number.isInteger(k)||k<1||k>sukhmaniSalokStarts.length)return status('Enter a Salok from 1 to '+sukhmaniSalokStarts.length);show(sukhmaniSalokStarts[k-1]);$('salokPosition').textContent='Salok '+k+' / '+sukhmaniSalokStarts.length;const selected=$('lines').children[sukhmaniSalokStarts[k-1]];selected?.scrollIntoView({block:'center',behavior:'smooth'})}
+$('openSalok').onclick=()=>openSalokNumber($('salokNumber').value);
+$('salokNumber').onkeydown=e=>{if(e.key==='Enter')$('openSalok').click()};
+$('nextSalok').onclick=()=>openSalokNumber(activeSalokNumber()+1);
+$('prevSalok').onclick=()=>openSalokNumber(activeSalokNumber()-1);
+$('angInput').onkeydown=e=>{if(e.key==='Enter')$('angSearch').click()};
 function getAng(x){const v=x?.pageNo??x?.verse?.pageNo??x?.source?.pageNo??shabadAng;return Number.isInteger(Number(v))&&Number(v)>0?Number(v):null}
 function markAng(n){const el=$('controlAng');el.hidden=!n;el.textContent=n?'ਅੰਗ / Ang '+n:''}
 function unpackBaniLine(x){return x?.verse&&typeof x.verse==='object'?{...x.verse,...x,translation:x.verse.translation||x.translation,transliteration:x.verse.transliteration||x.transliteration}:x}
-function setReading(items,title,ang){if(!Array.isArray(items)||!items.length)throw Error('No verses returned');lines=items;active=-1;currentShabad=null;readingAng=ang||null;readingTitle=title;shabadAng=ang||null;$('results').hidden=true;renderLines();show(0,false);$('shabadCard').scrollIntoView({behavior:'smooth',block:'start'})}
+function setReading(items,title,ang){if(!Array.isArray(items)||!items.length)throw Error('No verses returned');lines=items;active=-1;currentShabad=null;readingAng=ang||null;readingTitle=title;shabadAng=ang||null;sukhmaniSalokStarts=title.startsWith('ਸੁਖਮਨੀ')?salokIndices(lines):[];$('results').hidden=true;renderReadingNavigator();renderLines();show(0,false);$('shabadCard').scrollIntoView({behavior:'smooth',block:'start'})}
 async function loadAng(value){const n=Number(value);if(!Number.isInteger(n)||n<1||n>1430)return status('Enter an Ang from 1 to 1430');const nonce=++searchNonce;status('Loading Ang '+n+'…');try{const d=await loadJson('https://api.banidb.com/v2/angs/'+n+'/G');if(nonce!==searchNonce)return;const arr=Array.isArray(d.page)?d.page:verses(d);setReading(arr,'ਅੰਗ / Ang '+n,n);$('angInput').value=n;put('gb-sehaj-ang',n);status('Ang '+n+' loaded · '+arr.length+' lines')}catch(e){status('Could not load Ang '+n+': '+e.message)}}
 // BaniDB reference routes. The source verses remain unmodified; no Gurbani is invented.
 const BANI_SOURCE={
@@ -280,8 +289,13 @@ async function loadCanonicalBani(k){
  try{
   const arr=await fetchCanonicalBani(k);
   if(nonce!==searchNonce)return;
-  setReading(arr,cfg.title,null);
-  status(cfg.title+' · '+arr.length+' verified lines')
+  let readingLines=arr;
+  if(k==='anand'){
+   try{const response=await fetch('data/anand-ending-salok.json');if(!response.ok)throw Error('Salok file is missing');const data=await response.json();if(!Array.isArray(data.verses)||data.verses.length!==7)throw Error('Salok verses invalid');if(!verse(data.verses[1]).startsWith('ਪਵਣੁ ਗੁਰੂ ਪਾਣੀ ਪਿਤਾ'))throw Error('Salok beginning mismatch');readingLines=[...arr,...data.verses]}catch(error){status('Anand Sahib loaded, but ending salok unavailable: '+error.message)}
+  }
+  if(nonce!==searchNonce)return;
+  setReading(readingLines,cfg.title,null);
+  status(cfg.title+' · '+readingLines.length+' lines loaded'+(k==='anand'?' including customary concluding salok':' · '+sukhmaniSalokStarts.length+' saloks'))
  }catch(e){status('Could not load '+cfg.title+': '+e.message)}
 }
 $('aapeSangat').onclick=async()=>{status('Loading ਸ਼ਬਦ…');try{const d=await loadJson('https://api.banidb.com/v2/angs/551/G');const line=(d.page||[]).find(x=>verse(x).includes('ਆਪੇ ਸੰਗਤਿ ਸਦਿ ਬਹਾਲ'));if(!line||!sid(line))throw Error('Shabad not found on Ang 551');await openShabad(line)}catch(e){status('Could not load ਸ਼ਬਦ: '+e.message)}};
@@ -292,7 +306,7 @@ async function openShabad(x,fromHistory=false){
  try{
   const d=await loadJson('https://api.banidb.com/v2/shabads/'+encodeURIComponent(n));
   if(nonce!==searchNonce)return;
-  const fetched=verses(d);lines=Array.isArray(fetched)?fetched:[];active=-1;readingAng=null;readingTitle='';shabadAng=d?.shabadInfo?.source?.pageNo??null;
+  const fetched=verses(d);lines=Array.isArray(fetched)?fetched:[];active=-1;readingAng=null;readingTitle='';sukhmaniSalokStarts=[];renderReadingNavigator();shabadAng=d?.shabadInfo?.source?.pageNo??null;
   const matchId=x?.verseId||x?.verseID||x?.verse?.verseId||x?.verse?.id;
   const match=lines.findIndex(v=>(matchId&&String(v.verseId||v.verseID||v.id)===String(matchId))||(verse(x)&&verse(v)===verse(x)));
   const existing=history.find(h=>String(h.id)===String(n));
@@ -326,7 +340,7 @@ function renderLines(){
 function show(i,mark=true){
  if(!lines[i])return;
  const scripts=selectedScripts(lines[i]);if(!Object.keys(scripts).length)return status('Enable an available Shabad script in ☰ Projection Lines');
- active=i;if(mark){lineVisits[visitKey(lines[i])]=Date.now();const keys=Object.keys(lineVisits);if(keys.length>1500)delete lineVisits[keys[0]];put('gb-line-visits',lineVisits)}
+ active=i;renderReadingNavigator();if(mark){lineVisits[visitKey(lines[i])]=Date.now();const keys=Object.keys(lineVisits);if(keys.length>1500)delete lineVisits[keys[0]];put('gb-line-visits',lineVisits)}
  if(currentShabad){currentShabad.lastIndex=i;saveHistory();renderHistory()}
  renderLines();
  const meanings=selectedMeanings(lines[i]);const ang=getAng(lines[i]);markAng(ang);
