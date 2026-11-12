@@ -54,6 +54,7 @@ function connection(c){
  c.on('open',()=>{hello(c);$('status').textContent='Waiting for pairing'});
  c.on('data',m=>{
   if(!m||typeof m!=='object')return;
+  if(m.type==='ping'){send(c,{type:'pong',id:m.id});return}
   if(m.type==='remove-pairing'&&owner&&m.token===owner){$('resetPairing').onclick();return}
   if(m.type==='auth'&&typeof m.token==='string'){
    if(owner&&owner!==m.token){send(c,{type:'rejected'});$('status').textContent='Paired to another controller — use Reset pairing to change';return}
