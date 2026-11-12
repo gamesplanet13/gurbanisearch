@@ -62,16 +62,18 @@ function send(conn,payload){if(conn?.open){try{conn.send(payload);return true}ca
 function announce(conn){send(conn,{type:'auth',token:myToken,code:myCode})}
 function setupConn(conn,key,codeValue){conn.on('open',()=>{announce(conn);$('connStatus').textContent='Online';renderDevices()});
 conn.on('data',m=>{if(!m||typeof m!=='object')return;
-if(m.type==='hello'){if(m.owner && m.owner!==myToken){status('Screen belongs to a different controller');conn.close();return}if(m.code){const existing=connections.get(m.deviceId||key);if(m.deviceId&&m.deviceId!==key){connections.delete(key);key=m.deviceId}known[key]={code:m.code,name:m.name||'Projection'};put('gb-known-devices',known);connections.set(key,conn);selected.add(key);put('gb-selected-devices',[...selected]);announce(conn);renderDevices();status('Projection connected')}}
+if(m.type==='hello'){if(m.owner && m.owner!==myToken){status('Screen is paired to another controller. On that screen choose Reset pairing.');conn.close();return}if(m.code){const existing=connections.get(m.deviceId||key);if(m.deviceId&&m.deviceId!==key){connections.delete(key);key=m.deviceId}known[key]={code:m.code,name:m.name||'Projection'};put('gb-known-devices',known);connections.set(key,conn);selected.add(key);put('gb-selected-devices',[...selected]);announce(conn);renderDevices();status('Projection connected')}}
 if(m.type==='accepted'){if(m.deviceId){if(m.deviceId!==key){connections.delete(key);key=m.deviceId}known[key]={code:m.code||codeValue,name:m.name||'Projection'};put('gb-known-devices',known);selected.add(key);put('gb-selected-devices',[...selected]);connections.set(key,conn)}renderDevices();status('Paired successfully')}
-if(m.type==='rejected'){status('Projection rejected pairing');conn.close()}
+if(m.type==='rejected'){status('Screen is paired to another controller. On that screen choose Reset pairing.');conn.close()}
 if(m.type==='identify'){known[key]={code:m.code||codeValue,name:m.name||'Projection'};put('gb-known-devices',known);renderDevices()}
 });
-conn.on('close',()=>{if(connections.get(key)===conn)connections.delete(key);renderDevices()});conn.on('error',e=>status('Connection: '+e.message));}
+conn.on('close',()=>{if(connections.get(key)===conn)connections.delete(key);renderDevices()});conn.on('error',e=>{if(connections.get(key)===conn)connections.delete(key);status('Connection failed: '+(e.message||'try again'));renderDevices()});}
 function connectProjection(key,codeValue){
  if(!peer||peer.destroyed||peer.disconnected||!peer.open){pendingPair={key,codeValue};$('connStatus').textContent='Offline — reconnecting';status('Waiting for internet connection; pairing will retry');return}
- const existing=connections.get(key);if(existing&&existing.open)return;
- const c=peer.connect(peerPrefix+codeValue,{reliable:true,metadata:{controller:myCode}});connections.set(key,c);setupConn(c,key,codeValue);renderDevices()
+ const existing=connections.get(key);if(existing&&existing.open)return;if(existing){connections.delete(key);try{existing.close()}catch(_){}}
+ status('Connecting to screen '+codeValue+'…');
+ const c=peer.connect(peerPrefix+codeValue,{reliable:true,metadata:{controller:myCode}});connections.set(key,c);setupConn(c,key,codeValue);renderDevices();
+ setTimeout(()=>{if(connections.get(key)===c&&!c.open){connections.delete(key);try{c.close()}catch(_){}renderDevices();status('Could not connect to '+codeValue+'. Check both devices are online and try again.')}},20000)
 }
 function start(){
  if(typeof GurbaniPeer==='undefined'){ $('connStatus').textContent='Connection library unavailable';return }
@@ -83,6 +85,7 @@ function start(){
  onTargetUnavailable:()=>status('Screen not found. Open Projection or Book app, wait for Online, then check its code.')});
 }
 $('pair').onclick=()=>{const c=$('pairCode').value.trim();if(!/^\d{5}$/.test(c))return status('Enter five digits');connectProjection(c,c)};
+setInterval(()=>{if(peer&&peer.open&&!peer.disconnected){for(const [key,d] of Object.entries(known))if(!connections.has(key))connectProjection(key,d.code)}},30000);
 function publish(payload){let sent=0;for(const id of selected){if(send(connections.get(id),{type:'project',token:myToken,...payload}))sent++}status(sent+' projection screen(s) updated');if(sent===0)status('No selected online projection. Reconnect or select a screen first.')}
 function settings(){return{verseSize:+$('vs').value,hindiVerseSize:+$('hsv').value,englishVerseSize:+$('esv').value,meaningSize:+$('enSize').value,englishSize:+$('enSize').value,punjabiSize:+$('paSize').value,hindiSize:+$('hiSize').value,clock:$('clock').checked}}
 let resizeDebounce;
