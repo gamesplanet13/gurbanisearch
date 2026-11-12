@@ -70,7 +70,7 @@ if(m.type==='identify'){known[key]={code:m.code||codeValue,name:m.name||'Project
 conn.on('close',()=>{if(connections.get(key)===conn)connections.delete(key);renderDevices()});conn.on('error',e=>status('Connection: '+e.message));}
 function connectProjection(key,codeValue){if(!peer||peer.disconnected)return status('PeerJS is offline');const c=peer.connect(peerPrefix+codeValue,{reliable:true,metadata:{controller:myCode}});connections.set(key,c);setupConn(c,key,codeValue);renderDevices()}
 function start(){if(typeof Peer==='undefined')return status('PeerJS did not load. Check internet.');peer=new Peer(controlPrefix+myCode);peer.on('open',()=>{$('connStatus').textContent='Online';Object.entries(known).forEach(([key,d])=>connectProjection(key,d.code))});
-peer.on('connection',c=>{c.on('open',()=>{send(c,{type:'hello-controller',code:myCode});setupConn(c,c.peer,c.metadata?.code||'')})});
+peer.on('connection',c=>{const peerCode=String(c.metadata?.code||c.peer.replace(peerPrefix,''));setupConn(c,peerCode,peerCode)});
 peer.on('error',e=>{if(e.type==='unavailable-id'){myCode=code();put('gb-controller-code',myCode);$('code').textContent=myCode;peer.destroy();start();return}$('connStatus').textContent='Offline';status('Peer: '+e.message)})}
 $('pair').onclick=()=>{const c=$('pairCode').value.trim();if(!/^\d{5}$/.test(c))return status('Enter five digits');connectProjection(c,c);$('pairCode').value=''};
 function publish(payload){let sent=0;for(const id of selected){if(send(connections.get(id),{type:'project',token:myToken,...payload}))sent++}status(sent+' projection screen(s) updated');if(sent===0)status('No selected online projection. Reconnect or select a screen first.')}
