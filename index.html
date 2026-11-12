@@ -313,7 +313,19 @@ async function loadJson(url){const r=await fetch(url);if(!r.ok)throw Error('Bani
 $('search').onclick=async()=>{const q=$('query').value.trim();if(!q)return;status('Searching…');$('results').hidden=false;$('results').replaceChildren();try{const d=await loadJson('https://api.banidb.com/v2/search/'+encodeURIComponent(q)+'?searchtype='+$('searchType').value+'&source=all&results=40');const arr=verses(d);for(const x of arr){const b=document.createElement('button');b.className='item';b.textContent=verse(x)||('Shabad '+sid(x));b.onclick=()=>openShabad(x);$('results').append(b)}status(arr.length+' matching results')}catch(e){status('Search unavailable: '+e.message+' (check browser API/CORS access)')}};
 $('query').onkeydown=e=>{if(e.key==='Enter')$('search').click()};
 $('keyboard').onchange=()=>{$('query').lang=$('keyboard').value;const m={en:'7',pa:'0',hi:'2'};$('searchType').value=m[$('keyboard').value];$('query').focus()};
-let readingAng=null,readingTitle='',shabadAng=null,sukhmaniSalokStarts=[];
+let readingAng=null,readingTitle='',shabadAng=null,sukhmaniSalokStarts=[],readingSourceInfo=null,shabadSourceInfo=null;
+function sourceLabelForLine(x,i,ang){
+ if(readingAng)return {name:'Sri Guru Granth Sahib Ji',ang:String(readingAng)};
+ const explicit=Number(x?.pageNo??x?.verse?.pageNo??x?.source?.pageNo);
+ if(readingTitle.startsWith('ਸੁਖਮਨੀ'))return {name:'Sri Guru Granth Sahib Ji',ang:explicit>=262&&explicit<=296?String(explicit):'262–296'};
+ if(readingTitle.startsWith('ਅਨੰਦ')){
+  const atEnd=i>=lines.length-7&&/ਪਵਣੁ ਗੁਰੂ ਪਾਣੀ ਪਿਤਾ/.test(lines.slice(-7).map(v=>verse(v)).join(' '));
+  return {name:'Sri Guru Granth Sahib Ji',ang:atEnd?'8':explicit>=917&&explicit<=922?String(explicit):'917–922',detail:atEnd?'Japji Sahib · concluding Salok':'Anand Sahib'}
+ }
+ if(shabadSourceInfo){return {name:shabadSourceInfo.name||'Gurbani source',ang:ang?String(ang):shabadSourceInfo.ang||''}}
+ if(ang&&shabadAng)return {name:'Sri Guru Granth Sahib Ji',ang:String(ang)};
+ return null
+}
 function salokIndices(items){return items.map((v,i)=>(/^\s*ਸਲੋਕੁ\s*[॥|]/.test(verse(v))?i:-1)).filter(i=>i>=0)}
 function activeSalokNumber(){if(!sukhmaniSalokStarts.length)return 0;let number=0;for(let i=0;i<sukhmaniSalokStarts.length;i++)if(sukhmaniSalokStarts[i]<=active)number=i+1;return number||1}
 function renderReadingNavigator(){const isSukhmani=readingTitle.startsWith('ਸੁਖਮਨੀ'),isAng=!!readingAng;$('readingNavigator').hidden=!(isSukhmani||isAng);$('sukhmaniNavigation').hidden=!isSukhmani;$('sehajNavigation').hidden=!isAng;$('readingKindLabel').textContent=isSukhmani?'Sukhmani Sahib · 24 Saloks':isAng?'Sehaj Path · Ang '+readingAng:'';if(isSukhmani){const n=activeSalokNumber();$('salokPosition').textContent=n?('Salok '+n+' / '+sukhmaniSalokStarts.length):'';$('salokNumber').value=n||1}if(isAng)$('angInput').value=readingAng}
@@ -326,7 +338,7 @@ $('angInput').onkeydown=e=>{if(e.key==='Enter')$('angSearch').click()};
 function getAng(x){const v=x?.pageNo??x?.verse?.pageNo??x?.source?.pageNo??shabadAng;return Number.isInteger(Number(v))&&Number(v)>0?Number(v):null}
 function markAng(n){const el=$('controlAng');el.hidden=!n;el.textContent=n?'ਅੰਗ / Ang '+n:''}
 function unpackBaniLine(x){return x?.verse&&typeof x.verse==='object'?{...x.verse,...x,translation:x.verse.translation||x.translation,transliteration:x.verse.transliteration||x.transliteration}:x}
-function setReading(items,title,ang){if(!Array.isArray(items)||!items.length)throw Error('No verses returned');lines=items;active=-1;currentShabad=null;readingAng=ang||null;readingTitle=title;shabadAng=ang||null;sukhmaniSalokStarts=title.startsWith('ਸੁਖਮਨੀ')?salokIndices(lines):[];$('results').hidden=true;renderReadingNavigator();renderLines();show(0,false);$('shabadCard').scrollIntoView({behavior:'smooth',block:'start'})}
+function setReading(items,title,ang){if(!Array.isArray(items)||!items.length)throw Error('No verses returned');lines=items;active=-1;currentShabad=null;readingAng=ang||null;readingTitle=title;shabadAng=ang||null;shabadSourceInfo=null;sukhmaniSalokStarts=title.startsWith('ਸੁਖਮਨੀ')?salokIndices(lines):[];$('results').hidden=true;renderReadingNavigator();renderLines();show(0,false);$('shabadCard').scrollIntoView({behavior:'smooth',block:'start'})}
 async function loadAng(value){const n=Number(value);if(!Number.isInteger(n)||n<1||n>1430)return status('Enter an Ang from 1 to 1430');const nonce=++searchNonce;status('Loading Ang '+n+'…');try{const d=await loadJson('https://api.banidb.com/v2/angs/'+n+'/G');if(nonce!==searchNonce)return;const arr=Array.isArray(d.page)?d.page:verses(d);setReading(arr,'ਅੰਗ / Ang '+n,n);$('angInput').value=n;put('gb-sehaj-ang',n);status('Ang '+n+' loaded · '+arr.length+' lines')}catch(e){status('Could not load Ang '+n+': '+e.message)}}
 // BaniDB reference routes. The source verses remain unmodified; no Gurbani is invented.
 const BANI_SOURCE={
@@ -418,6 +430,10 @@ async function openShabad(x,fromHistory=false){
   const d=await loadJson('https://api.banidb.com/v2/shabads/'+encodeURIComponent(n));
   if(nonce!==searchNonce)return;
   const fetched=verses(d);lines=Array.isArray(fetched)?fetched:[];active=-1;readingAng=null;readingTitle='';sukhmaniSalokStarts=[];renderReadingNavigator();shabadAng=d?.shabadInfo?.source?.pageNo??null;
+  const rawSource=d?.shabadInfo?.source||{};
+  const sourceId=String(rawSource.sourceId??rawSource.id??rawSource.source??'');
+  const rawName=rawSource.name?.english??rawSource.name??rawSource.englishName??rawSource.title??'';
+  shabadSourceInfo={name:typeof rawName==='string'&&rawName.trim()?rawName:sourceId==='G'?'Sri Guru Granth Sahib Ji':sourceId?'Source '+sourceId:'Source not specified',ang:Number(shabadAng)>0?String(shabadAng):''};
   const matchId=x?.verseId||x?.verseID||x?.verse?.verseId||x?.verse?.id;
   const match=lines.findIndex(v=>(matchId&&String(v.verseId||v.verseID||v.id)===String(matchId))||(verse(x)&&verse(v)===verse(x)));
   const existing=history.find(h=>String(h.id)===String(n));
@@ -456,7 +472,7 @@ function show(i,mark=true){
  renderLines();
  const meanings=selectedMeanings(lines[i]);const ang=getAng(lines[i]);markAng(ang);
  const obsData={sg:getScript(lines[i],'gurmukhi'),sh:getScript(lines[i],'hindi'),se:getScript(lines[i],'english'),mp:meaning(lines[i],'punjabi'),mh:meaning(lines[i],'hindi'),me:meaning(lines[i],'english')};
- lastContent={obsData,verse:scripts.gurmukhi||scripts.hindi||scripts.english||'',scripts,meanings,meaning:meanings.english||'',bookLines:lines.map(x=>verse(x)).filter(Boolean),activeIndex:i,ang,shabadTitle:currentShabad?.title||readingTitle||''};
+ lastContent={obsData,verse:scripts.gurmukhi||scripts.hindi||scripts.english||'',scripts,meanings,meaning:meanings.english||'',bookLines:lines.map(x=>verse(x)).filter(Boolean),activeIndex:i,ang,sourceMeta:sourceLabelForLine(lines[i],i,ang),shabadTitle:currentShabad?.title||readingTitle||''};
  put('gb-last-content',lastContent);publish({content:lastContent,settings:settings(),obsSettings:obsValues()})
 }
 $('next').onclick=()=>{if(readingAng&&active>=lines.length-1&&readingAng<1430)loadAng(readingAng+1);else show(active+1)};$('previous').onclick=()=>{if(readingAng&&active<=0&&readingAng>1)loadAng(readingAng-1);else show(active-1)};
