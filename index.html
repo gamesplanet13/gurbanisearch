@@ -168,54 +168,70 @@ function markAng(n){const el=$('controlAng');el.hidden=!n;el.textContent=n?'ਅ�
 function unpackBaniLine(x){return x?.verse&&typeof x.verse==='object'?{...x.verse,...x,translation:x.verse.translation||x.translation,transliteration:x.verse.transliteration||x.transliteration}:x}
 function setReading(items,title,ang){if(!Array.isArray(items)||!items.length)throw Error('No verses returned');lines=items;active=-1;currentShabad=null;readingAng=ang||null;readingTitle=title;shabadAng=ang||null;$('results').hidden=true;renderLines();show(0,false);$('shabadCard').scrollIntoView({behavior:'smooth',block:'start'})}
 async function loadAng(value){const n=Number(value);if(!Number.isInteger(n)||n<1||n>1430)return status('Enter an Ang from 1 to 1430');const nonce=++searchNonce;status('Loading Ang '+n+'…');try{const d=await loadJson('https://api.banidb.com/v2/angs/'+n+'/G');if(nonce!==searchNonce)return;const arr=Array.isArray(d.page)?d.page:verses(d);setReading(arr,'ਅੰਗ / Ang '+n,n);$('angInput').value=n;put('gb-sehaj-ang',n);status('Ang '+n+' loaded · '+arr.length+' lines')}catch(e){status('Could not load Ang '+n+': '+e.message)}}
-function endPauri(s,n){
- const digits=String(n).split('').map(d=>'੦੧੨੩੪੫੬੭੮੯'[Number(d)]).join('');
- return new RegExp('[॥|]+'+'\\s*(?:'+digits+'|'+n+')\\s*[॥|]+\\s*$').test(String(s||'').trim())
-}
+// BaniDB reference routes. The source verses remain unmodified; no Gurbani is invented.
 const BANI_SOURCE={
- anand:{title:'ਅਨੰਦ ਸਾਹਿਬ · 6 ਪਉੜੀਆਂ',angs:'917-922',source:'Sri Guru Granth Sahib Ji',selection:'pauris 1–5 and 40'},
- sukhmani:{title:'ਸੁਖਮਨੀ ਸਾਹਿਬ',angs:'262-296',source:'Sri Guru Granth Sahib Ji',selection:'full Sukhmani (24 ashtpadis)'}
+ anand:{title:'ਅਨੰਦ ਸਾਹਿਬ · 6 ਪਉੜੀਆਂ',baniId:10,angs:'917-922',source:'Sri Guru Granth Sahib Ji',selection:'pauris 1–5 and 40'},
+ sukhmani:{title:'ਸੁਖਮਨੀ ਸਾਹਿਬ',baniId:31,angs:'262-296',source:'Sri Guru Granth Sahib Ji',selection:'full Sukhmani (24 ashtpadis)'}
 };
-function baniCacheKey(k){return 'gb-bani-ang-cache-v2-'+k}
-async function fetchCanonicalBani(k){
- const cfg=BANI_SOURCE[k];
- const cached=stored(baniCacheKey(k),null);
- if(cached?.length>0)return cached;
- const d=await loadJson('https://api.banidb.com/v2/angs/'+cfg.angs+'/G');
- let arr=Array.isArray(d.page)?d.page:verses(d);
- if(!Array.isArray(arr)||arr.length<40)throw Error('Gurbani pages returned no usable lines');
- arr=arr.map(unpackBaniLine).filter(x=>verse(x));
- if(k==='anand'){
-  const begin=arr.findIndex(x=>/ਅਨੰਦੁ ਭਇਆ|ਅਨੰਦ ਭਇਆ/.test(verse(x)));
-  if(begin<0)throw Error('Anand Sahib start not found on Ang 917');
-  let firstEnd=-1,finalStart=-1,finalEnd=-1;
-  for(let i=begin;i<arr.length;i++){
-   if(firstEnd<0&&endPauri(verse(arr[i]),5))firstEnd=i;
-   if(firstEnd>=0&&endPauri(verse(arr[i]),39))finalStart=i+1;
-   if(finalStart>=0&&endPauri(verse(arr[i]),40)){finalEnd=i;break}
-  }
-  if(firstEnd<0||finalStart<firstEnd||finalEnd<finalStart)throw Error('Unable to confirm Anand Sahib first five and final 40th pauri; will not show unverified text');
-  const heading=arr.slice(Math.max(0,begin-2),begin);
-  arr=[...heading,...arr.slice(begin,firstEnd+1),...arr.slice(finalStart,finalEnd+1)];
- } else {
-  const start=arr.findIndex(x=>/ਗਉੜੀ ਸੁਖਮਨੀ|ਗਉੜੀ ਸੁਖਮਨੀ|ਗਉੜੀ ਸੁਖਮਨੀ|ਸੁਖਮਨੀ ਮਹਲਾ/.test(verse(x)));
-  if(start<0)throw Error('Sukhmani Sahib heading not found on Ang 262');
-  arr=arr.slice(start);
-  // Stop at the following composition if the source range includes it.
-  const end=arr.findIndex((x,i)=>i>100&&/ਗਉੜੀ ਮਹਲਾ.*ਥਿਤੀ|ਥਿਤੀ ਗਉੜੀ/.test(verse(x)));
-  if(end>0)arr=arr.slice(0,end);
+function baniCacheKey(k){return 'gb-bani-cache-v3-'+k}
+function endsPauri(s,n){
+ const digits=String(n).split('').map(d=>'੦੧੨੩੪੫੬੭੮੯'[Number(d)]).join('');
+ // The final Anand stanza ends ॥੪੦॥੧॥, so don't anchor to end of line.
+ return new RegExp('[॥|]+\\s*(?:'+digits+'|'+n+')\\s*[॥|]+').test(String(s||''))
+}
+function normalizeBaniResult(d){
+ const direct=Array.isArray(d)?d:Array.isArray(d?.page)?d.page:Array.isArray(d?.verses)?d.verses:Array.isArray(d?.data?.verses)?d.data.verses:verses(d);
+ return (Array.isArray(direct)?direct:[]).flatMap(x=>Array.isArray(x?.page)?x.page:[x]).map(unpackBaniLine).filter(x=>verse(x))
+}
+function trimAnandSix(arr){
+ const begin=arr.findIndex(x=>/ਅਨੰਦੁ?\s+ਭਇਆ/.test(verse(x)));
+ if(begin<0)throw Error('Anand Sahib first pauri not found');
+ let fifth=-1,fortiethStart=-1,fortieth=-1;
+ for(let i=begin;i<arr.length;i++){
+  const v=verse(arr[i]);
+  if(fifth<0&&endsPauri(v,5))fifth=i;
+  if(fifth>=0&&endsPauri(v,39))fortiethStart=i+1;
+  if(fortiethStart>fifth&&endsPauri(v,40)){fortieth=i;break}
  }
- try{put(baniCacheKey(k),arr)}catch(_){}
- return arr
+ if(fifth<0||fortiethStart<=fifth||fortieth<fortiethStart)throw Error('The first five and 40th pauri boundaries could not be verified');
+ // Retain the heading only when it belongs to the source's Anand composition.
+ const heading=arr.slice(Math.max(0,begin-2),begin).filter(x=>/ਰਾਮਕਲੀ|ਅਨੰਦੁ|ਮਹਲਾ/.test(verse(x)));
+ return [...heading,...arr.slice(begin,fifth+1),...arr.slice(fortiethStart,fortieth+1)]
+}
+function trimSukhmani(arr){
+ let begin=arr.findIndex(x=>/ਗਉੜੀ\s+ਸੁਖਮਨੀ|ਸੁਖਮਨੀ\s+ਮਹਲਾ/.test(verse(x)));
+ if(begin<0)begin=arr.findIndex(x=>/ਆਦਿ\s+ਗੁਰਏ\s+ਨਮਹ|ਆਦਿ\s+ਗੁਰਏ\s+ਨਮਃ/.test(verse(x)));
+ if(begin<0)throw Error('Sukhmani Sahib beginning was not found');
+ arr=arr.slice(begin);
+ const ending=arr.findIndex(x=>/॥\s*੮\s*॥\s*੨੪\s*॥|[|]\s*8\s*[|]\s*24\s*[|]/.test(verse(x)));
+ if(ending<0)throw Error('Sukhmani Sahib final Ashtpadi 24 could not be verified');
+ return arr.slice(0,ending+1)
+}
+async function fetchCanonicalBani(k){
+ const cached=stored(baniCacheKey(k),null);
+ if(Array.isArray(cached)&&cached.length>20)return cached;
+ const cfg=BANI_SOURCE[k];
+ let errors=[];
+ for(const url of ['https://api.banidb.com/v2/banis/'+cfg.baniId,'https://api.banidb.com/v2/angs/'+cfg.angs+'/G']){
+  try{
+   const d=await loadJson(url),arr=normalizeBaniResult(d);
+   if(arr.length<40)throw Error('insufficient verses');
+   const selected=k==='anand'?trimAnandSix(arr):trimSukhmani(arr);
+   if(selected.length<20)throw Error('verified verses incomplete');
+   try{put(baniCacheKey(k),selected)}catch(_){}
+   return selected
+  }catch(e){errors.push(e.message)}
+ }
+ throw Error(errors.join(' / '))
 }
 async function loadCanonicalBani(k){
- const nonce=++searchNonce, cfg=BANI_SOURCE[k];
- status('Loading '+cfg.title+' from Sri Guru Granth Sahib Ji (Ang '+cfg.angs+')…');
+ const nonce=++searchNonce,cfg=BANI_SOURCE[k];
+ status('Loading '+cfg.title+' from Sri Guru Granth Sahib Ji · Ang '+cfg.angs+'…');
  try{
   const arr=await fetchCanonicalBani(k);
   if(nonce!==searchNonce)return;
   setReading(arr,cfg.title,null);
-  status(cfg.title+' · '+arr.length+' lines loaded')
+  status(cfg.title+' · '+arr.length+' verified lines')
  }catch(e){status('Could not load '+cfg.title+': '+e.message)}
 }
 $('aapeSangat').onclick=async()=>{status('Loading ਸ਼ਬਦ…');try{const d=await loadJson('https://api.banidb.com/v2/angs/551/G');const line=(d.page||[]).find(x=>verse(x).includes('ਆਪੇ ਸੰਗਤਿ ਸਦਿ ਬਹਾਲ'));if(!line||!sid(line))throw Error('Shabad not found on Ang 551');await openShabad(line)}catch(e){status('Could not load ਸ਼ਬਦ: '+e.message)}};
