@@ -1,0 +1,32 @@
+plugins { id 'com.android.application' }
+android {
+    namespace 'in.gurbanisearch.app'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'in.gurbanisearch'
+        minSdk 23
+        targetSdk 28
+        versionCode 1
+        versionName '0.1.0'
+    }
+    flavorDimensions += 'role'
+    productFlavors {
+        controller {
+            dimension 'role'
+            applicationIdSuffix '.controller'
+            resValue 'string', 'app_name', 'Gurbani Controller'
+            buildConfigField 'String', 'START_PAGE', '"index.html"'
+        }
+        projection {
+            dimension 'role'
+            applicationIdSuffix '.projection'
+            resValue 'string', 'app_name', 'Gurbani Projection'
+            buildConfigField 'String', 'START_PAGE', '"projection.html"'
+        }
+    }
+    buildFeatures { buildConfig true }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
