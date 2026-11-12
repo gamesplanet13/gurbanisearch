@@ -61,6 +61,7 @@ public class MainActivity extends Activity {
     @Override public void onBackPressed() {
         if(web.canGoBack()) web.goBack();
         else if(BuildConfig.START_PAGE.equals("projection.html")) web.loadUrl(SITE+"projection.html");
+        else if(BuildConfig.START_PAGE.equals("book.html")) web.loadUrl(SITE+"book.html");
         else web.loadUrl(SITE+"index.html");
     }
     @Override protected void onDestroy() {
