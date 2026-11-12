@@ -9,12 +9,16 @@ import android.webkit.WebViewClient;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.PermissionRequest;
+import android.webkit.ValueCallback;
+import android.content.ClipData;
 import android.graphics.Color;
 import android.content.Intent;
 import android.net.Uri;
 
 public class MainActivity extends Activity {
     private WebView web;
+    private static final int FILE_PICKER_REQUEST=3804;
+    private ValueCallback<Uri[]> fileCallback;
     private Updater updater;
     private WifiDiscovery wifiDiscovery;
     private static final String SITE = "https://gamesplanet13.github.io/gurbanisearch/";
@@ -46,6 +50,22 @@ public class MainActivity extends Activity {
             }
         });
         web.setWebChromeClient(new WebChromeClient() {
+            @Override public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> callback, FileChooserParams params) {
+                if (fileCallback != null) { fileCallback.onReceiveValue(null); fileCallback = null; }
+                fileCallback = callback;
+                try {
+                    Intent choose = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                    choose.addCategory(Intent.CATEGORY_OPENABLE);
+                    choose.setType("image/*");
+                    choose.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                    startActivityForResult(choose, FILE_PICKER_REQUEST);
+                    return true;
+                } catch (Exception ex) {
+                    fileCallback.onReceiveValue(null);
+                    fileCallback = null;
+                    return true;
+                }
+            }
             @Override public void onPermissionRequest(PermissionRequest request){
                 request.deny();
             }
@@ -56,6 +76,24 @@ public class MainActivity extends Activity {
         web.loadUrl(SITE + BuildConfig.START_PAGE + "?app=20261116");
         updater = new Updater(this);
         updater.check();
+    }
+    @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != FILE_PICKER_REQUEST) return;
+        if (fileCallback == null) return;
+        Uri[] result = null;
+        if (resultCode == Activity.RESULT_OK && data != null) {
+            ClipData clip = data.getClipData();
+            if (clip != null && clip.getItemCount() > 0) {
+                int count = Math.min(clip.getItemCount(), 20);
+                result = new Uri[count];
+                for (int i=0; i<count; i++) result[i]=clip.getItemAt(i).getUri();
+            } else if (data.getData() != null) {
+                result = new Uri[]{data.getData()};
+            }
+        }
+        fileCallback.onReceiveValue(result);
+        fileCallback = null;
     }
     @Override public void onWindowFocusChanged(boolean focused) {
         super.onWindowFocusChanged(focused);
@@ -69,6 +107,7 @@ public class MainActivity extends Activity {
         else finish();
     }
     @Override protected void onDestroy() {
+        if(fileCallback != null) { fileCallback.onReceiveValue(null); fileCallback = null; }
         if(updater!=null) updater.close();
         if(wifiDiscovery!=null) wifiDiscovery.close();
         if(web!=null) web.removeJavascriptInterface("GurbaniWifi");
