@@ -78,10 +78,12 @@ function removeDevice(key){
 }
 function send(conn,payload){if(conn?.open){try{conn.send(payload);return true}catch{}}return false}
 function announce(conn){send(conn,{type:'auth',token:myToken,code:myCode})}
-function setupConn(conn,key,codeValue){conn.on('open',()=>{announce(conn);$('connStatus').textContent='Online';renderDevices()});
-conn.on('data',m=>{if(!m||typeof m!=='object')return;
+const health=new WeakMap();
+function setupConn(conn,key,codeValue){conn.on('open',()=>{health.set(conn,Date.now());announce(conn);$('connStatus').textContent='Online';renderDevices()});
+conn.on('data',m=>{if(!m||typeof m!=='object')return;health.set(conn,Date.now());if(m.type==='pong'){return}
 if(m.type==='hello'){if(m.owner && m.owner!==myToken){status('Screen is paired to another controller. On that screen choose Reset pairing.');conn.close();return}if(m.code){const existing=connections.get(m.deviceId||key);if(m.deviceId&&m.deviceId!==key){connections.delete(key);key=m.deviceId}known[key]={code:m.code,name:m.name||'Projection',kind:m.kind||'projection'};put('gb-known-devices',known);connections.set(key,conn);selected.add(key);put('gb-selected-devices',[...selected]);announce(conn);renderDevices();status('Projection connected')}}
 if(m.type==='accepted'&&m.kind==='obs')send(conn,{type:'project',token:myToken,obsSettings:obsValues(),...(lastContent?{content:lastContent}:{})});
+if(m.type==='accepted'&&m.kind!=='obs'&&lastContent)send(conn,{type:'project',token:myToken,content:lastContent,settings:settings(),obsSettings:obsValues()});
 if(m.type==='accepted'){if(m.deviceId){if(m.deviceId!==key){connections.delete(key);key=m.deviceId}known[key]={code:m.code||codeValue,name:m.name||'Projection',kind:m.kind||known[key]?.kind||'projection'};put('gb-known-devices',known);selected.add(key);put('gb-selected-devices',[...selected]);connections.set(key,conn)}renderDevices();status('Paired successfully')}
 if((m.type==='hello'||m.type==='accepted')&&m.kind==='book'&&m.bookSettings){if(bookPending&&m.type==='accepted'){send(conn,{type:'project',token:myToken,bookSettings:bookValues()});bookPending=false;put('gb-control-book-pending',false)}else if(!bookPending){adoptBookSettings(m.bookSettings)}}
 if(m.type==='book-settings')adoptBookSettings(m);
@@ -128,8 +130,9 @@ window.gbWifiFinished=(error)=>{if(error){$('wifiStatus').textContent=error;retu
 $('searchWifi').onclick=()=>{wifiDevices.clear();renderWifiDevices();if(!window.GurbaniWifi||typeof window.GurbaniWifi.search!=='function'){$('wifiStatus').textContent='Install the updated Gurbani Controller Android app for Wi-Fi search. You can still enter a code.';return}$('wifiStatus').textContent='Searching the same Wi-Fi…';try{window.GurbaniWifi.search()}catch(e){$('wifiStatus').textContent='Wi-Fi search unavailable. Use the code.'}};
 $('pair').onclick=()=>{const c=$('pairCode').value.trim();if(!/^\d{5}$/.test(c))return status('Enter five digits');connectProjection(c,c)};
 function reconnectSaved(){if(peer&&peer.open&&!peer.disconnected){for(const [key,d] of Object.entries(known))if(autoReconnect[key]!==false&&!connections.has(key))connectProjection(key,d.code)}}
+setInterval(()=>{for(const [key,c] of connections){if(!c?.open){if(c&&!c.open){connections.delete(key)}continue}const last=health.get(c)||Date.now();if(Date.now()-last>36000){connections.delete(key);try{c.close()}catch(_){}status('Reconnecting unresponsive display '+key);continue}send(c,{type:'ping',id:Date.now(),token:myToken})}renderDevices()},12000);
 setInterval(reconnectSaved,10000);
-window.addEventListener('online',reconnectSaved);
+window.addEventListener('online',reconnectSaved);window.addEventListener('focus',reconnectSaved);window.addEventListener('pageshow',reconnectSaved);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)reconnectSaved()});
 $('changeControllerCode').onclick=()=>{const v=$('newControllerCode').value.trim();if(!/^\d{5}$/.test(v))return status('Enter a valid 5-digit controller code');if(v===myCode)return status('This is already your controller code');put('gb-controller-code',v);location.reload()};
 function publish(payload,projectionOnly=false){let sent=0;for(const id of selected){if(projectionOnly&&['book','obs'].includes(known[id]?.kind))continue;if(send(connections.get(id),{type:'project',token:myToken,...payload}))sent++}status(sent+' projection screen(s) updated');if(sent===0)status('No selected online projection. Reconnect or select a screen first.');return sent}
