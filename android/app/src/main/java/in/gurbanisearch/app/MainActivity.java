@@ -50,7 +50,7 @@ public class MainActivity extends Activity {
             }
         });
         setContentView(web);
-        web.loadUrl(SITE + BuildConfig.START_PAGE + "?app=20261114");
+        web.loadUrl(SITE + BuildConfig.START_PAGE + "?app=20261115");
         updater = new Updater(this);
         updater.check();
     }
