@@ -211,6 +211,16 @@ function trimSukhmani(arr){
  return arr.slice(0,ending+1)
 }
 async function fetchCanonicalBani(k){
+ const localFile=k==='anand'?'data/banis/anand-six.json':'data/banis/sukhmani-sahib.json';
+ try{
+  const response=await fetch(localFile,{cache:'default'});
+  if(!response.ok)throw Error('Local Gurbani file unavailable');
+  const local=await response.json(),arr=local.lines;
+  if(!Array.isArray(arr)||arr.length<(k==='anand'?30:1900))throw Error('Local Gurbani file incomplete');
+  if(k==='anand'&&!endsPauri(verse(arr.at(-1)),40))throw Error('Anand Sahib final pauri could not be verified');
+  if(k==='sukhmani'&&!endsPauri(verse(arr.at(-1)),24))throw Error('Sukhmani Sahib final Ashtpadi could not be verified');
+  return arr
+ }catch(e){console.warn('Using online BaniDB fallback',e.message)}
  const cached=stored(baniCacheKey(k),null);
  if(Array.isArray(cached)&&cached.length>20)return cached;
  const cfg=BANI_SOURCE[k];
