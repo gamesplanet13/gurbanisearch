@@ -6,8 +6,8 @@ android {
         applicationId 'in.gurbanisearch'
         minSdk 23
         targetSdk 28
-        versionCode 20261113
-        versionName '2026.11.12.2'
+        versionCode 20261114
+        versionName '2026.11.12.3'
     }
     flavorDimensions += 'role'
     productFlavors {

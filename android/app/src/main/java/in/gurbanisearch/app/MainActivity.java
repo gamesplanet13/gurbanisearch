@@ -50,7 +50,7 @@ public class MainActivity extends Activity {
             }
         });
         setContentView(web);
-        web.loadUrl(SITE + BuildConfig.START_PAGE);
+        web.loadUrl(SITE + BuildConfig.START_PAGE + "?app=20261114");
         updater = new Updater(this);
         updater.check();
     }
@@ -62,10 +62,8 @@ public class MainActivity extends Activity {
             View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
     }
     @Override public void onBackPressed() {
-        if(web.canGoBack()) web.goBack();
-        else if(BuildConfig.START_PAGE.equals("projection.html")) web.loadUrl(SITE+"projection.html");
-        else if(BuildConfig.START_PAGE.equals("book.html")) web.loadUrl(SITE+"book.html");
-        else web.loadUrl(SITE+"index.html");
+        if(web != null && web.canGoBack()) web.goBack();
+        else finish();
     }
     @Override protected void onDestroy() {
         if(updater!=null) updater.close();
