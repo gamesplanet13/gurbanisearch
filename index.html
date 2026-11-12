@@ -1,10 +1,10 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gurbani Control</title><style>
-*{box-sizing:border-box}body{margin:0;background:#0b101a;color:#eef5ff;font:15px system-ui,sans-serif}header{padding:16px;background:#182438;display:flex;justify-content:space-between;align-items:center;gap:10px}h1{font-size:21px;margin:0}main{max-width:1150px;margin:20px auto;padding:0 12px;display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{border:1px solid #36455e;background:#172232;padding:18px;border-radius:15px;margin-bottom:14px}h2{margin:0 0 12px;font-size:18px}input,select,button{font:inherit;color:#fff;background:#101b2d;border:1px solid #53627c;border-radius:9px;padding:11px}button{cursor:pointer;background:#28486b}button.primary{background:#1669ae}.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0}.grow{flex:1;min-width:110px}.muted{color:#b0bfd3;font-size:13px}.code{font-size:31px;letter-spacing:5px;color:#f7d48a;font-weight:bold}.list{max-height:50vh;overflow:auto}.item{display:block;text-align:left;width:100%;line-height:1.55;margin:7px 0;white-space:normal}.item.active{background:#575025;border-color:#e0bd68}.device{display:flex;align-items:center;gap:8px;background:#253347;border-radius:8px;margin:7px 0;padding:10px}.device label{flex:1}.devstatus{font-size:12px;color:#89d5af}.verse{font-size:20px}.small{font-size:12px;color:#aebed4}a{color:#a7d2ff}label.field{display:block;margin:8px 0}input[type=range]{width:100%}input[type=checkbox]{accent-color:#dab66b}@media(max-width:850px){main{grid-template-columns:1fr}}#searchColumn{display:flex;flex-direction:column}#searchCard{order:0}#connectCard{order:1}#results[hidden]{display:none}#shabadCard label{font-size:12px}
-</style></head><body><header><h1>ੴ Gurbani Searcher · Control</h1><a href="projection.html" target="_blank">Projection Browser</a></header><main><div id='searchColumn'>
+*{box-sizing:border-box}body{margin:0;background:#0b101a;color:#eef5ff;font:15px system-ui,sans-serif}header{padding:16px;background:#182438;display:flex;justify-content:space-between;align-items:center;gap:10px}h1{font-size:21px;margin:0}main{max-width:1150px;margin:20px auto;padding:0 12px;display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{border:1px solid #36455e;background:#172232;padding:18px;border-radius:15px;margin-bottom:14px}h2{margin:0 0 12px;font-size:18px}input,select,button{font:inherit;color:#fff;background:#101b2d;border:1px solid #53627c;border-radius:9px;padding:11px}button{cursor:pointer;background:#28486b}button.primary{background:#1669ae}.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0}.grow{flex:1;min-width:110px}.muted{color:#b0bfd3;font-size:13px}.code{font-size:31px;letter-spacing:5px;color:#f7d48a;font-weight:bold}.list{max-height:50vh;overflow:auto}.item{display:block;text-align:left;width:100%;line-height:1.55;margin:7px 0;white-space:normal}.item.active{background:#575025;border-color:#e0bd68}.device{display:flex;align-items:center;gap:8px;background:#253347;border-radius:8px;margin:7px 0;padding:10px}.device label{flex:1}.devstatus{font-size:12px;color:#89d5af}.verse{font-size:20px}.small{font-size:12px;color:#aebed4}a{color:#a7d2ff}label.field{display:block;margin:8px 0}input[type=range]{width:100%}input[type=checkbox]{accent-color:#dab66b}@media(max-width:850px){main{grid-template-columns:1fr}}#searchColumn{display:flex;flex-direction:column}#searchCard{order:0}#connectCard{order:1}#historyCard{order:2}#results[hidden]{display:none}#shabadCard label{font-size:12px}
+header{position:sticky;top:0;z-index:8}#menuButton{min-width:45px;font-size:23px;padding:7px 12px}#functionsMenu{position:fixed;right:12px;top:63px;z-index:20;max-width:min(94vw,400px);max-height:80vh;overflow-y:auto;background:#18263b;border:1px solid #6d7a96;border-radius:16px;padding:16px;box-shadow:0 15px 70px #000b}#functionsMenu[hidden]{display:none}#functionsMenu label{display:block;padding:6px 0}#menuOptions h2{font-size:16px;margin:9px 0}#connectCard,#fontCard{display:none}#functionsMenu #connectCard,#functionsMenu #fontCard{display:block;padding:10px;margin:8px 0}#functionsMenu .card{box-shadow:none}.historyItem{display:block;width:100%;text-align:left;margin:6px 0;background:#273750}.markMain{float:right;padding:4px 8px;margin-left:6px;background:#344864}.mainNote{color:#f3cc75;font-size:12px}#lines .item{overflow:auto}</style></head><body><header><h1>ੴ Gurbani Searcher · Control</h1><button id="menuButton" aria-label="Open functions" aria-expanded="false">☰</button></header><main><div id="searchColumn">
 <section class="card" id="connectCard"><h2>Connected Projections</h2><div class="row"><div class="grow"><span class="muted">Your controller code</span><div id="code" class="code">•••••</div></div><span id="connStatus" class="muted">Connecting…</span></div><div class="row"><input id="pairCode" placeholder="Projection 5-digit code" inputmode="numeric" maxlength="5" class="grow"><button id="pair" class="primary">Connect</button></div><p class="small">You can also type your controller code into the Projection browser. Select displays below before projecting.</p><div id="devices"></div></section>
-<section class="card" id="searchCard"><h2>Search Gurbani</h2><div class="row"><select id="keyboard"><option value="en">English keyboard</option><option value="pa">Gurmukhi keyboard</option><option value="hi">Hindi keyboard</option></select><select id="searchType"><option value="7">First letters (English)</option><option value="0">First letters (Gurmukhi)</option><option value="2">Full word (Gurmukhi)</option><option value="4">Romanized word</option></select></div><div class="row"><input id="query" class="grow" placeholder="Type first letters (e.g. ddss)"><button id="search" class="primary">Search</button></div><div id="results" class="list" hidden></div><p class="small">Results from the BaniDB public API. Internet required for Gurbani search.</p></section></div>
-<div><section class="card" id="shabadCard"><h2>Shabad · Choose a Line</h2><div class="row"><select id="script"><option value="gurmukhi">Gurmukhi</option><option value="hindi">Hindi transliteration</option></select><label><input type="checkbox" id="enCheck" checked> English meaning</label><label><input type="checkbox" id="paCheck"> Punjabi meaning</label><label><input type="checkbox" id="hiCheck"> Hindi meaning</label></div><div id="lines" class="list"></div><div class="row"><button id="previous">Previous</button><button id="next">Next</button><button id="clear">Clear projection</button></div></section>
-<section class="card"><h2>Projection Settings</h2><label class="field">Gurbani size <span id="vsLabel">64</span> px<input type="range" id="vs" min="24" max="150" value="64"></label><label class="field">English meaning size <span id="enLabel">28</span> px<input type="range" id="enSize" min="16" max="90" value="28"></label><label class="field">Punjabi meaning size <span id="paLabel">28</span> px<input type="range" id="paSize" min="16" max="90" value="28"></label><label class="field">Hindi meaning size <span id="hiLabel">28</span> px<input type="range" id="hiSize" min="16" max="90" value="28"></label><label><input id="clock" type="checkbox"> Show clock (top left)</label><p class="small">Font size changes live. No Apply needed.</p><p id="status" class="muted">Ready.</p><p class="small">Last projected line remains on the display when controller disconnects. Reconnection needs the Projection tab to remain open and online.</p></section></div></main>
+<section class="card" id="searchCard"><h2>Search Gurbani</h2><div class="row"><select id="keyboard"><option value="en">English keyboard</option><option value="pa">Gurmukhi keyboard</option><option value="hi">Hindi keyboard</option></select><select id="searchType"><option value="7">First letters (English)</option><option value="0">First letters (Gurmukhi)</option><option value="2">Full word (Gurmukhi)</option><option value="4">Romanized word</option></select></div><div class="row"><input id="query" class="grow" placeholder="Type first letters (e.g. ddss)"><button id="search" class="primary">Search</button><button id="waheguru" style="background:linear-gradient(120deg,#ff9d59,#a75dff,#24c6ad);font-weight:750" aria-label="Project animated Waheguru">ਵਾਹਿਗੁਰੂ ✨</button></div><div id="results" class="list" hidden></div><p class="small">Results from the BaniDB public API. Internet required for Gurbani search.</p></section><section class="card" id="historyCard"><h2>Recent Shabads · History</h2><div id="historyList"></div></section></div>
+<div><section class="card" id="shabadCard"><h2>Shabad · Choose a Line</h2><div class="row"><button id="mainLine" class="primary">Go to Main Line</button><span id="mainLabel" class="small">Main: —</span></div><p class="small">Tap any line to project; use ☆ to set that line as Main.</p><div id="lines" class="list"></div><div class="row"><button id="previous">Previous</button><button id="next">Next</button><button id="clear">Clear projection</button></div></section>
+<section class="card" id="fontCard"><h2>Projection Font Size</h2><label class="field">Gurbani size <span id="vsLabel">64</span> px<input type="range" id="vs" min="24" max="150" value="64"></label><label class="field">English meaning size <span id="enLabel">28</span> px<input type="range" id="enSize" min="16" max="90" value="28"></label><label class="field">Punjabi meaning size <span id="paLabel">28</span> px<input type="range" id="paSize" min="16" max="90" value="28"></label><label class="field">Hindi meaning size <span id="hiLabel">28</span> px<input type="range" id="hiSize" min="16" max="90" value="28"></label><label><input id="clock" type="checkbox"> Show clock (top left)</label><p class="small">Font size changes live. No Apply needed.</p><p id="status" class="muted">Ready.</p><p class="small">Last projected line remains on the display when controller disconnects. Reconnection needs the Projection tab to remain open and online.</p></section></div></main><aside id="functionsMenu" hidden><div class="row" style="justify-content:space-between"><strong>Functions</strong><button id="closeMenu">✕</button></div><div id="menuOptions"><h2>Projection Lines</h2><p class="small">Gurbani Shabad</p><label><input type="checkbox" id="gurmukhiCheck" checked> Gurmukhi</label><label><input type="checkbox" id="hindiShabadCheck"> Hindi</label><label><input type="checkbox" id="englishShabadCheck"> English</label><p class="small">Gurbani Arth</p><label><input type="checkbox" id="paCheck" checked> Punjabi</label><label><input type="checkbox" id="hiCheck"> Hindi</label><label><input type="checkbox" id="enCheck"> English</label><hr><a href="projection.html" target="_blank">Open Projection Browser</a></div></aside>
 <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script><script>
 'use strict';
 const $=id=>document.getElementById(id);
@@ -20,7 +20,8 @@ const extract=v=>typeof v==='string'?v:(v?.unicode||v?.gurmukhi||v?.text||v?.tra
 const verses=obj=>Array.isArray(obj)?obj:obj?.verses||obj?.shabads||obj?.results||obj?.data?.results||obj?.data?.verses||obj?.shabad?.verses||obj?.data||[];
 function verse(x){return extract(x?.verse)||extract(x?.gurmukhi)||extract(x?.line)||extract(x?.unicode)||extract(x?.text)||''}
 function sid(x){return x?.shabadId||x?.shabadID||x?.shabad_id||x?.shabad?.id||x?.shabad?.shabadId||x?.id}
-function getText(x){if($('script').value==='gurmukhi')return verse(x);const t=x?.transliteration||x?.transliterations||{};return extract(t?.hindi||t?.devanagari||t?.hi)||''}
+function getScript(x,lang){if(lang==='gurmukhi')return verse(x);const t=x?.transliteration||x?.transliterations||{};if(lang==='hindi')return extract(t?.hindi||t?.devanagari||t?.hi)||'';return extract(t?.english||t?.roman||t?.en||t?.romanized)||''}
+function getText(x){return getScript(x,'gurmukhi')||getScript(x,'hindi')||getScript(x,'english')}
 function asMeaning(v){
  if(typeof v==='string')return v;
  if(!v||typeof v!=='object')return '';
@@ -43,13 +44,19 @@ function meaning(x,lang){
  }
  return ''
 }
-function selectedMeanings(x){
- const result={};
- for(const [lang,id] of [['english','enCheck'],['punjabi','paCheck'],['hindi','hiCheck']]){
-  if($(id).checked){const m=meaning(x,lang);if(m)result[lang]=m}
- }
- return result
+function selectedMeanings(x){const result={};for(const [lang,id] of [['english','enCheck'],['punjabi','paCheck'],['hindi','hiCheck']]){if($(id).checked){const m=meaning(x,lang);if(m)result[lang]=m}}return result}
+function selectedScripts(x){const result={};for(const [lang,id] of [['gurmukhi','gurmukhiCheck'],['hindi','hindiShabadCheck'],['english','englishShabadCheck']]){if($(id).checked){const value=getScript(x,lang);if(value)result[lang]=value}}return result}
+let history=stored('gb-history-v1',[]),currentShabad=null,searchNonce=0;
+function saveHistory(){put('gb-history-v1',history.slice(0,35))}
+function renderHistory(){
+ const box=$('historyList');box.replaceChildren();
+ if(!history.length){box.textContent='No searched shabads yet.';return}
+ for(const h of history){const btn=document.createElement('button');btn.className='historyItem';btn.textContent=(h.title||'Shabad')+' · Line '+((h.lastIndex??h.mainIndex??0)+1);btn.onclick=()=>openShabad({shabadId:h.id,verseId:h.matchId},true);box.append(btn)}
 }
+function menu(show){$('functionsMenu').hidden=!show;$('menuButton').setAttribute('aria-expanded',String(show))}
+$('menuButton').onclick=()=>menu($('functionsMenu').hidden);$('closeMenu').onclick=()=>menu(false);
+$('functionsMenu').append($('connectCard'),$('fontCard'));
+document.addEventListener('pointerdown',e=>{if(!e.target.closest('#functionsMenu,#menuButton'))menu(false)});
 function renderDevices(){const box=$('devices');box.replaceChildren();const entries=Object.entries(known);if(!entries.length)box.textContent='No saved projection screens';for(const [key,info] of entries){const line=document.createElement('div');line.className='device';const cb=document.createElement('input');cb.type='checkbox';cb.checked=selected.has(key);cb.onchange=()=>{cb.checked?selected.add(key):selected.delete(key);put('gb-selected-devices',[...selected])};const label=document.createElement('label');label.textContent=(info.name||'Projection')+' · '+info.code;const st=document.createElement('span');st.className='devstatus';st.textContent=connections.get(key)?.open?'Online':'Offline';const b=document.createElement('button');b.textContent='Reconnect';b.onclick=()=>connectProjection(key,info.code);line.append(cb,label,st,b);box.append(line)}}
 function send(conn,payload){if(conn?.open){try{conn.send(payload);return true}catch{}}return false}
 function announce(conn){send(conn,{type:'auth',token:myToken,code:myCode})}
@@ -79,41 +86,56 @@ async function loadJson(url){const r=await fetch(url);if(!r.ok)throw Error('Bani
 $('search').onclick=async()=>{const q=$('query').value.trim();if(!q)return;status('Searching…');$('results').hidden=false;$('results').replaceChildren();try{const d=await loadJson('https://api.banidb.com/v2/search/'+encodeURIComponent(q)+'?searchtype='+$('searchType').value+'&source=all&results=40');const arr=verses(d);for(const x of arr){const b=document.createElement('button');b.className='item';b.textContent=verse(x)||('Shabad '+sid(x));b.onclick=()=>openShabad(x);$('results').append(b)}status(arr.length+' matching results')}catch(e){status('Search unavailable: '+e.message+' (check browser API/CORS access)')}};
 $('query').onkeydown=e=>{if(e.key==='Enter')$('search').click()};
 $('keyboard').onchange=()=>{$('query').lang=$('keyboard').value;const m={en:'7',pa:'0',hi:'2'};$('searchType').value=m[$('keyboard').value];$('query').focus()};
-async function openShabad(x){
+async function openShabad(x,fromHistory=false){
  const n=sid(x);if(!n)return status('No shabad ID available');
+ const nonce=++searchNonce;
  try{
   const d=await loadJson('https://api.banidb.com/v2/shabads/'+encodeURIComponent(n));
-  lines=verses(d);active=-1;
+  if(nonce!==searchNonce)return;
+  const fetched=verses(d);lines=Array.isArray(fetched)?fetched:[];active=-1;
   const matchId=x?.verseId||x?.verseID||x?.verse?.verseId||x?.verse?.id;
   const match=lines.findIndex(v=>(matchId&&String(v.verseId||v.verseID||v.id)===String(matchId))||(verse(x)&&verse(v)===verse(x)));
+  const existing=history.find(h=>String(h.id)===String(n));
+  const main=existing?.mainIndex??(match>=0?match:0);
+  currentShabad={id:n,title:verse(x)||existing?.title||verse(lines[0])||'Shabad',mainIndex:main,lastIndex:existing?.lastIndex??main,matchId:matchId||existing?.matchId||null};
+  history=[currentShabad,...history.filter(h=>String(h.id)!==String(n))].slice(0,35);
+  saveHistory();renderHistory();
   $('results').hidden=true;$('results').replaceChildren();
   renderLines();status(lines.length+' lines loaded');
-  if(lines.length)show(match>=0?match:0);
-  $('shabadCard').scrollIntoView({behavior:'smooth',block:'start'})
+  const index=fromHistory?currentShabad.lastIndex:(match>=0?match:currentShabad.mainIndex);
+  if(lines.length)show(Math.max(0,Math.min(lines.length-1,index)));
+  $('shabadCard').scrollIntoView({behavior:'smooth',block:'start'});
  }catch(e){status('Could not load shabad: '+e.message)}
 }
+function setMain(i){if(!currentShabad||!lines[i])return;currentShabad.mainIndex=i;saveHistory();renderHistory();renderLines();status('Main Line set to '+(i+1))}
 function renderLines(){
  const box=$('lines');box.replaceChildren();
+ $('mainLabel').textContent=currentShabad?'Main: Line '+(currentShabad.mainIndex+1):'Main: —';
  lines.forEach((x,i)=>{
-  const b=document.createElement('button');b.className='item'+(i===active?' active':'');
-  const v=document.createElement('div');v.className='verse';v.textContent=getText(x)||'Script not available';b.append(v);
-  const meanings=selectedMeanings(x);
-  for(const [lang,value] of Object.entries(meanings)){
-   const m=document.createElement('div');m.className='small';m.textContent=lang.toUpperCase()+': '+value;b.append(m)
-  }
-  b.onclick=()=>show(i);box.append(b)
+  const row=document.createElement('div');row.className='item'+(i===active?' active':'');row.style.display='flow-root';
+  const b=document.createElement('button');b.style.border='none';b.style.background='transparent';b.style.textAlign='left';b.style.width='calc(100% - 50px)';b.style.padding='4px';b.style.float='left';
+  const v=document.createElement('div');v.className='verse';v.textContent=getText(x)||'Script unavailable';b.append(v);
+  for(const [lang,value] of Object.entries(selectedMeanings(x))){const m=document.createElement('div');m.className='small';m.textContent=lang.toUpperCase()+': '+value;b.append(m)}
+  if(i===currentShabad?.mainIndex){const note=document.createElement('span');note.className='mainNote';note.textContent=' ★ MAIN';b.append(note)}
+  b.onclick=()=>show(i);
+  const star=document.createElement('button');star.className='markMain';star.textContent=i===currentShabad?.mainIndex?'★':'☆';star.title='Set Main Line';star.setAttribute('aria-label','Set line '+(i+1)+' as main');star.onclick=()=>setMain(i);
+  row.append(b,star);box.append(row)
  })
 }
 function show(i){
  if(!lines[i])return;
- const v=getText(lines[i]);if(!v)return status('That script is not available for this line');
- active=i;renderLines();
+ const scripts=selectedScripts(lines[i]);if(!Object.keys(scripts).length)return status('Enable an available Shabad script in ☰ Projection Lines');
+ active=i;
+ if(currentShabad){currentShabad.lastIndex=i;saveHistory();renderHistory()}
+ renderLines();
  const meanings=selectedMeanings(lines[i]);
- lastContent={verse:v,meanings,meaning:meanings.english||''};
+ lastContent={verse:scripts.gurmukhi||scripts.hindi||scripts.english||'',scripts,meanings,meaning:meanings.english||''};
  put('gb-last-content',lastContent);publish({content:lastContent,settings:settings()})
 }
 $('next').onclick=()=>show(active+1);$('previous').onclick=()=>show(active-1);
-$('script').onchange=()=>{renderLines();if(active>=0)show(active)};
-for(const id of ['enCheck','paCheck','hiCheck'])$(id).onchange=()=>{renderLines();if(active>=0)show(active)};
+$('mainLine').onclick=()=>{if(currentShabad)show(currentShabad.mainIndex)};
+for(const id of ['gurmukhiCheck','hindiShabadCheck','englishShabadCheck','enCheck','paCheck','hiCheck'])$(id).onchange=()=>{renderLines();if(active>=0)show(active)};
+$('waheguru').onclick=()=>{publish({content:{mode:'waheguru',verse:'ਵਾਹਿਗੁਰੂ',scripts:{gurmukhi:'ਵਾਹਿਗੁਰੂ',hindi:'वाहेगुरु',english:'Waheguru'},meanings:{}},settings:settings()});status('Animated Waheguru sent to selected displays')};
+renderHistory();
 renderDevices();start();
 </script></body></html>
