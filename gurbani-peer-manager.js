@@ -1,9 +1,33 @@
 /* Connection lifecycle shared by controller, projection and book view. */
 (function () {
   'use strict';
+  // Open Relay publishes this static-auth secret for its free TURN service.
+  // TURN credentials expire; WebRTC data remain end-to-end encrypted.
+  async function iceConfig() {
+    const iceServers = [
+      {urls: 'stun:stun.l.google.com:19302'},
+      {urls: 'stun:stun.cloudflare.com:3478'}
+    ];
+    try {
+      if (!window.crypto || !window.crypto.subtle) return {iceServers};
+      const username = String(Math.floor(Date.now() / 1000) + 86400) + ':gurbanisearch';
+      const enc = new TextEncoder();
+      const key = await window.crypto.subtle.importKey('raw', enc.encode('openrelayprojectsecret'), {name:'HMAC', hash:'SHA-1'}, false, ['sign']);
+      const bytes = new Uint8Array(await window.crypto.subtle.sign('HMAC', key, enc.encode(username)));
+      let raw = ''; for (const byte of bytes) raw += String.fromCharCode(byte);
+      const credential = btoa(raw);
+      iceServers.push({urls:[
+        'turn:staticauth.openrelay.metered.ca:80?transport=udp',
+        'turn:staticauth.openrelay.metered.ca:80?transport=tcp',
+        'turn:staticauth.openrelay.metered.ca:443?transport=tcp',
+        'turns:staticauth.openrelay.metered.ca:443?transport=tcp'
+      ], username, credential});
+    } catch (_) {} // Retain ordinary STUN connections if secure crypto is unavailable.
+    return {iceServers};
+  }
   window.GurbaniPeer = {
     start: function (options) {
-      let current = null, timer = null, attempts = 0, opened = false;
+      let current = null, timer = null, attempts = 0, opened = false, creating = false;
       const setStatus = message => options.onStatus(message);
       function schedule(delay) {
         if (timer) return;
@@ -22,10 +46,14 @@
         if (current && !current.destroyed) current.destroy();
         create();
       }
-      function create() {
+      async function create() {
+        if (creating) return;
         if (typeof Peer === 'undefined') { setStatus('Connection library unavailable — reopen app online'); schedule(10000); return; }
-        setStatus('Connecting…'); opened = false;
-        const p = current = new Peer(options.id(), {debug: 0});
+        setStatus('Connecting…'); opened = false; creating = true;
+        const config = await Promise.race([iceConfig(), new Promise(resolve => setTimeout(() => resolve(undefined), 2500))]);
+        creating = false;
+        if (current && !current.destroyed) return;
+        const p = current = new Peer(options.id(), config ? {debug: 0, config} : {debug: 0});
         options.onPeer(p);
         p.on('open', () => {
           if (p !== current) return;
@@ -67,3 +95,4 @@
     }
   };
 })();
+
