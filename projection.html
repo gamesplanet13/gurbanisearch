@@ -189,6 +189,8 @@ function hello(c){send(c,{type:'hello',deviceId:code,code:code,name:name,owner:o
 function handle(c){connections.add(c);c.on('open',()=>{hello(c);$('status').textContent='Waiting for controller authorization'});
 c.on('data',m=>{if(!m||typeof m!=='object')return;if(m.type==='ping'){send(c,{type:'pong',id:m.id});return}
 if(m.type==='display-mode'&&owner&&m.token===owner){displayMode=m.mode==='book'?'book':'projection';localStorage.setItem('gb-projection-view-mode',displayMode);render();send(c,{type:'applied',rev:m.rev});return}
+if(m.type==='sahibzaade-show'&&owner&&m.token===owner){openSahibzaade();return}
+if(m.type==='sahibzaade-close'&&owner&&m.token===owner){closeSahibzaade();return}
 if(m.type?.startsWith('photo-')&&owner&&m.token===owner){remotePhoto(m);return}
 if(m.type==='remove-pairing'&&owner&&m.token===owner){$('resetPairing').onclick();return}
   if(m.type==='auth'&&typeof m.token==='string'){if(owner&&owner!==m.token){send(c,{type:'rejected'});$('status').textContent='Paired to another controller — use Reset pairing to change';return}owner=m.token;store('gb-projection-owner',owner);updateMainPairing();send(c,{type:'accepted',deviceId:code,code:code,name:name});$('status').textContent='Connected to controller'}
