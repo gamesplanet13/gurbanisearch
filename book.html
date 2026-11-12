@@ -54,7 +54,7 @@ function start(){
 }
 $('join').onclick=()=>{const c=$('controllerCode').value.trim();if(!/^\d{5}$/.test(c))return $('status').textContent='Enter 5-digit controller code';connectController(c)};
 $('saveName').onclick=()=>{name=$('name').value.trim().slice(0,50)||'Book Reading Projection';put('gb-book-name',name);for(const c of connections)send(c,{type:'identify',code,name})};
-$('resetPairing').onclick=()=>{if(!confirm('Remove the saved controller pairing? The current shabad will remain on screen.'))return;owner=null;put('gb-book-owner',null);for(const c of [...connections])try{c.close()}catch(_){}connections.clear();$('status').textContent='Pairing cleared — ready for a controller'};
+$('resetPairing').onclick=()=>{owner=null;put('gb-book-owner',null);for(const c of [...connections])try{c.close()}catch(_){}connections.clear();$('status').textContent='Pairing cleared — ready for a controller'};
 $('fullscreen').onclick=()=>document.documentElement.requestFullscreen?.();
 $('fontSize').oninput=()=>{size=Number($('fontSize').value);$('sizeLabel').textContent=size;put('gb-book-font-size',size);for(const el of document.querySelectorAll('.line'))el.style.fontSize=size+'px'};
 render();start();

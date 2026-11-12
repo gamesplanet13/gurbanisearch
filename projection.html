@@ -100,7 +100,7 @@ function start(){
 }
 $('join').onclick=()=>{const c=$('controllerCode').value.trim();if(!/^\d{5}$/.test(c))return $('status').textContent='Enter 5-digit controller code';connectController(c)};
 $('saveName').onclick=()=>{name=$('name').value.trim().slice(0,50)||'Projection Screen';store('gb-projection-name',name);for(const c of connections){send(c,{type:'identify',code:code,name:name})}$('status').textContent='Display name saved'};
-$('resetPairing').onclick=()=>{if(!confirm('Remove the saved controller pairing? The current shabad will remain on screen.'))return;owner=null;store('gb-projection-owner',null);for(const c of [...connections])try{c.close()}catch(_){}connections.clear();$('status').textContent='Pairing cleared — ready for a controller'};
+$('resetPairing').onclick=()=>{owner=null;store('gb-projection-owner',null);for(const c of [...connections])try{c.close()}catch(_){}connections.clear();$('status').textContent='Pairing cleared — ready for a controller'};
 $('fullscreen').onclick=()=>document.documentElement.requestFullscreen?.();
 function menu(show){document.body.classList.toggle('menu-open',show);$('menuButton').setAttribute('aria-expanded',String(show))}
 $('menuButton').onclick=()=>menu(!document.body.classList.contains('menu-open'));
