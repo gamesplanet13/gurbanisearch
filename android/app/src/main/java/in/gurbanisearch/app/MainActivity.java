@@ -16,6 +16,7 @@ import android.net.Uri;
 public class MainActivity extends Activity {
     private WebView web;
     private Updater updater;
+    private WifiDiscovery wifiDiscovery;
     private static final String SITE = "https://gamesplanet13.github.io/gurbanisearch/";
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,8 +50,10 @@ public class MainActivity extends Activity {
                 request.deny();
             }
         });
+        wifiDiscovery = new WifiDiscovery(this, web, BuildConfig.ROLE);
+        web.addJavascriptInterface(wifiDiscovery, "GurbaniWifi");
         setContentView(web);
-        web.loadUrl(SITE + BuildConfig.START_PAGE + "?app=20261115");
+        web.loadUrl(SITE + BuildConfig.START_PAGE + "?app=20261116");
         updater = new Updater(this);
         updater.check();
     }
@@ -67,6 +70,8 @@ public class MainActivity extends Activity {
     }
     @Override protected void onDestroy() {
         if(updater!=null) updater.close();
+        if(wifiDiscovery!=null) wifiDiscovery.close();
+        if(web!=null) web.removeJavascriptInterface("GurbaniWifi");
         if(web!=null){web.loadUrl("about:blank");web.destroy();}
         super.onDestroy();
     }
