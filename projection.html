@@ -56,7 +56,7 @@ function fitProjection(){
 }
 let displayMode=storeMode();
 function storeMode(){const saved=localStorage.getItem('gb-projection-view-mode');return saved==='book'?'book':'projection'}
-let altBookSettings={fontSize:30,lineSpacing:160,nightMode:false,larrivaar:false,flow:false,pause:false};
+let altBookSettings=read('gb-projection-alternate-book-settings',{fontSize:30,lineSpacing:160,nightMode:false,larrivaar:false,flow:false,pause:false});
 function renderAlternateBook(){
  const c=slide.content||{},arr=Array.isArray(c.bookLines)&&c.bookLines.length?c.bookLines:(c.verse?[c.verse]:[]);
  $('bookAlternate').hidden=displayMode!=='book';
@@ -137,7 +137,7 @@ if(m.type==='display-mode'&&owner&&m.token===owner){displayMode=m.mode==='book'?
 if(m.type?.startsWith('photo-')&&owner&&m.token===owner){remotePhoto(m);return}
 if(m.type==='remove-pairing'&&owner&&m.token===owner){$('resetPairing').onclick();return}
   if(m.type==='auth'&&typeof m.token==='string'){if(owner&&owner!==m.token){send(c,{type:'rejected'});$('status').textContent='Paired to another controller — use Reset pairing to change';return}owner=m.token;store('gb-projection-owner',owner);updateMainPairing();send(c,{type:'accepted',deviceId:code,code:code,name:name});$('status').textContent='Connected to controller'}
-if(m.type==='project'&&owner&&m.token===owner){if(Object.prototype.hasOwnProperty.call(m,'content')){slide.content=m.content;if(m.content&&m.content.verse)markAwaitSelection(false)}if(m.bookSettings&&typeof m.bookSettings==='object'){altBookSettings={...altBookSettings,...m.bookSettings}}
+if(m.type==='project'&&owner&&m.token===owner){if(Object.prototype.hasOwnProperty.call(m,'content')){slide.content=m.content;if(m.content&&m.content.verse)markAwaitSelection(false)}if(m.bookSettings&&typeof m.bookSettings==='object'){altBookSettings={...altBookSettings,...m.bookSettings};store('gb-projection-alternate-book-settings',altBookSettings)}
 if(m.settings)slide.settings={verseSize:Math.max(24,Math.min(200,Number(m.settings.verseSize)||64)),hindiVerseSize:Math.max(24,Math.min(200,Number(m.settings.hindiVerseSize)||64)),englishVerseSize:Math.max(24,Math.min(200,Number(m.settings.englishVerseSize)||64)),meaningSize:Math.max(16,Math.min(90,Number(m.settings.meaningSize)||28)),englishSize:Math.max(16,Math.min(90,Number(m.settings.englishSize)||Number(m.settings.meaningSize)||28)),punjabiSize:Math.max(16,Math.min(90,Number(m.settings.punjabiSize)||28)),hindiSize:Math.max(16,Math.min(90,Number(m.settings.hindiSize)||28)),clock:!!m.settings.clock,lineSpacing:Math.max(90,Math.min(220,Number(m.settings.lineSpacing)||135)),dayMode:typeof m.settings.dayMode==='boolean'?m.settings.dayMode:!!slide.settings?.dayMode,autoFit:m.settings.autoFit!==false,larrivaar:!!m.settings.larrivaar,flow:!!m.settings.flow,pause:!!m.settings.pause};if(m.projectionTheme&&typeof m.projectionTheme.dayMode==='boolean'){slide.settings=slide.settings||{};slide.settings.dayMode=m.projectionTheme.dayMode}store('gb-projection-slide',slide);render();if(m.rev!==undefined)send(c,{type:'applied',rev:m.rev})}
 });c.on('close',()=>{connections.delete(c);$('status').textContent=owner?'Disconnected — last slide remains':'Pairing cleared — ready for a controller'});c.on('error',e=>$('status').textContent=e.message)}
 function connectController(controllerCode){
