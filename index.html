@@ -272,10 +272,24 @@ $('next').onclick=()=>{if(readingAng&&active>=lines.length-1&&readingAng<1430)lo
 $('mainLine').onclick=()=>{if(currentShabad)show(currentShabad.mainIndex)};
 for(const id of ['gurmukhiCheck','hindiShabadCheck','englishShabadCheck','enCheck','paCheck','hiCheck'])$(id).onchange=()=>{renderLines();if(active>=0)show(active,false)};
 const obsLabels={sg:'Gurmukhi Shabad',sh:'Hindi Shabad',se:'English Shabad',mp:'Punjabi Arth',mh:'Hindi Arth',me:'English Arth'};
-let obsConfig=stored('gb-obs-options',{order:Object.keys(obsLabels),enabled:['sg']}),obsCode=stored('gb-obs-code',null)||code();put('gb-obs-code',obsCode);
-function obsValues(){return {order:obsConfig.order.slice(),enabled:obsConfig.enabled.slice()}}
+let obsConfig=stored('gb-obs-options',{order:Object.keys(obsLabels),enabled:['sg','mh'],slots:{sg:'top',sh:'top',se:'top',mp:'bottom',mh:'bottom',me:'bottom'},sizes:{sg:70,sh:62,se:62,mp:38,mh:38,me:38}}),obsCode=stored('gb-obs-code',null)||code();
+obsConfig.slots??={sg:'top',sh:'top',se:'top',mp:'bottom',mh:'bottom',me:'bottom'};obsConfig.sizes??={sg:70,sh:62,se:62,mp:38,mh:38,me:38};put('gb-obs-code',obsCode);
+function obsValues(){return {order:obsConfig.order.slice(),enabled:obsConfig.enabled.slice(),slots:{...obsConfig.slots},sizes:{...obsConfig.sizes}}}
 function sendObsOptions(){put('gb-obs-options',obsValues());for(const id of selected)if(known[id]?.kind==='obs')send(connections.get(id),{type:'project',token:myToken,obsSettings:obsValues()})}
-function renderObs(){const box=$('obsOptions');box.replaceChildren();obsConfig.order.forEach((key,i)=>{const row=document.createElement('div');row.className='row';const cb=document.createElement('input');cb.type='checkbox';cb.checked=obsConfig.enabled.includes(key);cb.onchange=()=>{obsConfig.enabled=cb.checked?[...new Set([...obsConfig.enabled,key])]:obsConfig.enabled.filter(x=>x!==key);sendObsOptions()};const label=document.createElement('span');label.textContent=obsLabels[key];label.className='grow';const up=document.createElement('button'),down=document.createElement('button');up.textContent='↑';down.textContent='↓';up.onclick=()=>{if(i>0){[obsConfig.order[i-1],obsConfig.order[i]]=[obsConfig.order[i],obsConfig.order[i-1]];renderObs();sendObsOptions()}};down.onclick=()=>{if(i<obsConfig.order.length-1){[obsConfig.order[i+1],obsConfig.order[i]]=[obsConfig.order[i],obsConfig.order[i+1]];renderObs();sendObsOptions()}};row.append(cb,label,up,down);box.append(row)})}
+function renderObs(){
+ const box=$('obsOptions');box.replaceChildren();
+ for(const [i,key] of obsConfig.order.entries()){
+  const row=document.createElement('div');row.className='row';row.style.flexWrap='wrap';
+  const cb=document.createElement('input');cb.type='checkbox';cb.checked=obsConfig.enabled.includes(key);cb.onchange=()=>{obsConfig.enabled=cb.checked?[...new Set([...obsConfig.enabled,key])]:obsConfig.enabled.filter(x=>x!==key);sendObsOptions()};
+  const label=document.createElement('span');label.textContent=obsLabels[key];label.className='grow';
+  const select=document.createElement('select');for(const value of ['top','bottom']){const o=document.createElement('option');o.value=value;o.textContent=value==='top'?'↑ Top':'↓ Bottom';select.append(o)}select.value=obsConfig.slots[key]||((key[0]==='m')?'bottom':'top');select.onchange=()=>{obsConfig.slots[key]=select.value;sendObsOptions()};
+  const up=document.createElement('button'),down=document.createElement('button');up.textContent='↑';down.textContent='↓';
+  up.onclick=()=>{if(i>0){[obsConfig.order[i-1],obsConfig.order[i]]=[obsConfig.order[i],obsConfig.order[i-1]];renderObs();sendObsOptions()}};
+  down.onclick=()=>{if(i<obsConfig.order.length-1){[obsConfig.order[i+1],obsConfig.order[i]]=[obsConfig.order[i],obsConfig.order[i+1]];renderObs();sendObsOptions()}};
+  const font=document.createElement('input');font.type='range';font.min='14';font.max='200';font.value=String(obsConfig.sizes[key]||((key[0]==='m')?38:70));font.style.width='100%';const px=document.createElement('span');px.className='small';px.textContent=font.value+'px';font.oninput=()=>{px.textContent=font.value+'px';obsConfig.sizes[key]=Number(font.value);sendObsOptions()};
+  row.append(cb,label,select,up,down,font,px);box.append(row)
+ }
+}
 $('obsUrl').value=new URL('obs.html?code='+obsCode,location.href).href;$('copyObs').onclick=async()=>{try{await navigator.clipboard.writeText($('obsUrl').value);status('OBS link copied')}catch(e){$('obsUrl').select();status('Select and copy the OBS link')}};
 $('connectObs').onclick=()=>connectProjection(obsCode,obsCode);renderObs();
 $('sendCustom').onclick=()=>{const text=$('customText').value.trim();if(!text)return status('Paste text first');const content={mode:'custom',verse:text,scripts:{gurmukhi:text},meanings:{},scroll:!!$('customScroll').checked};publish({content,settings:settings()},true)};
