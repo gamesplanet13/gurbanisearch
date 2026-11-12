@@ -62,7 +62,40 @@ document.addEventListener('pointerdown',e=>{if(!e.target.closest('#functionsMenu
 
 let pics=[];
 function picRender(){const b=$('picList');b.replaceChildren();pics.forEach((p,i)=>{const row=document.createElement('div');row.className='row';const im=new Image();im.src=p.src;im.style.cssText='width:42px;height:30px;object-fit:contain';const nm=document.createElement('span');nm.className='grow small';nm.textContent=p.name;const up=document.createElement('button'),dn=document.createElement('button'),del=document.createElement('button');up.textContent='↑';dn.textContent='↓';del.textContent='×';up.onclick=()=>{if(i>0){[pics[i-1],pics[i]]=[pics[i],pics[i-1]];picRender()}};dn.onclick=()=>{if(i+1<pics.length){[pics[i+1],pics[i]]=[pics[i],pics[i+1]];picRender()}};del.onclick=()=>{pics.splice(i,1);picRender()};row.append(im,nm,up,dn,del);b.append(row)})}
-$('picFiles').onchange=async e=>{const ff=[...e.target.files].slice(0,20);e.target.value='';for(const f of ff){try{if(!f.type.startsWith('image/'))continue;const bm=await createImageBitmap(f),scale=Math.min(1,960/Math.max(bm.width,bm.height)),cv=document.createElement('canvas');cv.width=Math.round(bm.width*scale);cv.height=Math.round(bm.height*scale);cv.getContext('2d').drawImage(bm,0,0,cv.width,cv.height);bm.close();let q=.7,src=cv.toDataURL('image/jpeg',q);while(src.length>110000&&q>.20){q-=.12;src=cv.toDataURL('image/jpeg',q)}if(src.length>160000)throw Error('too large');pics.push({name:f.name.slice(0,70),src})}catch(ex){status('Image error: '+ex.message)}}picRender()};
+async function readPictureForController(file){
+ if(!file.type.startsWith('image/'))throw Error('Select an image file');
+ const url=URL.createObjectURL(file);
+ try {
+  const img=await new Promise((resolve,reject)=>{
+   const photo=new Image();photo.onload=()=>resolve(photo);photo.onerror=()=>reject(new Error('Cannot decode image'));
+   photo.src=url;
+  });
+  const scale=Math.min(1,900/Math.max(img.naturalWidth,img.naturalHeight));
+  const cv=document.createElement('canvas');
+  cv.width=Math.max(1,Math.round(img.naturalWidth*scale));
+  cv.height=Math.max(1,Math.round(img.naturalHeight*scale));
+  const ctx=cv.getContext('2d',{alpha:false});
+  if(!ctx)throw Error('Canvas unavailable');
+  ctx.drawImage(img,0,0,cv.width,cv.height);
+  let quality=.62,src=cv.toDataURL('image/jpeg',quality);
+  while(src.length>70000&&quality>.26){quality=Math.max(.25,quality-.10);src=cv.toDataURL('image/jpeg',quality)}
+  if(src.length>125000)throw Error('Picture is too large; choose a smaller photo');
+  return{name:file.name.slice(0,70),src};
+ }finally{URL.revokeObjectURL(url)}
+}
+$('picFiles').onchange=async e=>{
+ const ff=Array.from(e.target.files||[]).slice(0,20);
+ e.target.value='';
+ if(!ff.length)return;
+ status('Preparing '+ff.length+' picture(s)…');
+ let added=0;
+ for(const f of ff){
+  try{pics.push(await readPictureForController(f));added++}
+  catch(ex){status('Picture '+f.name+' failed: '+ex.message)}
+ }
+ picRender();
+ if(added)status(added+' picture(s) ready. Tap Send Slideshow.');
+};
 $('picInterval').oninput=()=>$('picSeconds').textContent=$('picInterval').value;
 $('picSend').onclick=async()=>{if(!pics.length)return status('Select pictures first');const ids=[...selected].filter(id=>!['book','obs'].includes(known[id]?.kind)&&connections.get(id)?.open);if(!ids.length)return status('Select online Projection first');const batch=String(Date.now());for(const id of ids)send(connections.get(id),{type:'photo-start',token:myToken,batch,total:pics.length,fade:$('picFade').checked,seconds:+$('picInterval').value});for(let i=0;i<pics.length;i++){for(const id of ids)send(connections.get(id),{type:'photo-add',token:myToken,batch,index:i,photo:pics[i]});await new Promise(r=>setTimeout(r,180))}for(const id of ids)send(connections.get(id),{type:'photo-play',token:myToken,batch});status('Slideshow sent to '+ids.length+' screen(s)')};
 $('picStop').onclick=()=>{for(const id of selected)if(!['book','obs'].includes(known[id]?.kind))send(connections.get(id),{type:'photo-stop',token:myToken});status('Pictures closed')};
