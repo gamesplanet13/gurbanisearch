@@ -1,0 +1,71 @@
+{
+  "title": "ਸਲੋਕੁ — ਪਵਣੁ ਗੁਰੂ ਪਾਣੀ ਪਿਤਾ",
+  "source": "Sri Guru Granth Sahib Ji, Japji Sahib concluding salok, Ang 8",
+  "note": "Recited after the six selected pauris of Anand Sahib in the customary service sequence; it is a salok from Japji Sahib, not an Anand Sahib pauri.",
+  "reference": "https://github.com/RealQuickLtd/nitnem/blob/main/app/src/main/assets/banis/japji-sahib.json",
+  "verses": [
+    {
+      "verse": {
+        "unicode": "ਸਲੋਕੁ ॥"
+      },
+      "transliteration": {
+        "english": "salok ||",
+        "hindi": "सलोकु ॥"
+      }
+    },
+    {
+      "verse": {
+        "unicode": "ਪਵਣੁ ਗੁਰੂ ਪਾਣੀ ਪਿਤਾ ਮਾਤਾ ਧਰਤਿ ਮਹਤੁ ॥"
+      },
+      "transliteration": {
+        "english": "pavan guroo paanee pitaa maataa dharat mahat ||",
+        "hindi": "पवणु गुरू पाणी पिता माता धरति महतु ॥"
+      }
+    },
+    {
+      "verse": {
+        "unicode": "ਦਿਵਸੁ ਰਾਤਿ ਦੁਇ ਦਾਈ ਦਾਇਆ ਖੇਲੈ ਸਗਲ ਜਗਤੁ ॥"
+      },
+      "transliteration": {
+        "english": "dhivas raat dhui dhaiee dhaiaa khelai sagal jagat ||",
+        "hindi": "दिवसु राति दुइ दाई दाइआ खेलै सगल जगतु ॥"
+      }
+    },
+    {
+      "verse": {
+        "unicode": "ਚੰਗਿਆਈਆ ਬੁਰਿਆਈਆ ਵਾਚੈ ਧਰਮੁ ਹਦੂਰਿ ॥"
+      },
+      "transliteration": {
+        "english": "cha(n)giaaieeaa buriaaieeaa vaachai dharam hadhoor ||",
+        "hindi": "चंगिआईआ बुरिआईआ वाचै धरमु हदूरि ॥"
+      }
+    },
+    {
+      "verse": {
+        "unicode": "ਕਰਮੀ ਆਪੋ ਆਪਣੀ ਕੇ ਨੇੜੈ ਕੇ ਦੂਰਿ ॥"
+      },
+      "transliteration": {
+        "english": "karamee aapo aapanee ke neRai ke dhoor ||",
+        "hindi": "करमी आपो आपणी के नेड़ै के दूरि ॥"
+      }
+    },
+    {
+      "verse": {
+        "unicode": "ਜਿਨੀ ਨਾਮੁ ਧਿਆਇਆ ਗਏ ਮਸਕਤਿ ਘਾਲਿ ॥"
+      },
+      "transliteration": {
+        "english": "jinee naam dhiaaiaa ge masakat ghaal ||",
+        "hindi": "जिनी नामु धिआइआ गए मसकति घालि ॥"
+      }
+    },
+    {
+      "verse": {
+        "unicode": "ਨਾਨਕ ਤੇ ਮੁਖ ਉਜਲੇ ਕੇਤੀ ਛੁਟੀ ਨਾਲਿ ॥੧॥"
+      },
+      "transliteration": {
+        "english": "naanak te mukh ujale ketee chhuTee naal ||1||",
+        "hindi": "नानक ते मुख उजले केती छुटी नालि ॥१॥"
+      }
+    }
+  ]
+}
