@@ -15,6 +15,7 @@ import android.net.Uri;
 
 public class MainActivity extends Activity {
     private WebView web;
+    private Updater updater;
     private static final String SITE = "https://gamesplanet13.github.io/gurbanisearch/";
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +51,8 @@ public class MainActivity extends Activity {
         });
         setContentView(web);
         web.loadUrl(SITE + BuildConfig.START_PAGE);
+        updater = new Updater(this);
+        updater.check();
     }
     @Override public void onWindowFocusChanged(boolean focused) {
         super.onWindowFocusChanged(focused);
@@ -65,6 +68,7 @@ public class MainActivity extends Activity {
         else web.loadUrl(SITE+"index.html");
     }
     @Override protected void onDestroy() {
+        if(updater!=null) updater.close();
         if(web!=null){web.loadUrl("about:blank");web.destroy();}
         super.onDestroy();
     }

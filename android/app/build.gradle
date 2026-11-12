@@ -6,8 +6,8 @@ android {
         applicationId 'in.gurbanisearch'
         minSdk 23
         targetSdk 28
-        versionCode 20261112
-        versionName '2026.11.12.2216'
+        versionCode 20261113
+        versionName '2026.11.12.2'
     }
     flavorDimensions += 'role'
     productFlavors {
@@ -16,18 +16,21 @@ android {
             applicationIdSuffix '.controller'
             resValue 'string', 'app_name', 'Gurbani Controller'
             buildConfigField 'String', 'START_PAGE', '"index.html"'
+            buildConfigField 'String', 'ROLE', '"controller"'
         }
         projection {
             dimension 'role'
             applicationIdSuffix '.projection'
             resValue 'string', 'app_name', 'Gurbani Projection'
             buildConfigField 'String', 'START_PAGE', '"projection.html"'
+            buildConfigField 'String', 'ROLE', '"projection"'
         }
         book {
             dimension 'role'
             applicationIdSuffix '.book'
             resValue 'string', 'app_name', 'Gurbani Book View'
             buildConfigField 'String', 'START_PAGE', '"book.html"'
+            buildConfigField 'String', 'ROLE', '"book"'
         }
     }
     buildFeatures { buildConfig true }
