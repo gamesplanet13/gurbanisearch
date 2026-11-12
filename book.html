@@ -6,13 +6,13 @@
 #mainPairing .main-pair-title{font-size:clamp(22px,4vw,50px);font-weight:800;color:#f1d08c}
 #mainPairingCode{font-size:clamp(68px,18vw,220px);line-height:1;letter-spacing:.07em;font-weight:850;font-variant-numeric:tabular-nums;color:#fff}
 #mainPairing .main-pair-help{font-size:clamp(16px,2.4vw,30px);color:#ddd;max-width:95%;line-height:1.4}
-</style></head><body><main id="book"><h2 class="heading">ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ</h2><div id="lines"><div class="empty">ਵਾਹਿਗੁਰੂ<br>Waiting for Gurbani Shabad</div></div></main><section id="mainPairing" hidden role="status" aria-live="polite"><div class="main-pair-title">Book View · Connection code</div><div id="mainPairingCode">•••••</div><div class="main-pair-help">इस कोड को Control ऐप में डालकर Connect करें</div></section><button id="menuButton" aria-label="Open book settings" aria-expanded="false">☰</button><aside id="panel" hidden><div class="row"><b style="flex:1">Book Projection</b><button id="closeMenu">✕</button></div><div class="small">Projection connection code</div><div class="pair" id="code">•••••</div><p id="status" class="small">Connecting…</p><div class="row"><input type="text" id="controllerCode" placeholder="Controller 5-digit code" maxlength="5" inputmode="numeric"><button id="join" class="action">Connect</button></div><input type="text" id="name" placeholder="Device name"><button id="saveName" class="action">Save Name</button><label class="sliders">Book Shabad font: <span id="sizeLabel">30</span> px<input type="range" id="fontSize" min="14" max="85" value="30"></label><label class="sliders">Line spacing: <span id="spacingLabel">160</span>%<input type="range" id="lineSpacing" min="90" max="220" step="5" value="160"></label><p class="small">Pinch with two fingers on the page to resize text. Settings are saved automatically.</p><button id="resetPairing" class="action">Reset pairing</button> <button id="fullscreen" class="action">Fullscreen</button><p class="small">Only Gurbani shabad is displayed. Selected line is highlighted. This page pairs exactly like other projections.</p></aside><footer class="gp-credit">Software by Games Planet · Developed 2026 by Rajinder Singh · Contact: 7983624797 · Version 2026.11.12.6</footer>
-<script src="peerjs-1.5.5.min.js"></script><script src="gurbani-peer-manager.js?v=20261112-turn1"></script><script>
+.pause-word{color:#e35b17;font-weight:800}#lines.flow .line{display:inline;padding:0;box-shadow:none}#lines.flow .line.current:before{content:""}</style></head><body><main id="book"><h2 class="heading">ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ</h2><div id="lines"><div class="empty">ਵਾਹਿਗੁਰੂ<br>Waiting for Gurbani Shabad</div></div></main><section id="mainPairing" hidden role="status" aria-live="polite"><div class="main-pair-title">Book View · Connection code</div><div id="mainPairingCode">•••••</div><div class="main-pair-help">इस कोड को Control ऐप में डालकर Connect करें</div></section><button id="menuButton" aria-label="Open book settings" aria-expanded="false">☰</button><aside id="panel" hidden><div class="row"><b style="flex:1">Book Projection</b><button id="closeMenu">✕</button></div><div class="small">Projection connection code</div><div class="pair" id="code">•••••</div><p id="status" class="small">Connecting…</p><div class="row"><input type="text" id="controllerCode" placeholder="Controller 5-digit code" maxlength="5" inputmode="numeric"><button id="join" class="action">Connect</button></div><input type="text" id="name" placeholder="Device name"><button id="saveName" class="action">Save Name</button><label class="sliders">Book Shabad font: <span id="sizeLabel">30</span> px<input type="range" id="fontSize" min="14" max="85" value="30"></label><label class="sliders">Line spacing: <span id="spacingLabel">160</span>%<input type="range" id="lineSpacing" min="90" max="220" step="5" value="160"></label><label><input type="checkbox" id="bookLari"> ਲੜੀਵਾਰ</label><br><label><input type="checkbox" id="bookFlow"> Continuous shabad lines</label><br><label><input type="checkbox" id="bookPause"> Colour words before punctuation</label><p class="small">Colour marks source punctuation, not verified ਵਿਸਰਾਮ.</p><p class="small">Pinch with two fingers on the page to resize text. Settings are saved automatically.</p><button id="resetPairing" class="action">Reset pairing</button> <button id="fullscreen" class="action">Fullscreen</button><p class="small">Only Gurbani shabad is displayed. Selected line is highlighted. This page pairs exactly like other projections.</p></aside><footer class="gp-credit">Software by Games Planet · Developed 2026 by Rajinder Singh · Contact: 7983624797 · Version 2026.11.12.6</footer>
+<script src="gurbani-layout.js?v=1"></script><script src="peerjs-1.5.5.min.js"></script><script src="gurbani-peer-manager.js?v=20261112-turn1"></script><script>
 'use strict';
 const $=id=>document.getElementById(id),read=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},put=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const code5=()=>String(10000+Math.floor(Math.random()*90000));
 const peerPrefix='gurbani-projection-v1-',ctrlPrefix='gurbani-control-v1-';
-let pendingController=null, code=read('gb-book-code',null)||code5(),owner=read('gb-book-owner',null),name=read('gb-book-name','Book Reading Projection'),saved=read('gb-book-slide',{content:null}),peer,connections=new Set(),size=read('gb-book-font-size',30),spacing=read('gb-book-line-spacing',160),pinch=null;
+let pendingController=null, code=read('gb-book-code',null)||code5(),owner=read('gb-book-owner',null),name=read('gb-book-name',((navigator.userAgent.match(/Android[^;)]*;\s*([^;)]+?)(?:\s+Build\/|\))/i)||[])[1]||'Book Reading Projection').trim()),saved=read('gb-book-slide',{content:null}),peer,connections=new Set(),size=read('gb-book-font-size',30),spacing=read('gb-book-line-spacing',160),pinch=null;
 size=Math.max(14,Math.min(85,Number(size)||30));spacing=Math.max(90,Math.min(220,Number(spacing)||160));
 put('gb-book-code',code);$('code').textContent=code;$('name').value=name;$('fontSize').value=size;$('sizeLabel').textContent=size;$('lineSpacing').value=spacing;$('spacingLabel').textContent=spacing;
 function applyBookSettings(font,space,notify){
@@ -20,9 +20,13 @@ function applyBookSettings(font,space,notify){
  $('fontSize').value=size;$('sizeLabel').textContent=size;$('lineSpacing').value=spacing;$('spacingLabel').textContent=spacing;
  $('book').style.setProperty('--book-leading',String(spacing/100));$('book').style.setProperty('--book-line-pad',Math.round(Math.max(0,spacing-90)*9/70)+'px');
  for(const el of document.querySelectorAll('.line'))el.style.fontSize=size+'px';put('gb-book-font-size',size);put('gb-book-line-spacing',spacing);
- if(notify){clearTimeout(bookNotifyTimer);bookNotifyTimer=setTimeout(()=>{for(const c of connections)send(c,{type:'book-settings',fontSize:size,lineSpacing:spacing})},120)}
+ if(notify){clearTimeout(bookNotifyTimer);bookNotifyTimer=setTimeout(()=>{for(const c of connections)send(c,{type:'book-settings',...bookState()})},120)}
 }
 let bookNotifyTimer;
+let bookLayout=read('gb-book-layout',{larrivaar:false,flow:false,pause:false});
+function bookState(){return {fontSize:size,lineSpacing:spacing,...bookLayout}}
+function setBookLayout(v,notify){for(const [id,key] of [['bookLari','larrivaar'],['bookFlow','flow'],['bookPause','pause']]){if(typeof v[key]==='boolean')bookLayout[key]=v[key];$(id).checked=!!bookLayout[key]}put('gb-book-layout',bookLayout);render();if(notify){for(const c of connections)send(c,{type:'book-settings',...bookState()})}}
+for(const [id,key] of [['bookLari','larrivaar'],['bookFlow','flow'],['bookPause','pause']])$(id).onchange=()=>setBookLayout({[key]:$(id).checked},true);
 function pinchDistance(t){return Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY)}
 $('book').addEventListener('touchstart',e=>{if(e.touches.length===2){const d=pinchDistance(e.touches);if(d>0){pinch={distance:d,size};e.preventDefault()}}},{passive:false});
 $('book').addEventListener('touchmove',e=>{if(pinch&&e.touches.length===2){e.preventDefault();applyBookSettings(pinch.size*pinchDistance(e.touches)/pinch.distance,spacing,true)}},{passive:false});
@@ -35,14 +39,14 @@ function render(){
  const content=saved.content||{},box=$('lines');box.replaceChildren();
  const lines=Array.isArray(content.bookLines)&&content.bookLines.length?content.bookLines:(content.verse?[content.verse]:[]);
  if(!lines.length){const empty=document.createElement('div');empty.className='empty';empty.textContent='ੴ ਵਾਹਿਗੁਰੂ — Waiting for Gurbani Shabad';box.append(empty);return}
- const current=Number.isInteger(content.activeIndex)?content.activeIndex:0;
- lines.forEach((value,i)=>{const d=document.createElement('div');d.className='line'+(i===current?' current':'');d.textContent=value;d.style.fontSize=size+'px';d.id='line-'+i;box.append(d)});
+ const current=Number.isInteger(content.activeIndex)?content.activeIndex:0;box.classList.toggle('flow',!!bookLayout.flow);
+ lines.forEach((value,i)=>{const d=document.createElement(bookLayout.flow?'span':'div');d.className='line'+(i===current?' current':'');GurbaniLayout.draw(d,value,bookLayout.larrivaar,bookLayout.pause);d.style.fontSize=size+'px';d.id='line-'+i;box.append(d);if(bookLayout.flow&&!bookLayout.larrivaar&&i<lines.length-1)box.append(document.createTextNode(' '))});
  const hi=$('line-'+Math.max(0,Math.min(current,lines.length-1)));
  if(hi)requestAnimationFrame(()=>hi.scrollIntoView({behavior:'smooth',block:'center'}))
 }
 function updateMainPairing(){ $('mainPairingCode').textContent=code; $('mainPairing').hidden=!!owner; }
 function send(c,m){try{if(c.open)c.send(m)}catch{}}
-function hello(c){send(c,{type:'hello',deviceId:code,code,name,owner,kind:'book',bookSettings:{fontSize:size,lineSpacing:spacing}})}
+function hello(c){send(c,{type:'hello',deviceId:code,code,name,owner,kind:'book',bookSettings:bookState()})}
 function connection(c){
  connections.add(c);
  c.on('open',()=>{hello(c);$('status').textContent='Waiting for pairing'});
@@ -50,10 +54,10 @@ function connection(c){
   if(!m||typeof m!=='object')return;
   if(m.type==='auth'&&typeof m.token==='string'){
    if(owner&&owner!==m.token){send(c,{type:'rejected'});$('status').textContent='Paired to another controller — use Reset pairing to change';return}
-   owner=m.token;put('gb-book-owner',owner);updateMainPairing();send(c,{type:'accepted',deviceId:code,code,name,kind:'book',bookSettings:{fontSize:size,lineSpacing:spacing}});$('status').textContent='Paired';return
+   owner=m.token;put('gb-book-owner',owner);updateMainPairing();send(c,{type:'accepted',deviceId:code,code,name,kind:'book',bookSettings:bookState()});$('status').textContent='Paired';return
   }
   if(m.type==='project'&&owner&&m.token===owner){
-   if(m.bookSettings&&typeof m.bookSettings==='object')applyBookSettings(m.bookSettings.fontSize,m.bookSettings.lineSpacing,false);
+   if(m.bookSettings&&typeof m.bookSettings==='object'){applyBookSettings(m.bookSettings.fontSize,m.bookSettings.lineSpacing,false);setBookLayout(m.bookSettings,false)}
    if(Object.prototype.hasOwnProperty.call(m,'content')&&(!m.content||m.content.mode!=='waheguru')){saved.content=m.content;put('gb-book-slide',saved);render()}
   }
  });
@@ -80,7 +84,8 @@ $('resetPairing').onclick=()=>{owner=null;put('gb-book-owner',null);updateMainPa
 $('fullscreen').onclick=()=>document.documentElement.requestFullscreen?.();
 $('fontSize').oninput=()=>applyBookSettings($('fontSize').value,spacing,true);
 $('lineSpacing').oninput=()=>applyBookSettings(size,$('lineSpacing').value,true);
-updateMainPairing();applyBookSettings(size,spacing,false);render();advertiseWifi();start();
+updateMainPairing();applyBookSettings(size,spacing,false);setBookLayout(bookLayout,false);render();advertiseWifi();start();
 </script></body></html>
+
 
 
