@@ -1,0 +1,41 @@
+{
+  "version": "2026-11-13",
+  "description": "Verified Gurbani source references for runtime loading. Original verse text is fetched using BaniDB; not copied into this repository.",
+  "sources": {
+    "anandSix": {
+      "title": "ਅਨੰਦ ਸਾਹਿਬ — 6 ਪਉੜੀਆਂ",
+      "source": "Sri Guru Granth Sahib Ji",
+      "angs": [
+        917,
+        918,
+        919,
+        920,
+        921,
+        922
+      ],
+      "firstPauris": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "lastPauri": 40,
+      "baniDbUrl": "https://api.banidb.com/v2/banis/10",
+      "angUrl": "https://api.banidb.com/v2/angs/917-922/G",
+      "validation": "Require first 5 and 40th pauri boundaries before display"
+    },
+    "sukhmani": {
+      "title": "ਸੁਖਮਨੀ ਸਾਹਿਬ",
+      "source": "Sri Guru Granth Sahib Ji",
+      "startAng": 262,
+      "endAng": 296,
+      "ashtpadis": 24,
+      "baniDbUrl": "https://api.banidb.com/v2/banis/31",
+      "angUrl": "https://api.banidb.com/v2/angs/262-296/G",
+      "validation": "Require Sukhmani first heading and final Ashtpadi 24 marker before display"
+    }
+  },
+  "attribution": "BaniDB Alliance/Khalis Foundation for API-sourced verse data; follow the provider's Terms of Service",
+  "licenseNotice": "The complete BaniDB corpus and translations are not reproduced here. Republishing the BaniDB dataset may require separate permission."
+}
