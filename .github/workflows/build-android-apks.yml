@@ -1,4 +1,4 @@
-name: Build Controller and Projection APKs
+name: Build Gurbani Controller Projection and Book APKs
 on:
   push:
     branches: [main]
@@ -23,9 +23,9 @@ jobs:
           gradle-version: '8.10.2'
       - name: Install Android SDK 35
         run: sdkmanager --install "platforms;android-35" "build-tools;35.0.0"
-      - name: Build both debug APKs
+      - name: Build three debug APKs
         working-directory: android
-        run: gradle --no-daemon assembleControllerDebug assembleProjectionDebug
+        run: gradle --no-daemon assembleControllerDebug assembleProjectionDebug assembleBookDebug
       - uses: actions/upload-artifact@v4
         with:
           name: Gurbani-Controller-APK
@@ -34,3 +34,7 @@ jobs:
         with:
           name: Gurbani-Projection-APK
           path: android/app/build/outputs/apk/projection/debug/*.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Gurbani-Book-View-APK
+          path: android/app/build/outputs/apk/book/debug/*.apk
