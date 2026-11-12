@@ -1,11 +1,28 @@
-# Android APK Builds
+# Gurbani Searcher — Three Android Apps
 
-Two separate APK flavors:
-- Controller: `in.gurbanisearch.controller`
-- Projection: `in.gurbanisearch.projection`
+The GitHub Actions workflow builds **three independent debug APKs**:
 
-Open GitHub **Actions > Build Controller and Projection APKs** and download each artifact ZIP after a successful run, then extract the .apk.
+| App | Application ID | Page |
+|---|---|---|
+| Gurbani Controller | `in.gurbanisearch.controller` | `https://gamesplanet13.github.io/gurbanisearch/index.html` |
+| Gurbani Projection | `in.gurbanisearch.projection` | `https://gamesplanet13.github.io/gurbanisearch/projection.html` |
+| Gurbani Book View | `in.gurbanisearch.book` | `https://gamesplanet13.github.io/gurbanisearch/book.html` |
 
-These are Android WebView wrappers for a **deployed sync server** hosting /index.html and /projection.html. On first launch, enter that server's base URL. Both devices must use the same server. Long-press to edit server URL; the projection mode keeps the display awake and uses immersive fullscreen.
+All launch directly in fullscreen Android WebView, support portrait/landscape rotation, and use the same static GitHub Pages PeerJS/WebRTC system.
 
-**Important:** No public sync backend is deployed as part of this build. Until the backend is hosted, the APKs are installable shells, not a live Gurbani search/sync product. Debug builds are test-only and not Play Store signed production builds.
+## APK download
+
+Open [Actions](https://github.com/gamesplanet13/gurbanisearch/actions/workflows/build-android-apks.yml). Select a successful `Build Gurbani Controller Projection and Book APKs` run, then download:
+- Gurbani-Controller-APK
+- Gurbani-Projection-APK
+- Gurbani-Book-View-APK
+
+Each artifact is a ZIP containing a debug APK. GitHub must finish the build successfully before these artifacts exist. Debug APKs are test builds, not release-signed production APKs.
+
+## Notes
+
+- These WebView apps display the website, and do **not** conceal the public website source.
+- Internet is required for PeerJS signaling and BaniDB search.
+- All three can be installed simultaneously.
+- The Book View shows only Gurbani text and highlights the line chosen on the controller.
+- Source privacy requires a private repository / different deployment architecture; packaging into an APK does not make public JavaScript secret.
