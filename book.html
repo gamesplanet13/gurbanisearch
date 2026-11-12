@@ -47,7 +47,7 @@ function connection(c){
   }
   if(m.type==='project'&&owner&&m.token===owner){
    if(m.bookSettings&&typeof m.bookSettings==='object')applyBookSettings(m.bookSettings.fontSize,m.bookSettings.lineSpacing,false);
-   if(Object.prototype.hasOwnProperty.call(m,'content')){saved.content=m.content;put('gb-book-slide',saved);render()}
+   if(Object.prototype.hasOwnProperty.call(m,'content')&&(!m.content||m.content.mode!=='waheguru')){saved.content=m.content;put('gb-book-slide',saved);render()}
   }
  });
  c.on('close',()=>{connections.delete(c);$('status').textContent=owner?'Disconnected — last shabad retained':'Pairing cleared — ready for a controller'});

@@ -102,7 +102,7 @@ window.gbWifiFinished=(error)=>{if(error){$('wifiStatus').textContent=error;retu
 $('searchWifi').onclick=()=>{wifiDevices.clear();renderWifiDevices();if(!window.GurbaniWifi||typeof window.GurbaniWifi.search!=='function'){$('wifiStatus').textContent='Install the updated Gurbani Controller Android app for Wi-Fi search. You can still enter a code.';return}$('wifiStatus').textContent='Searching the same Wi-Fi…';try{window.GurbaniWifi.search()}catch(e){$('wifiStatus').textContent='Wi-Fi search unavailable. Use the code.'}};
 $('pair').onclick=()=>{const c=$('pairCode').value.trim();if(!/^\d{5}$/.test(c))return status('Enter five digits');connectProjection(c,c)};
 setInterval(()=>{if(peer&&peer.open&&!peer.disconnected){for(const [key,d] of Object.entries(known))if(!connections.has(key))connectProjection(key,d.code)}},30000);
-function publish(payload){let sent=0;for(const id of selected){if(send(connections.get(id),{type:'project',token:myToken,...payload}))sent++}status(sent+' projection screen(s) updated');if(sent===0)status('No selected online projection. Reconnect or select a screen first.');return sent}
+function publish(payload,projectionOnly=false){let sent=0;for(const id of selected){if(projectionOnly&&known[id]?.kind==='book')continue;if(send(connections.get(id),{type:'project',token:myToken,...payload}))sent++}status(sent+' projection screen(s) updated');if(sent===0)status('No selected online projection. Reconnect or select a screen first.');return sent}
 function settings(){return{verseSize:+$('vs').value,hindiVerseSize:+$('hsv').value,englishVerseSize:+$('esv').value,meaningSize:+$('enSize').value,englishSize:+$('enSize').value,punjabiSize:+$('paSize').value,hindiSize:+$('hiSize').value,clock:$('clock').checked}}
 let bookSaved=stored('gb-control-book-settings',{fontSize:30,lineSpacing:160}),bookPending=stored('gb-control-book-pending',false),bookDebounce;
 function bookValues(){return{fontSize:Math.max(14,Math.min(85,Number($('bookSize').value)||30)),lineSpacing:Math.max(90,Math.min(220,Number($('bookSpacing').value)||160))}}
@@ -170,7 +170,7 @@ function show(i){
 $('next').onclick=()=>show(active+1);$('previous').onclick=()=>show(active-1);
 $('mainLine').onclick=()=>{if(currentShabad)show(currentShabad.mainIndex)};
 for(const id of ['gurmukhiCheck','hindiShabadCheck','englishShabadCheck','enCheck','paCheck','hiCheck'])$(id).onchange=()=>{renderLines();if(active>=0)show(active)};
-$('waheguru').onclick=()=>{lastContent={mode:'waheguru',verse:'ਵਾਹਿਗੁਰੂ',scripts:{gurmukhi:'ਵਾਹਿਗੁਰੂ',hindi:'वाहेगुरु',english:'Waheguru'},meanings:{}};put('gb-last-content',lastContent);if(publish({content:lastContent,settings:settings()}))status('Animated Waheguru sent to selected displays')};
+$('waheguru').onclick=()=>{const content={mode:'waheguru',verse:'ਵਾਹਿਗੁਰੂ',scripts:{gurmukhi:'ਵਾਹਿਗੁਰੂ',hindi:'वाहेगुरु',english:'Waheguru'},meanings:{}};if(publish({content,settings:settings()},true))status('Animated Waheguru sent to selected Projection screens')};
 renderHistory();
 renderDevices();start();
 </script></body></html>
