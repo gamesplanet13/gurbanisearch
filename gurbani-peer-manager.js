@@ -73,7 +73,7 @@
         p.on('error', e => {
           if (p !== current) return;
           if (e.type === 'unavailable-id') {
-            current = null; p.destroy(); options.onCollision(); schedule(1500); return;
+            current = null; p.destroy(); options.onCollision(); schedule(7000); return;
           }
           if (e.type === 'peer-unavailable') {
             options.onTargetUnavailable(); return;
