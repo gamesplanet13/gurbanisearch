@@ -163,7 +163,7 @@ function closeSahibzaade(){
  if(!slide.content?.verse)rainbow(displayMode==='projection');
  menu(false)
 }
-$('showSahibzaade').onclick=openSahibzaade;
+$('showSahibzaade').onclick=()=>{document.documentElement.requestFullscreen?.().catch?.(()=>{});openSahibzaade()};
 $('hideSahibzaade').onclick=closeSahibzaade;
 $('chooseSahibzaade').onclick=()=>$('sahibzaadeFile').click();
 $('sahibzaadeFile').onchange=async e=>{
