@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gurbani Control</title><style>
 *{box-sizing:border-box}body{margin:0;background:#0b101a;color:#eef5ff;font:15px system-ui,sans-serif}header{padding:16px;background:#182438;display:flex;justify-content:space-between;align-items:center;gap:10px}h1{font-size:21px;margin:0}main{max-width:1150px;margin:20px auto;padding:0 12px;display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{border:1px solid #36455e;background:#172232;padding:18px;border-radius:15px;margin-bottom:14px}h2{margin:0 0 12px;font-size:18px}input,select,button{font:inherit;color:#fff;background:#101b2d;border:1px solid #53627c;border-radius:9px;padding:11px}button{cursor:pointer;background:#28486b}button.primary{background:#1669ae}.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0}.grow{flex:1;min-width:110px}.muted{color:#b0bfd3;font-size:13px}.code{font-size:31px;letter-spacing:5px;color:#f7d48a;font-weight:bold}.list{max-height:50vh;overflow:auto}.item{display:block;text-align:left;width:100%;line-height:1.55;margin:7px 0;white-space:normal}.item.active{background:#575025;border-color:#e0bd68}.device{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:#253347;border-radius:8px;margin:7px 0;padding:10px}.device label{flex:1}.devstatus{font-size:12px;color:#89d5af}.verse{font-size:20px}.small{font-size:12px;color:#aebed4}a{color:#a7d2ff}label.field{display:block;margin:8px 0}input[type=range]{width:100%}input[type=checkbox]{accent-color:#dab66b}@media(max-width:850px){main{grid-template-columns:1fr}}#searchColumn{display:flex;flex-direction:column}#searchCard{order:0}#connectCard{order:1}#historyCard{order:2}#results[hidden]{display:none}#shabadCard label{font-size:12px}
 header{position:sticky;top:0;z-index:8}#menuButton{min-width:45px;font-size:23px;padding:7px 12px}#functionsMenu{position:fixed;right:12px;top:63px;z-index:20;max-width:min(94vw,400px);max-height:80vh;overflow-y:auto;background:#18263b;border:1px solid #6d7a96;border-radius:16px;padding:16px;box-shadow:0 15px 70px #000b}#functionsMenu[hidden]{display:none}#functionsMenu label{display:block;padding:6px 0}#menuOptions h2{font-size:16px;margin:9px 0}#connectCard,#fontCard{display:none}#functionsMenu #connectCard,#functionsMenu #fontCard{display:block;padding:10px;margin:8px 0}#functionsMenu .card{box-shadow:none}.historyItem{display:block;width:100%;text-align:left;margin:6px 0;background:#273750}.markMain{float:right;padding:4px 8px;margin-left:6px;background:#344864}.mainNote{color:#f3cc75;font-size:12px}#lines .item{overflow:auto} .gp-credit{font-size:9px;color:#7d8da4;text-align:center;padding:9px 4px 16px;opacity:.7} body.day-mode{background:#f5efe1;color:#25221c}body.day-mode header,body.day-mode #functionsMenu{background:#eee1c8;color:#25221c}body.day-mode .card{background:#fffaf0;border-color:#bcae94}body.day-mode input,body.day-mode select,body.day-mode button{background:#e7dcc6;color:#211d18;border-color:#9c896a}body.day-mode .small,body.day-mode .muted{color:#574e41}.ang-indicator{position:fixed;right:12px;bottom:18px;font-size:11px;color:#ab9a78;z-index:2;pointer-events:none}.quick-actions{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
-@media (orientation:landscape) and (min-width:650px){main{grid-template-columns:minmax(250px,42%) minmax(0,58%);align-items:start}main>div{min-width:0}#searchColumn{position:sticky;top:72px;max-height:calc(100dvh - 78px);overflow:auto}#shabadCard,#historyCard{width:100%}#lines{max-height:59dvh}#historyList{max-height:28dvh;overflow:auto}} @media (orientation:portrait),(max-width:649px){#searchColumn{position:static;max-height:none}#lines{max-height:45dvh}} #connectCard .device{flex-wrap:wrap} #connectCard .device select{max-width:150px} #customTools textarea{border-radius:9px;border:1px solid #52617a;background:#101b2d;color:#fff;padding:10px;margin:7px 0}#customTools summary{cursor:pointer;font-weight:700;padding:7px 0} #shabadCard{position:relative}#historyCard{position:absolute;top:54px;right:12px;z-index:12;width:min(360px,calc(100% - 24px));max-height:60vh;overflow:auto;box-shadow:0 16px 45px #000b;background:#202c41}#historyCard[hidden],#readingNavigator[hidden],#sukhmaniNavigation[hidden],#sehajNavigation[hidden]{display:none!important}#sukhmaniNavigation,#sehajNavigation{margin:12px 0;padding:10px;background:#223149;border-radius:12px}#readingNavigator input{min-width:90px}#historyToggle{font-size:13px;padding:8px 11px}@media(orientation:landscape) and (min-width:650px){main{grid-template-columns:minmax(260px,40%) minmax(0,60%)}#historyCard{max-height:75vh}} </style></head><body><header><h1>ੴ Gurbani Searcher · Control</h1><button id="menuButton" aria-label="Open functions" aria-expanded="false">☰</button></header><main><div id="searchColumn">
+@media (orientation:landscape) and (min-width:650px){main{grid-template-columns:minmax(250px,42%) minmax(0,58%);align-items:start}main>div{min-width:0}#searchColumn{position:sticky;top:72px;max-height:calc(100dvh - 78px);overflow:auto}#shabadCard,#historyCard{width:100%}#lines{max-height:59dvh}#historyList{max-height:28dvh;overflow:auto}} @media (orientation:portrait),(max-width:649px){#searchColumn{position:static;max-height:none}#lines{max-height:45dvh}} #connectCard .device{flex-wrap:wrap} #connectCard .device select{max-width:150px} #customTools textarea{border-radius:9px;border:1px solid #52617a;background:#101b2d;color:#fff;padding:10px;margin:7px 0}#customTools summary{cursor:pointer;font-weight:700;padding:7px 0} #shabadCard{position:relative}#historyCard{position:absolute;top:54px;right:12px;z-index:12;width:min(360px,calc(100% - 24px));max-height:60vh;overflow:auto;box-shadow:0 16px 45px #000b;background:#202c41}#historyCard[hidden],#readingNavigator[hidden],#sukhmaniNavigation[hidden],#sehajNavigation[hidden]{display:none!important}#sukhmaniNavigation,#sehajNavigation{margin:12px 0;padding:10px;background:#223149;border-radius:12px}#readingNavigator input{min-width:90px}#historyToggle{font-size:13px;padding:8px 11px}@media(orientation:landscape) and (min-width:650px){main{grid-template-columns:minmax(260px,40%) minmax(0,60%)}#historyCard{max-height:75vh}} #devices .device{flex-wrap:wrap}#devices .device label{flex:1;min-width:135px}#devices .device select{max-width:145px}#devices .device-settings-editor{border:1px solid #7b8eab;background:#22324a;border-radius:12px;padding:12px;margin:8px 0 14px}#devices .device-settings-editor>select{width:100%;margin:5px 0}#devices .device-setting-field{display:block;margin:12px 0}#devices .device-setting-field input{display:block;width:100%;accent-color:#edc97d}#devices .device-setting-checkbox{display:block;padding:5px 0;font-size:14px} </style></head><body><header><h1>ੴ Gurbani Searcher · Control</h1><button id="menuButton" aria-label="Open functions" aria-expanded="false">☰</button></header><main><div id="searchColumn">
 <section class="card" id="connectCard"><h2>Connected Projections</h2><div class="row"><div class="grow"><span class="muted">Your controller code</span><div id="code" class="code">•••••</div></div><span id="connStatus" class="muted">Connecting…</span></div><div class="row"><input id="newControllerCode" class="grow" inputmode="numeric" maxlength="5" placeholder="New 5-digit controller code"><button id="changeControllerCode">Change code</button></div><div class="row"><button id="searchWifi" class="primary">Search Wi-Fi Projections</button></div><p id="wifiStatus" class="small" aria-live="polite">Find Projection or Book View on the same Wi-Fi.</p><div id="wifiResults"></div><div class="row"><input id="pairCode" placeholder="Projection 5-digit code" inputmode="numeric" maxlength="5" class="grow"><button id="pair" class="primary">Connect</button></div><p class="small">You can also type your controller code into the Projection browser. Select displays below before projecting.</p><p id="pairStatus" class="small" aria-live="polite">Connecting…</p><div id="devices"></div></section>
 <section class="card" id="searchCard"><h2>Search Gurbani</h2><div class="row"><select id="keyboard"><option value="en">English keyboard</option><option value="pa">Gurmukhi keyboard</option><option value="hi">Hindi keyboard</option></select><select id="searchType"><option value="7">First letters (English)</option><option value="0">First letters (Gurmukhi)</option><option value="2">Full word (Gurmukhi)</option><option value="4">Romanized word</option></select></div><div class="row"><input id="query" class="grow" placeholder="Type first letters (e.g. ddss)"><button id="search" class="primary">Search</button><button id="waheguru" style="background:linear-gradient(120deg,#ff9d59,#a75dff,#24c6ad);font-weight:750" aria-label="Project animated Waheguru">ਵਾਹਿਗੁਰੂ ✨</button></div><div class="quick-actions"><button id="aapeSangat">ਆਪੇ ਸੰਗਤਿ ਸਦਿ ਬਹਾਲੈ</button><button id="anandSix">ਅਨੰਦ ਸਾਹਿਬ · 6 ਪਉੜੀਆਂ</button><button id="sukhmani">ਸੁਖਮਨੀ ਸਾਹਿਬ</button><button id="sehaj">ਸਹਿਜ ਪਾਠ</button></div><div id="results" class="list" hidden></div><p class="small">Results from the BaniDB public API. Internet required for Gurbani search.</p></section></div>
 <div><section class="card" id="shabadCard"><div class="row" style="justify-content:space-between;align-items:center"><h2 style="margin:0">Shabad · Choose a Line</h2><button id="historyToggle" type="button" aria-expanded="false" title="Recent Shabads">☰ History</button></div><section class="card" id="historyCard" hidden><div class="row" style="justify-content:space-between"><strong>Recent Shabads</strong><button id="historyClose" type="button">✕</button></div><div id="historyList"></div></section><div class="row"><button id="mainLine" class="primary">Go to Main Line</button><span id="mainLabel" class="small">Main: —</span></div><p class="small">Tap any line to project; use ☆ to set that line as Main.</p><div id="readingNavigator" hidden><div class="small" id="readingKindLabel"></div><div id="sukhmaniNavigation" hidden class="row"><button id="prevSalok">◀ Previous Salok</button><input id="salokNumber" type="number" min="1" max="24" inputmode="numeric" placeholder="Salok 1–24" style="width:120px"><button id="openSalok">Open Salok</button><button id="nextSalok">Next Salok ▶</button><span id="salokPosition" class="small"></span></div><div id="sehajNavigation" hidden><div class="row"><input id="angInput" type="number" min="1" max="1430" inputmode="numeric" placeholder="Custom Ang 1–1430" class="grow"><button id="angSearch">Open Ang</button><button id="prevAng">◀ Previous Ang</button><button id="nextAng">Next Ang ▶</button></div></div></div><div id="lines" class="list"></div><div class="row"><button id="previous">Previous</button><button id="next">Next</button><button id="clear">Clear projection</button></div></section>
@@ -104,9 +104,103 @@ $('picInterval').oninput=()=>$('picSeconds').textContent=$('picInterval').value;
 $('picSend').onclick=async()=>{if(!pics.length)return status('Select pictures first');const ids=[...selected].filter(id=>!['book','obs'].includes(known[id]?.kind)&&connections.get(id)?.open);if(!ids.length)return status('Select online Projection first');const batch=String(Date.now());for(const id of ids)send(connections.get(id),{type:'photo-start',token:myToken,batch,total:pics.length,fade:$('picFade').checked,seconds:+$('picInterval').value});for(let i=0;i<pics.length;i++){for(const id of ids)send(connections.get(id),{type:'photo-add',token:myToken,batch,index:i,photo:pics[i]});await new Promise(r=>setTimeout(r,180))}for(const id of ids)send(connections.get(id),{type:'photo-play',token:myToken,batch});status('Slideshow sent to '+ids.length+' screen(s)')};
 $('picStop').onclick=()=>{for(const id of selected)if(!['book','obs'].includes(known[id]?.kind))send(connections.get(id),{type:'photo-stop',token:myToken});status('Pictures closed')};
 const deviceView=stored('gb-device-display-modes',{});
+const perDeviceSettings=stored('gb-per-device-settings-v1',{});
+let openDeviceSettingsKey=null;
+function deviceSettings(key){
+ if(!perDeviceSettings[key])perDeviceSettings[key]={projection:{...settings()},book:{...bookValues()}};
+ if(!perDeviceSettings[key].projection)perDeviceSettings[key].projection={...settings()};
+ if(!perDeviceSettings[key].book)perDeviceSettings[key].book={...bookValues()};
+ return perDeviceSettings[key];
+}
+function persistDeviceSettings(){put('gb-per-device-settings-v1',perDeviceSettings)}
+function sendOneDeviceSettings(key,includeContent=false){
+ const c=connections.get(key);
+ if(!c?.open){status('Settings saved for '+(known[key]?.name||key)+'; will apply when it reconnects');return}
+ const v=deviceSettings(key),rev=++deliveryCounter;
+ send(c,{type:'display-mode',token:myToken,mode:preferredView(key)});
+ const packet={type:'project',token:myToken,rev,settings:v.projection,bookSettings:v.book};
+ if(includeContent&&lastContent)packet.content=lastContent;
+ if(send(c,packet)){pendingDelivery.set(c,{rev,time:Date.now()});status('Settings sent to '+(known[key]?.name||key))}
+}
+function editDeviceSettings(key){
+ openDeviceSettingsKey=key;renderDevices();
+ const editor=$('deviceSettingsEditor');
+ if(editor)editor.scrollIntoView({behavior:'smooth',block:'nearest'})
+}
+function makeDeviceSlider(container,key,config,label,field,min,max,step,unit){
+ const wrap=document.createElement('label');wrap.className='device-setting-field';
+ const head=document.createElement('div');const val=document.createElement('strong');val.textContent=String(config[field])+unit;
+ head.textContent=label+' · ';head.append(val);
+ const slider=document.createElement('input');slider.type='range';slider.min=String(min);slider.max=String(max);slider.step=String(step);slider.value=String(config[field]??min);
+ slider.oninput=()=>{config[field]=Number(slider.value);val.textContent=slider.value+unit;persistDeviceSettings();queueDeviceSettings(key)};
+ wrap.append(head,slider);container.append(wrap)
+}
+function makeDeviceToggle(container,key,config,label,field){
+ const wrap=document.createElement('label');wrap.className='device-setting-checkbox';const chk=document.createElement('input');
+ chk.type='checkbox';chk.checked=!!config[field];chk.onchange=()=>{config[field]=chk.checked;persistDeviceSettings();queueDeviceSettings(key)};
+ wrap.append(chk,document.createTextNode(' '+label));container.append(wrap)
+}
+const deviceSettingTimers=new Map();
+function queueDeviceSettings(key){clearTimeout(deviceSettingTimers.get(key));deviceSettingTimers.set(key,setTimeout(()=>{deviceSettingTimers.delete(key);sendOneDeviceSettings(key)},100))}
+function renderDeviceSettingsPanel(key){
+ const card=document.createElement('section');card.className='device-settings-editor';card.id='deviceSettingsEditor';
+ const head=document.createElement('div');head.className='row';head.style.justifyContent='space-between';
+ const heading=document.createElement('strong');heading.textContent=(known[key]?.name||'Screen')+' · Individual Settings';
+ const close=document.createElement('button');close.textContent='✕';close.onclick=()=>{openDeviceSettingsKey=null;renderDevices()};
+ head.append(heading,close);card.append(head);
+ const v=deviceSettings(key),isBook=preferredView(key)==='book';
+ const mode=document.createElement('select');mode.setAttribute('aria-label','Screen display mode');
+ for(const [value,label] of [['projection','Normal Projection'],['book','Book Reading View']]){const option=document.createElement('option');option.value=value;option.textContent=label;mode.append(option)}
+ mode.value=preferredView(key);mode.onchange=()=>{deviceView[key]=mode.value;put('gb-device-display-modes',deviceView);persistDeviceSettings();sendOneDeviceSettings(key,true);renderDevices()};
+ card.append(mode);
+ const summary=document.createElement('p');summary.className='small';summary.textContent=isBook?'Book View settings · only this device':'Projection settings · only this device';card.append(summary);
+ const area=document.createElement('div');card.append(area);
+ if(isBook){
+  const b=v.book;
+  makeDeviceSlider(area,key,b,'Book Gurbani font','fontSize',14,85,1,'px');
+  makeDeviceSlider(area,key,b,'Book line spacing','lineSpacing',90,220,5,'%');
+  makeDeviceToggle(area,key,b,'Night mode','nightMode');
+  makeDeviceToggle(area,key,b,'Larrivaar (ਲੜੀਵਾਰ)','larrivaar');
+  makeDeviceToggle(area,key,b,'Continuous Gurbani lines','flow');
+  makeDeviceToggle(area,key,b,'Colour punctuation markers','pause');
+ }else{
+  const p=v.projection;
+  for(const [name,field] of [['Gurmukhi Shabad','verseSize'],['Hindi Shabad','hindiVerseSize'],['English Shabad','englishVerseSize'],['Punjabi Arth','punjabiSize'],['Hindi Arth','hindiSize'],['English Arth','englishSize']]){
+   makeDeviceSlider(area,key,p,name,field,field.endsWith('Size')&&(['verseSize','hindiVerseSize','englishVerseSize'].includes(field))?24:16,field==='verseSize'||field==='hindiVerseSize'||field==='englishVerseSize'?200:90,1,'px')
+  }
+  makeDeviceSlider(area,key,p,'Line spacing','lineSpacing',90,220,5,'%');
+  makeDeviceToggle(area,key,p,'Auto-fit screen','autoFit');
+  makeDeviceToggle(area,key,p,'Show clock','clock');
+  makeDeviceToggle(area,key,p,'Day mode','dayMode');
+  makeDeviceToggle(area,key,p,'Larrivaar (ਲੜੀਵਾਰ)','larrivaar');
+  makeDeviceToggle(area,key,p,'Continuous Gurbani lines','flow');
+  makeDeviceToggle(area,key,p,'Colour punctuation markers','pause');
+ }
+ const sendBtn=document.createElement('button');sendBtn.textContent='Apply only to this device';sendBtn.onclick=()=>sendOneDeviceSettings(key,true);card.append(sendBtn);
+ return card
+}
 function preferredView(key){return deviceView[key]||((known[key]?.kind==='book')?'book':'projection')}
 function sendDeviceView(key){const c=connections.get(key);if(c?.open)send(c,{type:'display-mode',token:myToken,mode:preferredView(key)})}
-function renderDevices(){const box=$('devices');box.replaceChildren();const entries=Object.entries(known);if(!entries.length)box.textContent='No saved projection screens';for(const [key,info] of entries){const line=document.createElement('div');line.className='device';const cb=document.createElement('input');cb.type='checkbox';cb.checked=selected.has(key);cb.onchange=()=>{cb.checked?selected.add(key):selected.delete(key);put('gb-selected-devices',[...selected])};const label=document.createElement('label');label.textContent=(info.name||'Projection')+' · '+info.code;const st=document.createElement('span');st.className='devstatus';st.textContent=connections.get(key)?.open?'Online':'Offline';const b=document.createElement('button');b.textContent='Reconnect';b.onclick=()=>connectProjection(key,info.code);const remove=document.createElement('button');remove.textContent='Remove';remove.setAttribute('aria-label','Remove '+(info.name||'Projection'));remove.onclick=()=>removeDevice(key);const arlabel=document.createElement('label');arlabel.className='auto-reconnect';const ar=document.createElement('input');ar.type='checkbox';ar.checked=autoReconnect[key]!==false;ar.setAttribute('aria-label','Auto reconnect '+(info.name||'Projection'));ar.onchange=()=>{autoReconnect[key]=ar.checked;put('gb-auto-reconnect',autoReconnect);if(ar.checked&&!connections.has(key))connectProjection(key,info.code)};arlabel.append(ar,document.createTextNode(' Auto reconnect'));const mode=document.createElement('select');mode.title='Choose display view for this device';mode.setAttribute('aria-label','Display view for '+(info.name||'Projection'));for(const [value,title] of [['projection','Projection'],['book','Book View']]){const o=document.createElement('option');o.value=value;o.textContent=title;mode.append(o)}mode.value=preferredView(key);mode.onchange=()=>{deviceView[key]=mode.value;put('gb-device-display-modes',deviceView);sendDeviceView(key);if(lastContent)send(connections.get(key),{type:'project',token:myToken,content:lastContent,settings:settings(),bookSettings:bookValues()});status((info.name||'Screen')+' set to '+mode.value)};line.append(cb,label,st,b,remove,arlabel,mode);box.append(line)}}
+function renderDevices(){
+ const box=$('devices');box.replaceChildren();const entries=Object.entries(known);
+ if(!entries.length){box.textContent='No saved projection screens';return}
+ for(const [key,info] of entries){
+  const line=document.createElement('div');line.className='device';
+  const cb=document.createElement('input');cb.type='checkbox';cb.checked=selected.has(key);
+  cb.onchange=()=>{cb.checked?selected.add(key):selected.delete(key);put('gb-selected-devices',[...selected])};
+  const label=document.createElement('label');label.textContent=(info.name||'Projection')+' · '+info.code;
+  const st=document.createElement('span');st.className='devstatus';st.textContent=connections.get(key)?.open?'Online':'Offline';
+  const b=document.createElement('button');b.textContent='Reconnect';b.onclick=()=>connectProjection(key,info.code);
+  const settingsButton=document.createElement('button');settingsButton.textContent='⚙ Settings';settingsButton.setAttribute('aria-label','Individual settings for '+(info.name||'Projection'));settingsButton.onclick=()=>editDeviceSettings(key);
+  const remove=document.createElement('button');remove.textContent='Remove';remove.setAttribute('aria-label','Remove '+(info.name||'Projection'));remove.onclick=()=>removeDevice(key);
+  const arlabel=document.createElement('label');arlabel.className='auto-reconnect';const ar=document.createElement('input');ar.type='checkbox';ar.checked=autoReconnect[key]!==false;ar.setAttribute('aria-label','Auto reconnect '+(info.name||'Projection'));ar.onchange=()=>{autoReconnect[key]=ar.checked;put('gb-auto-reconnect',autoReconnect);if(ar.checked&&!connections.has(key))connectProjection(key,info.code)};arlabel.append(ar,document.createTextNode(' Auto reconnect'));
+  const mode=document.createElement('select');mode.title='Choose display view for this device';mode.setAttribute('aria-label','Display view for '+(info.name||'Projection'));
+  for(const [value,title] of [['projection','Projection'],['book','Book View']]){const o=document.createElement('option');o.value=value;o.textContent=title;mode.append(o)}
+  mode.value=preferredView(key);mode.onchange=()=>{deviceView[key]=mode.value;put('gb-device-display-modes',deviceView);sendOneDeviceSettings(key,true);renderDevices()};
+  line.append(cb,label,st,settingsButton,mode,b,remove,arlabel);box.append(line);
+  if(openDeviceSettingsKey===key)box.append(renderDeviceSettingsPanel(key))
+ }
+}
 function removeDevice(key){
  const c=connections.get(key),online=!!c?.open;
  if(online)send(c,{type:'remove-pairing',token:myToken});
