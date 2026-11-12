@@ -36,7 +36,7 @@ function connection(c){
    if(Object.prototype.hasOwnProperty.call(m,'content')){saved.content=m.content;put('gb-book-slide',saved);render()}
   }
  });
- c.on('close',()=>{connections.delete(c);$('status').textContent='Disconnected — last shabad retained'});
+ c.on('close',()=>{connections.delete(c);$('status').textContent=owner?'Disconnected — last shabad retained':'Pairing cleared — ready for a controller'});
  c.on('error',e=>$('status').textContent=e.message)
 }
 function connectController(controllerCode){
@@ -54,7 +54,7 @@ function start(){
 }
 $('join').onclick=()=>{const c=$('controllerCode').value.trim();if(!/^\d{5}$/.test(c))return $('status').textContent='Enter 5-digit controller code';connectController(c)};
 $('saveName').onclick=()=>{name=$('name').value.trim().slice(0,50)||'Book Reading Projection';put('gb-book-name',name);for(const c of connections)send(c,{type:'identify',code,name})};
-$('resetPairing').onclick=()=>{owner=null;put('gb-book-owner',null);for(const c of [...connections])try{c.close()}catch(_){}connections.clear();$('status').textContent='Pairing cleared — ready for a controller'};
+$('resetPairing').onclick=()=>{owner=null;put('gb-book-owner',null);for(const c of [...connections]){send(c,{type:'unpaired'});setTimeout(()=>{try{c.close()}catch(_){}},250)}connections.clear();$('status').textContent='Pairing cleared — ready for a controller'};
 $('fullscreen').onclick=()=>document.documentElement.requestFullscreen?.();
 $('fontSize').oninput=()=>{size=Number($('fontSize').value);$('sizeLabel').textContent=size;put('gb-book-font-size',size);for(const el of document.querySelectorAll('.line'))el.style.fontSize=size+'px'};
 render();start();

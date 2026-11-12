@@ -84,7 +84,7 @@ function handle(c){connections.add(c);c.on('open',()=>{hello(c);$('status').text
 c.on('data',m=>{if(!m||typeof m!=='object')return;
 if(m.type==='auth'&&typeof m.token==='string'){if(owner&&owner!==m.token){send(c,{type:'rejected'});$('status').textContent='Paired to another controller — use Reset pairing to change';return}owner=m.token;store('gb-projection-owner',owner);send(c,{type:'accepted',deviceId:code,code:code,name:name});$('status').textContent='Connected to controller'}
 if(m.type==='project'&&owner&&m.token===owner){if(Object.hasOwn(m,'content'))slide.content=m.content;if(m.settings)slide.settings={verseSize:Math.max(24,Math.min(150,Number(m.settings.verseSize)||64)),hindiVerseSize:Math.max(24,Math.min(150,Number(m.settings.hindiVerseSize)||64)),englishVerseSize:Math.max(24,Math.min(150,Number(m.settings.englishVerseSize)||64)),meaningSize:Math.max(16,Math.min(90,Number(m.settings.meaningSize)||28)),englishSize:Math.max(16,Math.min(90,Number(m.settings.englishSize)||Number(m.settings.meaningSize)||28)),punjabiSize:Math.max(16,Math.min(90,Number(m.settings.punjabiSize)||28)),hindiSize:Math.max(16,Math.min(90,Number(m.settings.hindiSize)||28)),clock:!!m.settings.clock};store('gb-projection-slide',slide);render()}
-});c.on('close',()=>{connections.delete(c);$('status').textContent='Disconnected — last slide remains'});c.on('error',e=>$('status').textContent=e.message)}
+});c.on('close',()=>{connections.delete(c);$('status').textContent=owner?'Disconnected — last slide remains':'Pairing cleared — ready for a controller'});c.on('error',e=>$('status').textContent=e.message)}
 function connectController(controllerCode){
  if(!peer||peer.destroyed||peer.disconnected||!peer.open){pendingController=controllerCode;$('status').textContent='Offline — reconnecting; pairing will retry';return}
  $('status').textContent='Connecting to controller '+controllerCode+'…';const c=peer.connect(ctrlPrefix+controllerCode,{reliable:true,metadata:{code:code}});let finished=false;c.on('open',()=>{finished=true});c.on('close',()=>{finished=true});c.on('error',()=>{finished=true});setTimeout(()=>{if(!finished&&!c.open){finished=true;try{c.close()}catch(_){}$('status').textContent='Could not connect. Check both devices are online and try again.'}},20000);handle(c)
@@ -100,7 +100,7 @@ function start(){
 }
 $('join').onclick=()=>{const c=$('controllerCode').value.trim();if(!/^\d{5}$/.test(c))return $('status').textContent='Enter 5-digit controller code';connectController(c)};
 $('saveName').onclick=()=>{name=$('name').value.trim().slice(0,50)||'Projection Screen';store('gb-projection-name',name);for(const c of connections){send(c,{type:'identify',code:code,name:name})}$('status').textContent='Display name saved'};
-$('resetPairing').onclick=()=>{owner=null;store('gb-projection-owner',null);for(const c of [...connections])try{c.close()}catch(_){}connections.clear();$('status').textContent='Pairing cleared — ready for a controller'};
+$('resetPairing').onclick=()=>{owner=null;store('gb-projection-owner',null);for(const c of [...connections]){send(c,{type:'unpaired'});setTimeout(()=>{try{c.close()}catch(_){}},250)}connections.clear();$('status').textContent='Pairing cleared — ready for a controller'};
 $('fullscreen').onclick=()=>document.documentElement.requestFullscreen?.();
 function menu(show){document.body.classList.toggle('menu-open',show);$('menuButton').setAttribute('aria-expanded',String(show))}
 $('menuButton').onclick=()=>menu(!document.body.classList.contains('menu-open'));
