@@ -1,0 +1,30 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gurbani Projection</title><style>
+*{box-sizing:border-box}body{margin:0;background:#000;color:#fff;font-family:system-ui,'Noto Sans Gurmukhi',sans-serif}#stage{min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8vh 5vw;gap:3vh;overflow-wrap:anywhere}#verse{font-weight:600;line-height:1.35}#meaning{color:#f6db9d;line-height:1.45}#clock{position:fixed;top:14px;left:20px;color:#bcbcbc;font-size:20px}#setup{position:fixed;left:10px;bottom:10px;background:#172033f5;border:1px solid #596780;border-radius:15px;padding:14px;min-width:260px;max-width:min(410px,calc(100vw - 20px));font-family:system-ui,sans-serif;box-shadow:0 6px 35px #000a}.row{display:flex;gap:7px;align-items:center;margin:7px 0}.grow{flex:1}input,button{background:#26374e;color:white;border:1px solid #546786;border-radius:9px;padding:10px;font:inherit;min-width:0}button{cursor:pointer}.code{font-size:34px;color:#f1d08c;letter-spacing:5px;font-weight:bold}.muted{font-size:12px;color:#b7c8de}.hidden .body{display:none}#hint{color:#dac38e;font-size:25px}#stage.hasverse #hint{display:none}#status{overflow-wrap:anywhere}
+</style></head><body><div id="stage"><div id="clock" hidden></div><div id="verse"></div><div id="meaning"></div><div id="hint">ੴ<br>Gurbani Projection Ready</div></div><div id="setup"><div class="row"><b class="grow">Projection Connection</b><button id="toggle">Hide</button></div><div class="body"><span class="muted">Share this projection code with controller:</span><div id="code" class="code">•••••</div><p class="muted" id="status">Connecting…</p><div class="row"><input id="controllerCode" placeholder="Controller 5-digit code" inputmode="numeric" maxlength="5" class="grow"><button id="join">Connect</button></div><div class="row"><input id="name" class="grow" placeholder="Display name"><button id="saveName">Save</button></div><button id="fullscreen">Fullscreen</button><p class="muted">Latest slide is stored locally, even if the controller disconnects. Keep this browser running for live updates.</p></div></div>
+<script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script><script>
+'use strict';
+const $=id=>document.getElementById(id);
+const read=(k,def)=>{try{return JSON.parse(localStorage.getItem(k))??def}catch{return def}};
+const store=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+const code5=()=>String(10000+Math.floor(Math.random()*90000));
+const prefix='gurbani-projection-v1-',ctrlPrefix='gurbani-control-v1-';
+let code=read('gb-projection-code',null)||code5(),owner=read('gb-projection-owner',null),name=read('gb-projection-name','Projection Screen'),slide=read('gb-projection-slide',{content:null,settings:{verseSize:64,meaningSize:28,clock:false}}),peer,connections=new Set();
+store('gb-projection-code',code);$('code').textContent=code;$('name').value=name;
+function render(){const c=slide.content||{};const s=slide.settings||{};$('verse').textContent=c.verse||'';$('meaning').textContent=c.meaning||'';$('verse').style.fontSize=(s.verseSize||64)+'px';$('meaning').style.fontSize=(s.meaningSize||28)+'px';$('stage').classList.toggle('hasverse',!!c.verse);$('clock').hidden=!s.clock}
+function send(c,m){try{if(c.open)c.send(m)}catch{}}
+function hello(c){send(c,{type:'hello',deviceId:code,code:code,name:name,owner:owner})}
+function handle(c){connections.add(c);c.on('open',()=>{hello(c);$('status').textContent='Waiting for controller authorization'});
+c.on('data',m=>{if(!m||typeof m!=='object')return;
+if(m.type==='auth'&&typeof m.token==='string'){if(owner&&owner!==m.token){send(c,{type:'rejected'});return}owner=m.token;store('gb-projection-owner',owner);send(c,{type:'accepted',deviceId:code,code:code,name:name});$('status').textContent='Connected to controller'}
+if(m.type==='project'&&owner&&m.token===owner){if(Object.hasOwn(m,'content'))slide.content=m.content;if(m.settings)slide.settings={verseSize:Math.max(24,Math.min(150,Number(m.settings.verseSize)||64)),meaningSize:Math.max(16,Math.min(90,Number(m.settings.meaningSize)||28)),clock:!!m.settings.clock};store('gb-projection-slide',slide);render()}
+});c.on('close',()=>{connections.delete(c);$('status').textContent='Disconnected — last slide remains'});c.on('error',e=>$('status').textContent=e.message)}
+function start(){if(typeof Peer==='undefined')return $('status').textContent='PeerJS unavailable: check internet';peer=new Peer(prefix+code);peer.on('open',()=>{$('status').textContent=owner?'Ready (paired)':'Ready — enter code on controller';if(owner){}});
+peer.on('connection',handle);
+peer.on('error',e=>{if(e.type==='unavailable-id'){code=code5();store('gb-projection-code',code);$('code').textContent=code;peer.destroy();start()}else $('status').textContent='Peer: '+e.message})}
+$('join').onclick=()=>{const code2=$('controllerCode').value.trim();if(!/^\d{5}$/.test(code2))return $('status').textContent='Enter 5-digit controller code';if(!peer||peer.disconnected)return $('status').textContent='PeerJS offline';const c=peer.connect(ctrlPrefix+code2,{reliable:true,metadata:{code:code}});handle(c);$('controllerCode').value=''};
+$('saveName').onclick=()=>{name=$('name').value.trim().slice(0,50)||'Projection Screen';store('gb-projection-name',name);for(const c of connections){send(c,{type:'identify',code:code,name:name})}$('status').textContent='Display name saved'};
+$('fullscreen').onclick=()=>document.documentElement.requestFullscreen?.();
+$('toggle').onclick=()=>{$('setup').classList.toggle('hidden');$('toggle').textContent=$('setup').classList.contains('hidden')?'Show':'Hide'};
+setInterval(()=>{$('clock').textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})},1000);
+render();start();
+</script></body></html>
