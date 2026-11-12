@@ -96,13 +96,16 @@ $('stage').addEventListener('touchmove',e=>{if(!projectionPinch||e.touches.lengt
 $('stage').addEventListener('touchend',e=>{if(e.touches.length<2)projectionPinch=null});
 $('stage').addEventListener('touchcancel',()=>{projectionPinch=null});
 
-function updateMainPairing(){ $('mainPairingCode').textContent=code; $('mainPairing').hidden=!!owner; }
+let awaitSelection=read('gb-projection-await-selection',!owner);
+function markAwaitSelection(v){awaitSelection=v;store('gb-projection-await-selection',v);updateMainPairing()}
+function updateMainPairing(){ $('mainPairingCode').textContent=code; $('mainPairing').hidden=!!owner&&!awaitSelection; }
 function send(c,m){try{if(c.open)c.send(m)}catch{}}
 function hello(c){send(c,{type:'hello',deviceId:code,code:code,name:name,owner:owner})}
 function handle(c){connections.add(c);c.on('open',()=>{hello(c);$('status').textContent='Waiting for controller authorization'});
 c.on('data',m=>{if(!m||typeof m!=='object')return;
-if(m.type==='auth'&&typeof m.token==='string'){if(owner&&owner!==m.token){send(c,{type:'rejected'});$('status').textContent='Paired to another controller — use Reset pairing to change';return}owner=m.token;store('gb-projection-owner',owner);updateMainPairing();send(c,{type:'accepted',deviceId:code,code:code,name:name});$('status').textContent='Connected to controller'}
-if(m.type==='project'&&owner&&m.token===owner){if(Object.prototype.hasOwnProperty.call(m,'content'))slide.content=m.content;if(m.settings)slide.settings={verseSize:Math.max(24,Math.min(150,Number(m.settings.verseSize)||64)),hindiVerseSize:Math.max(24,Math.min(150,Number(m.settings.hindiVerseSize)||64)),englishVerseSize:Math.max(24,Math.min(150,Number(m.settings.englishVerseSize)||64)),meaningSize:Math.max(16,Math.min(90,Number(m.settings.meaningSize)||28)),englishSize:Math.max(16,Math.min(90,Number(m.settings.englishSize)||Number(m.settings.meaningSize)||28)),punjabiSize:Math.max(16,Math.min(90,Number(m.settings.punjabiSize)||28)),hindiSize:Math.max(16,Math.min(90,Number(m.settings.hindiSize)||28)),clock:!!m.settings.clock,autoFit:m.settings.autoFit!==false,larrivaar:!!m.settings.larrivaar,flow:!!m.settings.flow,pause:!!m.settings.pause};store('gb-projection-slide',slide);render()}
+if(m.type==='remove-pairing'&&owner&&m.token===owner){$('resetPairing').onclick();return}
+  if(m.type==='auth'&&typeof m.token==='string'){if(owner&&owner!==m.token){send(c,{type:'rejected'});$('status').textContent='Paired to another controller — use Reset pairing to change';return}owner=m.token;store('gb-projection-owner',owner);updateMainPairing();send(c,{type:'accepted',deviceId:code,code:code,name:name});$('status').textContent='Connected to controller'}
+if(m.type==='project'&&owner&&m.token===owner){if(Object.prototype.hasOwnProperty.call(m,'content')){slide.content=m.content;if(m.content&&m.content.verse)markAwaitSelection(false)}if(m.settings)slide.settings={verseSize:Math.max(24,Math.min(150,Number(m.settings.verseSize)||64)),hindiVerseSize:Math.max(24,Math.min(150,Number(m.settings.hindiVerseSize)||64)),englishVerseSize:Math.max(24,Math.min(150,Number(m.settings.englishVerseSize)||64)),meaningSize:Math.max(16,Math.min(90,Number(m.settings.meaningSize)||28)),englishSize:Math.max(16,Math.min(90,Number(m.settings.englishSize)||Number(m.settings.meaningSize)||28)),punjabiSize:Math.max(16,Math.min(90,Number(m.settings.punjabiSize)||28)),hindiSize:Math.max(16,Math.min(90,Number(m.settings.hindiSize)||28)),clock:!!m.settings.clock,autoFit:m.settings.autoFit!==false,larrivaar:!!m.settings.larrivaar,flow:!!m.settings.flow,pause:!!m.settings.pause};store('gb-projection-slide',slide);render()}
 });c.on('close',()=>{connections.delete(c);$('status').textContent=owner?'Disconnected — last slide remains':'Pairing cleared — ready for a controller'});c.on('error',e=>$('status').textContent=e.message)}
 function connectController(controllerCode){
  if(!peer||peer.destroyed||peer.disconnected||!peer.open){pendingController=controllerCode;$('status').textContent='Offline — reconnecting; pairing will retry';return}
@@ -114,13 +117,13 @@ function start(){
  onStatus:message=>{$('status').textContent=message},
  onOpen:()=>{$('status').textContent=owner?'Ready (paired)':'Ready — enter code on controller';if(pendingController){const target=pendingController;pendingController=null;connectController(target)}},
  onConnection:handle,
- onCollision:()=>{code=code5();store('gb-projection-code',code);$('code').textContent=code;updateMainPairing();advertiseWifi();$('status').textContent='Code in use; a new code was assigned'},
+ onCollision:()=>{markAwaitSelection(true);code=code5();store('gb-projection-code',code);$('code').textContent=code;updateMainPairing();advertiseWifi();$('status').textContent='Code in use; a new code was assigned'},
  onTargetUnavailable:()=>{$('status').textContent='Controller not found. Open Controller, wait for Online, and check its code.'}});
 }
 $('join').onclick=()=>{const c=$('controllerCode').value.trim();if(!/^\d{5}$/.test(c))return $('status').textContent='Enter 5-digit controller code';connectController(c)};
 function advertiseWifi(){if(window.GurbaniWifi&&typeof window.GurbaniWifi.advertise==='function'){try{window.GurbaniWifi.advertise(code,name)}catch(e){}}}
 $('saveName').onclick=()=>{name=$('name').value.trim().slice(0,50)||'Projection Screen';store('gb-projection-name',name);advertiseWifi();for(const c of connections){send(c,{type:'identify',code:code,name:name})}$('status').textContent='Display name saved'};
-$('resetPairing').onclick=()=>{owner=null;store('gb-projection-owner',null);updateMainPairing();for(const c of [...connections]){send(c,{type:'unpaired'});setTimeout(()=>{try{c.close()}catch(_){}},250)}connections.clear();$('status').textContent='Pairing cleared — ready for a controller'};
+$('resetPairing').onclick=()=>{owner=null;markAwaitSelection(true);store('gb-projection-owner',null);updateMainPairing();for(const c of [...connections]){send(c,{type:'unpaired'});setTimeout(()=>{try{c.close()}catch(_){}},250)}connections.clear();$('status').textContent='Pairing cleared — ready for a controller'};
 $('fullscreen').onclick=()=>document.documentElement.requestFullscreen?.();
 function menu(show){document.body.classList.toggle('menu-open',show);$('menuButton').setAttribute('aria-expanded',String(show))}
 $('menuButton').onclick=()=>menu(!document.body.classList.contains('menu-open'));

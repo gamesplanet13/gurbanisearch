@@ -44,7 +44,9 @@ function render(){
  const hi=$('line-'+Math.max(0,Math.min(current,lines.length-1)));
  if(hi)requestAnimationFrame(()=>hi.scrollIntoView({behavior:'smooth',block:'center'}))
 }
-function updateMainPairing(){ $('mainPairingCode').textContent=code; $('mainPairing').hidden=!!owner; }
+let awaitSelection=read('gb-book-await-selection',!owner);
+function markAwaitSelection(v){awaitSelection=v;put('gb-book-await-selection',v);updateMainPairing()}
+function updateMainPairing(){ $('mainPairingCode').textContent=code; $('mainPairing').hidden=!!owner&&!awaitSelection; }
 function send(c,m){try{if(c.open)c.send(m)}catch{}}
 function hello(c){send(c,{type:'hello',deviceId:code,code,name,owner,kind:'book',bookSettings:bookState()})}
 function connection(c){
@@ -52,13 +54,14 @@ function connection(c){
  c.on('open',()=>{hello(c);$('status').textContent='Waiting for pairing'});
  c.on('data',m=>{
   if(!m||typeof m!=='object')return;
+  if(m.type==='remove-pairing'&&owner&&m.token===owner){$('resetPairing').onclick();return}
   if(m.type==='auth'&&typeof m.token==='string'){
    if(owner&&owner!==m.token){send(c,{type:'rejected'});$('status').textContent='Paired to another controller — use Reset pairing to change';return}
    owner=m.token;put('gb-book-owner',owner);updateMainPairing();send(c,{type:'accepted',deviceId:code,code,name,kind:'book',bookSettings:bookState()});$('status').textContent='Paired';return
   }
   if(m.type==='project'&&owner&&m.token===owner){
    if(m.bookSettings&&typeof m.bookSettings==='object'){applyBookSettings(m.bookSettings.fontSize,m.bookSettings.lineSpacing,false);setBookLayout(m.bookSettings,false)}
-   if(Object.prototype.hasOwnProperty.call(m,'content')&&(!m.content||m.content.mode!=='waheguru')){saved.content=m.content;put('gb-book-slide',saved);render()}
+   if(Object.prototype.hasOwnProperty.call(m,'content')&&(!m.content||m.content.mode!=='waheguru')){saved.content=m.content;put('gb-book-slide',saved);if(m.content&&m.content.verse)markAwaitSelection(false);render()}
   }
  });
  c.on('close',()=>{connections.delete(c);$('status').textContent=owner?'Disconnected — last shabad retained':'Pairing cleared — ready for a controller'});
@@ -74,13 +77,13 @@ function start(){
  onStatus:message=>{$('status').textContent=message},
  onOpen:()=>{$('status').textContent=owner?'Ready — paired':'Ready for pairing';if(pendingController){const target=pendingController;pendingController=null;connectController(target)}},
  onConnection:connection,
- onCollision:()=>{code=code5();put('gb-book-code',code);$('code').textContent=code;updateMainPairing();advertiseWifi();$('status').textContent='Code in use; a new code was assigned'},
+ onCollision:()=>{markAwaitSelection(true);code=code5();put('gb-book-code',code);$('code').textContent=code;updateMainPairing();advertiseWifi();$('status').textContent='Code in use; a new code was assigned'},
  onTargetUnavailable:()=>{$('status').textContent='Controller not found. Open Controller, wait for Online, and check its code.'}});
 }
 $('join').onclick=()=>{const c=$('controllerCode').value.trim();if(!/^\d{5}$/.test(c))return $('status').textContent='Enter 5-digit controller code';connectController(c)};
 function advertiseWifi(){if(window.GurbaniWifi&&typeof window.GurbaniWifi.advertise==='function'){try{window.GurbaniWifi.advertise(code,name)}catch(e){}}}
 $('saveName').onclick=()=>{name=$('name').value.trim().slice(0,50)||'Book Reading Projection';put('gb-book-name',name);advertiseWifi();for(const c of connections)send(c,{type:'identify',code,name})};
-$('resetPairing').onclick=()=>{owner=null;put('gb-book-owner',null);updateMainPairing();for(const c of [...connections]){send(c,{type:'unpaired'});setTimeout(()=>{try{c.close()}catch(_){}},250)}connections.clear();$('status').textContent='Pairing cleared — ready for a controller'};
+$('resetPairing').onclick=()=>{owner=null;markAwaitSelection(true);put('gb-book-owner',null);updateMainPairing();for(const c of [...connections]){send(c,{type:'unpaired'});setTimeout(()=>{try{c.close()}catch(_){}},250)}connections.clear();$('status').textContent='Pairing cleared — ready for a controller'};
 $('fullscreen').onclick=()=>document.documentElement.requestFullscreen?.();
 $('fontSize').oninput=()=>applyBookSettings($('fontSize').value,spacing,true);
 $('lineSpacing').oninput=()=>applyBookSettings(size,$('lineSpacing').value,true);
