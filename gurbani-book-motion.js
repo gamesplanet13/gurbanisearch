@@ -19,7 +19,7 @@ window.GurbaniBookMotion = function (surface, scroller, fontSize, previewSize, s
    const height = page ? window.innerHeight : scroller.clientHeight;
    const bounds = line.getBoundingClientRect();
    const target = Math.max(0, Math.min(scroller.scrollHeight - height,
-     scroller.scrollTop + bounds.top + bounds.height / 2 - top - height / 2));
+     scroller.scrollTop + bounds.top - top + (surface.dataset.alignment === 'top' ? -Math.min(96, height * .16) : bounds.height / 2 - height / 2)));
    if (Math.abs(scroller.scrollTop - target) < 2) return;
    const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
    const nativeScroller = page ? window : scroller;

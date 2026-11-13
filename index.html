@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gurbani Control</title><style>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gurbani Searching Control</title><style>
 *{box-sizing:border-box}body{margin:0;background:#0b101a;color:#eef5ff;font:15px system-ui,sans-serif}header{padding:16px;background:#182438;display:flex;justify-content:space-between;align-items:center;gap:10px}h1{font-size:21px;margin:0}main{max-width:1150px;margin:20px auto;padding:0 12px;display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{border:1px solid #36455e;background:#172232;padding:18px;border-radius:15px;margin-bottom:14px}h2{margin:0 0 12px;font-size:18px}input,select,button{font:inherit;color:#fff;background:#101b2d;border:1px solid #53627c;border-radius:9px;padding:11px}button{cursor:pointer;background:#28486b}button.primary{background:#1669ae}.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0}.grow{flex:1;min-width:110px}.muted{color:#b0bfd3;font-size:13px}.code{font-size:31px;letter-spacing:5px;color:#f7d48a;font-weight:bold}.list{max-height:50vh;overflow:auto}.item{display:block;text-align:left;width:100%;line-height:1.55;margin:7px 0;white-space:normal}.item.active{background:#575025;border-color:#e0bd68}.device{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:#253347;border-radius:8px;margin:7px 0;padding:10px}.device label{flex:1}.devstatus{font-size:12px;color:#89d5af}.verse{font-size:20px}.small{font-size:12px;color:#aebed4}a{color:#a7d2ff}label.field{display:block;margin:8px 0}input[type=range]{width:100%}input[type=checkbox]{accent-color:#dab66b}@media(max-width:850px){main{grid-template-columns:1fr}}#searchColumn{display:flex;flex-direction:column}#searchCard{order:0}#connectCard{order:1}#historyCard{order:2}#results[hidden]{display:none}#shabadCard label{font-size:12px}
 header{position:sticky;top:0;z-index:8}#menuButton{min-width:45px;font-size:23px;padding:7px 12px}#functionsMenu{position:fixed;right:12px;top:63px;z-index:20;max-width:min(94vw,400px);max-height:80vh;overflow-y:auto;background:#18263b;border:1px solid #6d7a96;border-radius:16px;padding:16px;box-shadow:0 15px 70px #000b}#functionsMenu[hidden]{display:none}#functionsMenu label{display:block;padding:6px 0}#menuOptions h2{font-size:16px;margin:9px 0}#connectCard,#fontCard{display:none}#functionsMenu #connectCard,#functionsMenu #fontCard{display:block;padding:10px;margin:8px 0}#functionsMenu .card{box-shadow:none}.historyItem{display:block;width:100%;text-align:left;margin:6px 0;background:#273750}.markMain{float:right;padding:4px 8px;margin-left:6px;background:#344864}.mainNote{color:#f3cc75;font-size:12px}#lines .item{overflow:auto} .gp-credit{font-size:9px;color:#7d8da4;text-align:center;padding:9px 4px 16px;opacity:.7} body.day-mode{background:#f5efe1;color:#25221c}body.day-mode header,body.day-mode #functionsMenu{background:#eee1c8;color:#25221c}body.day-mode .card{background:#fffaf0;border-color:#bcae94}body.day-mode input,body.day-mode select,body.day-mode button{background:#e7dcc6;color:#211d18;border-color:#9c896a}body.day-mode .small,body.day-mode .muted{color:#574e41}.ang-indicator{position:fixed;right:12px;bottom:18px;font-size:11px;color:#ab9a78;z-index:2;pointer-events:none}.quick-actions{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
-@media (orientation:landscape) and (min-width:650px){main{grid-template-columns:minmax(250px,42%) minmax(0,58%);align-items:start}main>div{min-width:0}#searchColumn{position:sticky;top:72px;max-height:calc(100dvh - 78px);overflow:auto}#shabadCard,#historyCard{width:100%}#lines{max-height:59dvh}#historyList{max-height:28dvh;overflow:auto}} @media (orientation:portrait),(max-width:649px){#searchColumn{position:static;max-height:none}#lines{max-height:45dvh}} #connectCard .device{flex-wrap:wrap} #connectCard .device select{max-width:150px} #customTools textarea{border-radius:9px;border:1px solid #52617a;background:#101b2d;color:#fff;padding:10px;margin:7px 0}#customTools summary{cursor:pointer;font-weight:700;padding:7px 0} #shabadCard{position:relative}#historyCard{position:absolute;top:54px;right:12px;z-index:12;width:min(360px,calc(100% - 24px));max-height:60vh;overflow:auto;box-shadow:0 16px 45px #000b;background:#202c41}#historyCard[hidden],#readingNavigator[hidden],#sukhmaniNavigation[hidden],#sehajNavigation[hidden]{display:none!important}#sukhmaniNavigation,#sehajNavigation{margin:12px 0;padding:10px;background:#223149;border-radius:12px}#readingNavigator input{min-width:90px}#historyToggle{font-size:13px;padding:8px 11px}@media(orientation:landscape) and (min-width:650px){main{grid-template-columns:minmax(260px,40%) minmax(0,60%)}#historyCard{max-height:75vh}} #devices .device{flex-wrap:wrap}#devices .device label{flex:1;min-width:135px}#devices .device select{max-width:145px}#devices .device-settings-editor{border:1px solid #7b8eab;background:#22324a;border-radius:12px;padding:12px;margin:8px 0 14px}#devices .device-settings-editor>select{width:100%;margin:5px 0}#devices .device-setting-field{display:block;margin:12px 0}#devices .device-setting-field input{display:block;width:100%;accent-color:#edc97d}#devices .device-setting-checkbox{display:block;padding:5px 0;font-size:14px} 
+@media (orientation:landscape) and (min-width:650px){main{grid-template-columns:minmax(250px,42%) minmax(0,58%);align-items:start}main>div{min-width:0}#searchColumn{position:sticky;top:72px;max-height:calc(100dvh - 78px);overflow:auto}#shabadCard,#historyCard{width:100%}#lines{max-height:59dvh}#historyList{max-height:28dvh;overflow:auto}} @media (orientation:portrait),(max-width:649px){#searchColumn{position:static;max-height:none}#lines{max-height:45dvh}} #connectCard .device{flex-wrap:wrap} #connectCard .device select{max-width:150px} #customTools textarea{border-radius:9px;border:1px solid #52617a;background:#101b2d;color:#fff;padding:10px;margin:7px 0}#customTools summary{cursor:pointer;font-weight:700;padding:7px 0} #shabadCard{position:relative}#historyCard{position:absolute;top:54px;right:12px;z-index:12;width:min(360px,calc(100% - 24px));max-height:60vh;overflow:auto;box-shadow:0 16px 45px #000b;background:#202c41}#historyCard[hidden],#readingNavigator[hidden],#sukhmaniNavigation[hidden],#sehajNavigation[hidden],#asaNavigation[hidden]{display:none!important}#sukhmaniNavigation,#sehajNavigation{margin:12px 0;padding:10px;background:#223149;border-radius:12px}#readingNavigator input{min-width:90px}#historyToggle{font-size:13px;padding:8px 11px}@media(orientation:landscape) and (min-width:650px){main{grid-template-columns:minmax(260px,40%) minmax(0,60%)}#historyCard{max-height:75vh}} #devices .device{flex-wrap:wrap}#devices .device label{flex:1;min-width:135px}#devices .device select{max-width:145px}#devices .device-settings-editor{border:1px solid #7b8eab;background:#22324a;border-radius:12px;padding:12px;margin:8px 0 14px}#devices .device-settings-editor>select{width:100%;margin:5px 0}#devices .device-setting-field{display:block;margin:12px 0}#devices .device-setting-field input{display:block;width:100%;accent-color:#edc97d}#devices .device-setting-checkbox{display:block;padding:5px 0;font-size:14px}
 /* Ultra-compact Controller UI: icons retain tooltips and accessibility labels. */
 body{font-size:12px;line-height:1.35}
 header{padding:6px 9px;gap:5px}
@@ -147,11 +147,11 @@ main{width:100%;max-width:none;margin:3px auto;padding:0 4px;gap:4px;align-items
   <div class="row install-actions"><button id="installRetry" class="primary" hidden>↻ Retry / Resume</button><button id="installRefresh">↻ Recheck Storage</button></div>
   <p id="installOtherSources" class="small">Dasam Granth · Bhai Gurdas Ji · Bhai Nand Lal Ji: Checking GitHub source packs…</p>
  </div>
-</div><header><h1>ੴ Gurbani Searcher · Control</h1><button id="desktopPreviewToggle" aria-controls="desktopPreview" aria-expanded="false" hidden>Live Preview</button><button id="menuButton" class="icon-btn" title="Functions and connected devices" aria-label="Open functions" aria-expanded="false">☰</button></header><main><div id="searchColumn">
-<section class="card" id="connectCard"><h2>Connected Projections</h2><div class="row"><div class="grow"><span class="muted">Your controller code</span><div id="code" class="code">•••••</div></div><span id="connStatus" class="muted">Connecting…</span></div><div class="row"><input id="newControllerCode" class="grow" inputmode="numeric" maxlength="5" placeholder="New 5-digit controller code"><button id="changeControllerCode">Change code</button></div><div class="row"><button id="searchWifi" class="primary">Search Wi-Fi Projections</button></div><p id="wifiStatus" class="small" aria-live="polite">Find Projection or Book View on the same Wi-Fi.</p><div id="wifiResults"></div><div class="row"><input id="pairCode" placeholder="Projection 5-digit code" inputmode="numeric" maxlength="5" class="grow"><button id="pair" class="primary">Connect</button></div><p class="small">You can also type your controller code into the Projection browser. Select displays below before projecting.</p><p id="pairStatus" class="small" aria-live="polite">Connecting…</p><div id="devices"></div></section>
+</div><header><h1>ੴ Gurbani Searching Control</h1><button id="desktopPreviewToggle" aria-controls="desktopPreview" aria-expanded="false" hidden>Live Preview</button><button id="menuButton" class="icon-btn" title="Functions and connected devices" aria-label="Open functions" aria-expanded="false">☰</button></header><main><div id="searchColumn">
+<section class="card" id="connectCard"><h2>Connected Projections</h2><div class="row"><div class="grow"><span class="muted">Your controller code</span><div id="code" class="code">•••••</div></div><span id="connStatus" class="muted">Connecting…</span></div><div class="row"><input id="newControllerCode" class="grow" inputmode="numeric" maxlength="5" placeholder="New 5-digit controller code"><button id="changeControllerCode">Change code</button></div><div class="row"><button id="searchWifi" class="primary">Search Wi-Fi Projections</button></div><p id="wifiStatus" class="small" aria-live="polite">Find Projection or Granth View on the same Wi-Fi.</p><div id="wifiResults"></div><div class="row"><input id="pairCode" placeholder="Projection 5-digit code" inputmode="numeric" maxlength="5" class="grow"><button id="pair" class="primary">Connect</button></div><p class="small">You can also type your controller code into the Projection browser. Select displays below before projecting.</p><p id="pairStatus" class="small" aria-live="polite">Connecting…</p><div id="devices"></div></section>
 <section class="card" id="searchCard"><h2>Search Gurbani</h2><div class="row"><label for="corpusSource" class="small">Source</label><select id="corpusSource" class="grow"><option value="all">All Sources</option><option value="G">Sri Guru Granth Sahib Ji</option><option value="D">Sri Dasam Granth</option><option value="B">Bhai Gurdas Ji Vaaran</option><option value="N">Bhai Nand Lal Ji</option><option value="A">Amrit Keertan / Other</option></select></div><div class="row"><select id="keyboard" hidden aria-label="Keyboard language"><option value="en">English</option><option value="pa">Gurmukhi</option><option value="hi">Hindi</option></select><button id="keyboardToggle" class="icon-btn" title="Open language keyboard" aria-label="Open language keyboard" aria-expanded="false">⌨</button><select id="searchType"><option value="7">First letters (English)</option><option value="0">First letters (Gurmukhi)</option><option value="2">Full word (Gurmukhi)</option><option value="4">Romanized word</option></select></div><div class="row"><input id="query" class="grow" placeholder="Type first letters (e.g. ddss)"><button id="search" class="primary icon-btn" title="Search Gurbani" aria-label="Search Gurbani">⌕</button></div><div id="onscreenKeyboard" hidden><div id="keyboardLanguages" class="row"><button type="button" data-lang="en">EN</button><button type="button" data-lang="pa">ਗੁਰਮੁਖੀ</button><button type="button" data-lang="hi">हिन्दी</button><button id="keyboardHide" type="button" aria-label="Close keyboard">✕</button></div><div id="keyboardKeys"></div></div><div class="quick-actions" id="baniQuickActions"><button id="waheguru" class="waheguru-quick" aria-label="Project animated Waheguru">ਵਾਹਿਗੁਰੂ ✨</button><button id="nitnem" title="Nitnem morning Banis">ਨਿਤਨੇਮ</button><button id="japji" title="Japji Sahib">ਜਪੁਜੀ</button><button id="jaap" title="Jaap Sahib">ਜਾਪ</button><button id="tavPrasad" title="Tav Prasad Savaiye">ਤ੍ਵ ਪ੍ਰਸਾਦਿ ਸਵੱਯੇ</button><button id="deenan" title="Savaiye Deenan Ki Pratipal">ਦੀਨਨ ਕੀ ਪ੍ਰਤਿਪਾਲ</button><button id="chaupai" title="Chaupai Sahib">ਚੌਪਈ</button><button id="anandFull" title="Full Anand Sahib">ਅਨੰਦ ਸਾਹਿਬ</button><button id="anandSix" title="Anand Sahib Six Pauris">ਅਨੰਦ 6</button><button id="rehras" title="Rehras Sahib">ਰਹਿਰਾਸ</button><button id="sohila" title="Kirtan Sohila Sahib">ਸੋਹਿਲਾ</button><button id="asaVar" title="Asa Di Vaar">ਆਸਾ ਦੀ ਵਾਰ</button><button id="ardas" title="Ardas">ਅਰਦਾਸ</button><button id="sukhmani" title="Sukhmani Sahib">ਸੁਖਮਨੀ</button><button id="aapeSangat" title="ਆਪੇ ਸੰਗਤਿ ਸਦਿ ਬਹਾਲੈ">ਆਪੇ ਸੰਗਤਿ…</button><button id="sehaj" title="Sehaj Path">ਸਹਿਜ ਪਾਠ</button></div><div id="results" class="list" hidden></div><details class="offline-tools" id="offlineToolsDetails"><summary>Offline Library · Download &amp; Storage</summary><div class="row"><strong class="grow">Offline Gurbani Library</strong><span id="offlineBadge" class="small">Checking storage…</span></div><div class="row"><button id="offlineDownload" class="primary" title="Download Sri Guru Granth Sahib Ji Angs from Open Granth for offline search">↓ SGGS 1430 Angs</button><button id="offlineSourceDownload" class="primary" title="Save the chosen GitHub source pack on this device">↓ Selected Source</button><button id="offlineStop" title="Pause offline downloading">Ⅱ</button><button id="offlineRefresh" title="Check offline downloaded pages">↻</button></div><progress id="offlineProgress" value="0" max="1430"></progress><div class="row"><label class="small grow" for="offlineImport">Import vetted source pack (JSON)</label><input id="offlineImport" type="file" accept=".json,application/json" aria-label="Import locally saved scripture source pack"></div><div id="sourceAvailability" class="small" aria-live="polite"></div><p id="offlineMessage" class="small" aria-live="polite">Public-domain Gurbani text from Open Granth (Shabad OS source). Download once online; then search and read offline. English meaning is available when included in source.</p></details></section></div>
-<div><section class="card" id="shabadCard"><div class="row" style="justify-content:space-between;align-items:center"><h2 style="margin:0">Shabad · Choose a Line <span id="readingAngLabel" class="reading-ang-label" hidden></span></h2><button id="projectionSwitch" class="icon-btn projection-enabled" type="button" title="Projection ON — click to turn off" aria-label="Projection ON" aria-pressed="true">▣</button><button id="closeReading" class="icon-btn icon-danger" type="button" title="Close opened Shabad / Path" aria-label="Close opened Shabad / Path">✕</button><button id="historyToggle" class="icon-btn" type="button" aria-expanded="false" title="Recent Shabads History" aria-label="Recent Shabads History">☷</button></div><section class="card" id="historyCard" hidden><div class="row" style="justify-content:space-between"><strong>Recent Shabads</strong><button id="historyClose" type="button">✕</button></div><div id="historyList"></div></section><div class="row"><button id="mainLine" class="primary icon-btn" title="Go to Main Line" aria-label="Go to Main Line">⌂</button><span id="mainLabel" class="small">Main: —</span></div><p class="small">Tap any line to project; use ☆ to set that line as Main.</p><div id="readingNavigator" hidden><div class="small" id="readingKindLabel"></div><div id="sukhmaniNavigation" hidden class="row"><button id="prevSalok" class="icon-btn" title="Previous Salok" aria-label="Previous Salok">◀</button><input id="salokNumber" type="number" min="1" max="24" inputmode="numeric" placeholder="Salok 1–24" style="width:120px"><button id="openSalok" class="icon-btn" title="Open selected Salok" aria-label="Open selected Salok">↵</button><button id="nextSalok" class="icon-btn" title="Next Salok" aria-label="Next Salok">▶</button><span id="salokPosition" class="small"></span></div><div id="sehajNavigation" hidden><div class="row"><input id="angInput" type="number" min="1" max="1430" inputmode="numeric" placeholder="Custom Ang 1–1430" class="grow"><button id="angSearch" class="icon-btn" title="Open selected Ang" aria-label="Open selected Ang">↵</button><button id="prevAng" class="icon-btn" title="Previous Ang" aria-label="Previous Ang">◀</button><button id="nextAng" class="icon-btn" title="Next Ang" aria-label="Next Ang">▶</button></div></div></div><div id="lines" class="list"></div><div class="row"><button id="previous" class="icon-btn" type="button" title="Previous line" aria-label="Previous line">◀</button><button id="next" class="icon-btn" type="button" title="Next line" aria-label="Next line">▶</button><button id="clear" class="icon-btn icon-danger" type="button" title="Clear projection" aria-label="Clear projection">⌫</button></div></section>
-<section class="card" id="fontCard"><h2>Default Settings (New Devices)</h2><p class="small">For connected screens, open ⚙ Settings beside each device. These presets do not overwrite other devices.</p><label class="field">Gurbani size <span id="vsLabel">64</span> px<input type="range" id="vs" min="24" max="360" value="64"></label><label class="field">Hindi shabad size <span id="hsvLabel">64</span> px<input type="range" id="hsv" min="24" max="360" value="64"></label><label class="field">English shabad size <span id="esvLabel">64</span> px<input type="range" id="esv" min="24" max="360" value="64"></label><label class="field">English meaning size <span id="enLabel">28</span> px<input type="range" id="enSize" min="16" max="180" value="28"></label><label class="field">Punjabi meaning size <span id="paLabel">28</span> px<input type="range" id="paSize" min="16" max="180" value="28"></label><label class="field">Hindi meaning size <span id="hiLabel">28</span> px<input type="range" id="hiSize" min="16" max="180" value="28"></label><label class="field">Projection line spacing <span id="projectionSpacingLabel">135</span>%<input type="range" id="projectionSpacing" min="90" max="220" step="5" value="135"></label><h2>Projection display</h2><label><input type="checkbox" id="projectionFit" checked> Auto-fit full screen</label><label><input type="checkbox" id="projectionLari"> ਲੜੀਵਾਰ (Larrivaar)</label><label><input type="checkbox" id="projectionFlow"> Continuous shabad lines</label><label><input type="checkbox" id="projectionPause"> Colour words before punctuation</label><h2>Book View Settings</h2><label><input type="checkbox" id="bookLari"> ਲੜੀਵਾਰ (Larrivaar)</label><label><input type="checkbox" id="bookFlow"> Continuous shabad lines</label><label><input type="checkbox" id="bookPause"> Colour words before punctuation</label><label class="field">Book font <span id="bookSizeLabel">30</span> px<input type="range" id="bookSize" min="14" max="85" value="30"></label><label class="field">Book line spacing <span id="bookSpacingLabel">160</span>%<input type="range" id="bookSpacing" min="90" max="220" step="5" value="160"></label><p class="small">Changes apply to selected Book View screens and are saved.</p><label><input id="clock" type="checkbox"> Show clock (top left)</label><p class="small">Font size changes live. No Apply needed.</p><p id="status" class="muted">Ready.</p><p class="small">Last projected line remains on the display when controller disconnects. Reconnection needs the Projection tab to remain open and online.</p></section></div></main><footer class="gp-credit">Developed by Rajinder Singh · <a href="mailto:harjas.info@gmail.com">harjas.info@gmail.com</a> · 2026</footer><aside id="functionsMenu" hidden><div class="row" style="justify-content:space-between"><strong>Functions</strong><button id="closeMenu">✕</button></div><div id="menuOptions"><details id="cameraMenu"><summary>📹 Live Camera</summary>
+<div><section class="card" id="shabadCard"><div class="row" style="justify-content:space-between;align-items:center"><h2 style="margin:0">Shabad · Choose a Line <span id="readingAngLabel" class="reading-ang-label" hidden></span></h2><button id="projectionSwitch" class="icon-btn projection-enabled" type="button" title="Projection ON — click to turn off" aria-label="Projection ON" aria-pressed="true">▣</button><button id="closeReading" class="icon-btn icon-danger" type="button" title="Close opened Shabad / Path" aria-label="Close opened Shabad / Path">✕</button><button id="historyToggle" class="icon-btn" type="button" aria-expanded="false" title="Recent Shabads History" aria-label="Recent Shabads History">☷</button></div><section class="card" id="historyCard" hidden><div class="row" style="justify-content:space-between"><strong>Recent Shabads</strong><button id="historyClose" type="button">✕</button></div><div id="historyList"></div></section><div class="row"><button id="mainLine" class="primary icon-btn" title="Go to Main Line" aria-label="Go to Main Line">⌂</button><span id="mainLabel" class="small">Main: —</span></div><p class="small">Tap any line to project; use ☆ to set that line as Main.</p><div id="readingNavigator" hidden><div class="small" id="readingKindLabel"></div><div id="sukhmaniNavigation" hidden class="row"><button id="prevSalok" class="icon-btn" title="Previous Salok" aria-label="Previous Salok">◀</button><input id="salokNumber" type="number" min="1" max="24" inputmode="numeric" placeholder="Salok 1–24" style="width:120px"><button id="openSalok" class="icon-btn" title="Open selected Salok" aria-label="Open selected Salok">↵</button><button id="nextSalok" class="icon-btn" title="Next Salok" aria-label="Next Salok">▶</button><span id="salokPosition" class="small"></span></div><div id="asaNavigation" class="row" style="flex-wrap:wrap" hidden><button id="prevPauri">Previous Chhakka</button><label>Chhakka <input id="pauriNumber" type="number" min="1" max="24" inputmode="numeric" value="1"></label><button id="openPauri">Open</button><button id="nextPauri">Next Chhakka</button><span id="pauriPosition"></span></div><div id="sehajNavigation" hidden><div class="row"><input id="angInput" type="number" min="1" max="1430" inputmode="numeric" placeholder="Custom Ang 1–1430" class="grow"><button id="angSearch" class="icon-btn" title="Open selected Ang" aria-label="Open selected Ang">↵</button><button id="prevAng" class="icon-btn" title="Previous Ang" aria-label="Previous Ang">◀</button><button id="nextAng" class="icon-btn" title="Next Ang" aria-label="Next Ang">▶</button></div></div></div><div id="lines" class="list"></div><div class="row"><button id="previous" class="icon-btn" type="button" title="Previous line" aria-label="Previous line">◀</button><button id="next" class="icon-btn" type="button" title="Next line" aria-label="Next line">▶</button><button id="clear" class="icon-btn icon-danger" type="button" title="Clear projection" aria-label="Clear projection">⌫</button></div></section>
+<details class="card" id="fontCard"><summary>Defaults for new displays</summary><p class="small">For connected screens, open ⚙ Settings beside each device. These presets do not overwrite other devices.</p><label class="field">Gurbani size <span id="vsLabel">64</span> px<input type="range" id="vs" min="24" max="360" value="64"></label><label class="field">Hindi shabad size <span id="hsvLabel">64</span> px<input type="range" id="hsv" min="24" max="360" value="64"></label><label class="field">English shabad size <span id="esvLabel">64</span> px<input type="range" id="esv" min="24" max="360" value="64"></label><label class="field">English meaning size <span id="enLabel">28</span> px<input type="range" id="enSize" min="16" max="180" value="28"></label><label class="field">Punjabi meaning size <span id="paLabel">28</span> px<input type="range" id="paSize" min="16" max="180" value="28"></label><label class="field">Hindi meaning size <span id="hiLabel">28</span> px<input type="range" id="hiSize" min="16" max="180" value="28"></label><label class="field">Projection line spacing <span id="projectionSpacingLabel">135</span>%<input type="range" id="projectionSpacing" min="90" max="220" step="5" value="135"></label><h2>Projection display</h2><label><input type="checkbox" id="projectionFit" checked> Auto-fit full screen</label><label><input type="checkbox" id="projectionLari"> ਲੜੀਵਾਰ (Larrivaar)</label><label><input type="checkbox" id="projectionFlow"> Continuous shabad lines</label><label><input type="checkbox" id="projectionPause"> Colour words before punctuation</label><h2>Granth View Settings</h2><label><input type="checkbox" id="bookLari"> ਲੜੀਵਾਰ (Larrivaar)</label><label><input type="checkbox" id="bookFlow"> Continuous shabad lines</label><label><input type="checkbox" id="bookPause"> Colour words before punctuation</label><label class="field">Book font <span id="bookSizeLabel">30</span> px<input type="range" id="bookSize" min="14" max="85" value="30"></label><label class="field">Granth line spacing <span id="bookSpacingLabel">160</span>%<input type="range" id="bookSpacing" min="90" max="220" step="5" value="160"></label><p class="small">Changes apply to selected Granth View screens and are saved.</p><label><input id="clock" type="checkbox"> Show clock (top left)</label><p class="small">Font size changes live. No Apply needed.</p><p id="status" class="muted">Ready.</p><p class="small">Last projected line remains on the display when controller disconnects. Reconnection needs the Projection tab to remain open and online.</p></details></div></main><footer class="gp-credit">Developed by Rajinder Singh · <a href="mailto:harjas.info@gmail.com">harjas.info@gmail.com</a> · 2026</footer><aside id="functionsMenu" hidden><div class="row" style="justify-content:space-between"><strong>Functions</strong><button id="closeMenu">✕</button></div><div id="menuOptions"><details id="cameraMenu"><summary>📹 Live Camera</summary>
  <p class="small">On another phone open <a href="camera.html" target="_blank" rel="noopener">Camera Phone</a>, enable camera permission and enter its 5-digit code here.</p>
  <div class="row"><input id="cameraCodeInput" placeholder="5-digit Camera code" inputmode="numeric" maxlength="5" style="width:130px"><button id="cameraConnect" class="primary">Connect Camera</button></div>
  <div class="row"><button id="cameraLocalStart" class="primary">Use This Phone Camera</button><button id="cameraLocalStop">Stop This Phone Camera</button></div>
@@ -170,14 +170,14 @@ main{width:100%;max-width:none;margin:3px auto;padding:0 4px;gap:4px;align-items
  <div class="row"><button id="cameraProject" class="primary">▶ Show on selected displays</button><button id="cameraHide">■ Hide Camera</button></div>
  <div class="row"><button id="cameraRecord">● Record on Camera Phone</button><button id="cameraRecordStop">■ Stop &amp; Save</button></div>
  <p class="small">Remote recordings save on the Camera Phone. Select screens in Connected Projections above.</p>
- </details><hr><h2>Pictures · Controller</h2><p class="small">Send photos to selected Projection screens; order and fade controlled here.</p><input id="picFiles" type="file" accept="image/*" multiple><div id="picList"></div><label><input id="picFade" type="checkbox" checked> Fade</label><label>Duration <span id="picSeconds">5</span>s<input id="picInterval" type="range" min="2" max="30" value="5"></label><div class="row"><button id="picSend">Send Slideshow</button><button id="picStop">Close Pictures</button></div><div class="row"><button id="sahibzaadeSend" class="primary">Show Sahibzaade Picture · Full Screen</button><button id="sahibzaadeClose">Close Sahibzaade Picture</button></div><p class="small">Sends the built-in picture to the selected online Projection devices, without uploading it again.</p><hr><h2>Day / Night</h2><label><input id="controlDay" type="checkbox"> Control · Day mode</label><label><input id="projectionDay" type="checkbox"> Projection · Day mode</label><label><input id="bookNight" type="checkbox"> Book View · Night mode</label><h2>Projection Lines</h2><p class="small">Gurbani Shabad</p><label><input type="checkbox" id="gurmukhiCheck" checked> Gurmukhi</label><label><input type="checkbox" id="hindiShabadCheck"> Hindi</label><label><input type="checkbox" id="englishShabadCheck"> English</label><p class="small">Gurbani Arth</p><label><input type="checkbox" id="paCheck" checked> Punjabi</label><label><input type="checkbox" id="hiCheck"> Hindi</label><label><input type="checkbox" id="enCheck"> English</label><hr><a href="projection.html" target="_blank">Open Projection Browser</a><p><a href="book.html" target="_blank">Open Book Reading Projection</a></p><hr><details><summary>OBS Live Text</summary><h2>OBS Live Text</h2><p class="small">Open this link as an OBS Browser Source, then press Connect OBS.</p><input id="obsUrl" readonly aria-label="OBS link"><div class="row"><button id="copyObs">Copy OBS link</button><button id="connectObs">Connect OBS</button></div><p class="small">Tick languages and use ↑ / ↓ to set order.</p><div id="obsOptions"></div></details><hr><details id="customTools"><summary>Custom Text & Scroll</summary><p class="small">Type or paste text. Online translation is optional and may contain errors; review before projecting.</p><textarea id="customText" rows="4" style="width:100%;font:inherit" placeholder="Gurmukhi, Hindi or English text"></textarea><label>Translate online to <select id="customTarget"><option value="pa">Punjabi (Gurmukhi)</option><option value="hi">Hindi</option><option value="en">English</option></select></label><button id="convertCustom">Translate text online</button><textarea id="customConverted" rows="3" style="width:100%;font:inherit" placeholder="Editable translated text"></textarea><button id="useConverted">Use translated text</button><label><input type="checkbox" id="customScroll"> Scroll text on Projection</label><div class="row"><button id="sendCustom">Project custom text</button></div><p class="small" id="customStatus" aria-live="polite">Online translation is sent to a third-party service; avoid private text.</p></details><hr><details id="menuDatabasePanel" class="menu-db-panel"><summary>▸ Database · Download / Storage / Version</summary><div id="menuDatabaseHost"></div><div class="row"><button id="dbDelete" class="icon-danger" title="Delete offline scripture database from this device">🗑 Delete Database</button><button id="dbReload" title="Refresh storage status">↻ Status</button></div><div class="row"><label class="small">App Version</label><strong id="appVersionNumber">2026.11.12.6 · Database v2</strong></div><p class="small">Download runs while this app remains open. If Android stops the app, it automatically resumes the next time you open it. Missing text still uses online search when internet is available.</p></details><div class="developer-menu-foot"><strong>Developed by Rajinder Singh</strong><a href="mailto:harjas.info@gmail.com">✉ harjas.info@gmail.com</a><a href="https://www.youtube.com/results?search_query=HarjasTV" target="_blank" rel="noopener noreferrer">▶ HarjasTV · YouTube</a></div><div class="app-update-menu"><hr><button type="button" id="checkAppUpdate">Check for App Update</button><p id="appUpdateStatus" role="status"></p></div></div></aside>
+ </details><hr><h2>Pictures · Controller</h2><p class="small">Send photos to selected Projection screens; order and fade controlled here.</p><input id="picFiles" type="file" accept="image/*" multiple><div id="picList"></div><label><input id="picFade" type="checkbox" checked> Fade</label><label>Duration <span id="picSeconds">5</span>s<input id="picInterval" type="range" min="2" max="30" value="5"></label><div class="row"><button id="picSend">Send Slideshow</button><button id="picStop">Close Pictures</button></div><div class="row"><button id="sahibzaadeSend" class="primary">Show Sahibzaade Picture · Full Screen</button><button id="sahibzaadeClose">Close Sahibzaade Picture</button></div><p class="small">Sends the built-in picture to the selected online Projection devices, without uploading it again.</p><hr><h2>Day / Night</h2><label><input id="controlDay" type="checkbox"> Control · Day mode</label><label><input id="projectionDay" type="checkbox"> Projection · Day mode</label><label><input id="bookNight" type="checkbox"> Granth View · Night mode</label><details><summary>Default languages and Arth</summary><p class="small">Gurbani Shabad</p><label><input type="checkbox" id="gurmukhiCheck" checked> Gurmukhi</label><label><input type="checkbox" id="hindiShabadCheck"> Hindi</label><label><input type="checkbox" id="englishShabadCheck"> English</label><p class="small">Gurbani Arth</p><label><input type="checkbox" id="paCheck" checked> Punjabi</label><label><input type="checkbox" id="hiCheck"> Hindi</label><label><input type="checkbox" id="enCheck"> English</label></details><hr><a href="projection.html" target="_blank">Open Projection Browser</a><p><a href="book.html" target="_blank">Open Granth View</a></p><hr><details><summary>OBS Live Text</summary><h2>OBS Live Text</h2><p class="small">Open this link as an OBS Browser Source, then press Connect OBS.</p><input id="obsUrl" readonly aria-label="OBS link"><div class="row"><button id="copyObs">Copy OBS link</button><button id="connectObs">Connect OBS</button></div><p class="small">Tick languages and use ↑ / ↓ to set order.</p><div id="obsOptions"></div></details><hr><details id="customTools"><summary>Custom Text & Scroll</summary><p class="small">Type or paste text. Online translation is optional and may contain errors; review before projecting.</p><textarea id="customText" rows="4" style="width:100%;font:inherit" placeholder="Gurmukhi, Hindi or English text"></textarea><label>Translate online to <select id="customTarget"><option value="pa">Punjabi (Gurmukhi)</option><option value="hi">Hindi</option><option value="en">English</option></select></label><button id="convertCustom">Translate text online</button><textarea id="customConverted" rows="3" style="width:100%;font:inherit" placeholder="Editable translated text"></textarea><button id="useConverted">Use translated text</button><label><input type="checkbox" id="customScroll"> Scroll text on Projection</label><div class="row"><button id="sendCustom">Project custom text</button></div><p class="small" id="customStatus" aria-live="polite">Online translation is sent to a third-party service; avoid private text.</p></details><hr><details id="menuDatabasePanel" class="menu-db-panel"><summary>▸ Database · Download / Storage / Version</summary><div id="menuDatabaseHost"></div><div class="row"><button id="dbDelete" class="icon-danger" title="Delete offline scripture database from this device">🗑 Delete Database</button><button id="dbReload" title="Refresh storage status">↻ Status</button></div><div class="row"><label class="small">App Version</label><strong id="appVersionNumber">2026.11.12.6 · Database v2</strong></div><p class="small">Download runs while this app remains open. If Android stops the app, it automatically resumes the next time you open it. Missing text still uses online search when internet is available.</p></details><div class="developer-menu-foot"><strong>Developed by Rajinder Singh</strong><a href="mailto:harjas.info@gmail.com">✉ harjas.info@gmail.com</a><a href="https://www.youtube.com/results?search_query=HarjasTV" target="_blank" rel="noopener noreferrer">▶ HarjasTV · YouTube</a></div><div class="app-update-menu"><hr><button type="button" id="checkAppUpdate">Check for App Update</button><p id="appUpdateStatus" role="status"></p></div></div></aside>
 <aside id="desktopPreview" aria-label="Live Preview" hidden>
  <select id="desktopPreviewSource" aria-label="Preview source"></select>
  <img id="desktopPreviewImage" alt="Paired display preview" hidden>
  <video id="desktopPreviewVideo" aria-label="Camera preview" autoplay muted playsinline hidden></video>
  <p id="desktopPreviewStatus" class="small" role="status"></p>
 </aside>
-<script src="gurbani-desktop-preview.js?v=1"></script>
+<script src="gurbani-layout.js?v=2"></script><script src="gurbani-desktop-preview.js?v=1"></script>
 <script src="gurbani-updates.js?v=20261121" defer></script><script src="peerjs-1.5.5.min.js?v=20261118"></script><script src="gurbani-peer-manager.js?v=20261119"></script><script src="gurbani-camera.js?v=20261119"></script><script>
 'use strict';
 const $=id=>document.getElementById(id);
@@ -305,13 +305,35 @@ function adoptProjectionSettings(key,values,initial=false){
  }
  persistDeviceSettings();
 }
+const displayLanguages=[
+ ['sg','Gurmukhi Shabad','gurmukhiCheck'],['sh','Hindi Shabad','hindiShabadCheck'],['se','Roman Shabad','englishShabadCheck'],
+ ['mp','Punjabi Arth','paCheck'],['mh','Hindi Arth','hiCheck'],['me','English Arth','enCheck']
+];
+function displayContent(content,key){
+ if(!content?.obsData)return content;
+ const options=deviceSettings(key).languages;
+ if(!options)return {...content,bookLineDetails:true};
+ const allowed=(lang,id)=>options[lang]??$(id).checked;
+ const [sg,sh,se,mp,mh,me]=displayLanguages.map(([lang,,id])=>allowed(lang,id)?content.obsData[lang]:'');
+ const scripts={gurmukhi:sg||'',hindi:sh||'',english:se||''};
+ const meanings={punjabi:mp||'',hindi:mh||'',english:me||''};
+ return {...content,bookLineDetails:true,scripts,meanings,meaning:meanings.english,verse:sg||sh||se||mp||mh||me||''};
+}
+function makeAlignment(container,key,config){
+ const label=document.createElement('label');label.textContent='Text position ';
+ const choice=document.createElement('select');choice.setAttribute('aria-label','Text position');
+ choice.append(new Option('Top','top'),new Option('Center','center'));
+ choice.value=config.alignment==='top'?'top':'center';
+ choice.onchange=()=>{config.alignment=choice.value;persistDeviceSettings();queueDeviceSettings(key)};
+ label.append(choice);container.append(label);
+}
 function sendOneDeviceSettings(key,includeContent=false){
  const c=connections.get(key);
  if(!c?.open){status('Settings saved for '+(known[key]?.name||key)+'; will apply when it reconnects');return}
  const v=deviceSettings(key),rev=++deliveryCounter;
  send(c,{type:'display-mode',token:myToken,mode:preferredView(key)});
  const packet={type:'project',token:myToken,rev,settings:v.projection,bookSettings:v.book};
- if(includeContent&&lastContent&&projectionIsOn)packet.content=lastContent;
+ if(includeContent&&lastContent&&projectionIsOn)packet.content=displayContent(lastContent,key);
  if(send(c,packet)){pendingDelivery.set(c,{rev,time:Date.now()});status('Settings sent to '+(known[key]?.name||key))}
 }
 function editDeviceSettings(key){
@@ -342,15 +364,15 @@ function renderDeviceSettingsPanel(key){
  head.append(heading,close);card.append(head);
  const v=deviceSettings(key),isBook=preferredView(key)==='book';
  const mode=document.createElement('select');mode.setAttribute('aria-label','Screen display mode');
- for(const [value,label] of [['projection','Normal Projection'],['book','Book Reading View']]){const option=document.createElement('option');option.value=value;option.textContent=label;mode.append(option)}
+ for(const [value,label] of [['projection','Normal Projection'],['book','Granth View']]){const option=document.createElement('option');option.value=value;option.textContent=label;mode.append(option)}
  mode.value=preferredView(key);mode.onchange=()=>{deviceView[key]=mode.value;persistDeviceSettings();sendOneDeviceSettings(key,true);renderDevices()};
  card.append(mode);
- const summary=document.createElement('p');summary.className='small';summary.textContent=isBook?'Book View settings · only this device':'Projection settings · only this device';card.append(summary);
+ const summary=document.createElement('p');summary.className='small';summary.textContent=isBook?'Granth View settings · only this device':'Projection settings · only this device';card.append(summary);
  const area=document.createElement('div');card.append(area);
  if(isBook){
   const b=v.book;
-  makeDeviceSlider(area,key,b,'Book Gurbani font','fontSize',14,85,1,'px');
-  makeDeviceSlider(area,key,b,'Book line spacing','lineSpacing',90,220,5,'%');
+  makeDeviceSlider(area,key,b,'Granth Gurbani font','fontSize',14,85,1,'px');
+  makeDeviceSlider(area,key,b,'Granth line spacing','lineSpacing',90,220,5,'%');
   makeDeviceToggle(area,key,b,'Night mode','nightMode');
   makeDeviceToggle(area,key,b,'Larrivaar (ਲੜੀਵਾਰ)','larrivaar');
   makeDeviceToggle(area,key,b,'Continuous Gurbani lines','flow');
@@ -368,6 +390,16 @@ function renderDeviceSettingsPanel(key){
   makeDeviceToggle(area,key,p,'Continuous Gurbani lines','flow');
   makeDeviceToggle(area,key,p,'Colour punctuation markers','pause');
  }
+ makeAlignment(area,key,isBook?v.book:v.projection);
+ const languages=document.createElement('details');
+ const summaryLabel=document.createElement('summary');summaryLabel.textContent='Languages and Arth for this display';languages.append(summaryLabel);
+ for(const [lang,label,id] of displayLanguages){
+  const field=document.createElement('label');field.className='device-setting-checkbox';
+  const check=document.createElement('input');check.type='checkbox';check.checked=v.languages?.[lang]??$(id).checked;
+  check.onchange=()=>{(v.languages??={})[lang]=check.checked;persistDeviceSettings();queueDeviceSettings(key)};
+  field.append(check,document.createTextNode(' '+label));languages.append(field);
+ }
+ area.append(languages);
  const sendBtn=document.createElement('button');sendBtn.textContent='Apply only to this device';sendBtn.onclick=()=>sendOneDeviceSettings(key,true);card.append(sendBtn);
  return card
 }
@@ -389,7 +421,7 @@ function renderDevices(){
   const remove=document.createElement('button');compactIconButton(remove,'×','Remove '+(info.name||'Projection'));remove.classList.add('icon-danger');remove.onclick=()=>removeDevice(key);
   const arlabel=document.createElement('label');arlabel.className='auto-reconnect';const ar=document.createElement('input');ar.type='checkbox';ar.checked=autoReconnect[key]!==false;ar.setAttribute('aria-label','Auto reconnect '+(info.name||'Projection'));ar.onchange=()=>{autoReconnect[key]=ar.checked;put('gb-auto-reconnect',autoReconnect);if(ar.checked&&!connections.has(key))connectProjection(key,info.code)};arlabel.append(ar,document.createTextNode(' Auto reconnect'));
   const mode=document.createElement('select');mode.title='Choose display view for this device';mode.setAttribute('aria-label','Display view for '+(info.name||'Projection'));
-  for(const [value,title] of [['projection','Projection'],['book','Book View']]){const o=document.createElement('option');o.value=value;o.textContent=title;mode.append(o)}
+  for(const [value,title] of [['projection','Projection'],['book','Granth View']]){const o=document.createElement('option');o.value=value;o.textContent=title;mode.append(o)}
   mode.value=preferredView(key);mode.onchange=()=>{deviceView[key]=mode.value;sendOneDeviceSettings(key,true);renderDevices()};
   line.append(cb,label,st,settingsButton,mode,b,remove,arlabel);box.append(line);
   if(openDeviceSettingsKey===key)box.append(renderDeviceSettingsPanel(key))
@@ -426,7 +458,7 @@ if(m.type==='accepted'&&m.kind!=='obs')setTimeout(()=>sendOneDeviceSettings(key,
 if(m.type==='accepted'){if(m.deviceId){if(m.deviceId!==key){connections.delete(key);key=m.deviceId}known[key]={code:m.code||codeValue,name:m.name||'Projection',kind:m.kind||known[key]?.kind||'projection',localWaheguru:known[key]?.localWaheguru===true};put('gb-known-devices',known);selected.add(key);put('gb-selected-devices',[...selected]);connections.set(key,conn)}renderDevices();sendDeviceView(key);status('Paired successfully')}
 if((m.type==='hello'||m.type==='accepted')&&m.kind==='book'&&m.bookSettings&&!perDeviceSettings[key]){const saved=deviceSettings(key);saved.book={...saved.book,...m.bookSettings};persistDeviceSettings()}
 if(m.type==='projection-settings'&&m.settings&&connections.get(key)===conn){adoptProjectionSettings(key,m.settings);if(openDeviceSettingsKey===key)renderDevices();return}
-if(m.type==='book-settings'){const saved=deviceSettings(key);saved.book={...saved.book,...Object.fromEntries(['fontSize','lineSpacing','nightMode','larrivaar','flow','pause'].filter(k=>m[k]!==undefined).map(k=>[k,m[k]]))};persistDeviceSettings();if(openDeviceSettingsKey===key)renderDevices()}
+if(m.type==='book-settings'){const saved=deviceSettings(key);saved.book={...saved.book,...Object.fromEntries(['fontSize','lineSpacing','nightMode','larrivaar','flow','pause','alignment'].filter(k=>m[k]!==undefined).map(k=>[k,m[k]]))};persistDeviceSettings();if(openDeviceSettingsKey===key)renderDevices()}
 if(m.type==='rejected'){status('Screen is paired to another controller. On that screen choose Reset pairing.');conn.close()}
 if(m.type==='unpaired'){delete autoReconnect[key];put('gb-auto-reconnect',autoReconnect);delete known[key];selected.delete(key);put('gb-known-devices',known);put('gb-selected-devices',[...selected]);if(connections.get(key)===conn)connections.delete(key);renderDevices();status('Screen pairing removed');conn.close()}
 if(m.type==='code-change'&&/^\d{5}$/.test(m.code)&&known[key]){
@@ -674,13 +706,13 @@ function renderWifiDevices(){
  const box=$('wifiResults');box.replaceChildren();
  for(const [key,device] of wifiDevices){
   const row=document.createElement('div');row.className='device';
-  const label=document.createElement('label');label.textContent=device.name+' · '+(device.kind==='book'?'Book View':'Projection')+' · '+device.code;
+  const label=document.createElement('label');label.textContent=device.name+' · '+(device.kind==='book'?'Granth View':'Projection')+' · '+device.code;
   const button=document.createElement('button');button.textContent='Connect';button.onclick=()=>{status('Connecting to '+device.name+'…');connectProjection(device.code,device.code)};
   row.append(label,button);box.append(row)
  }
 }
 window.gbWifiFound=(code,name,kind)=>{if(!/^\d{5}$/.test(code)||typeof name!=='string'||!['projection','book'].includes(kind))return;wifiDevices.set(kind+':'+code,{code,name:name.slice(0,80),kind});renderWifiDevices();$('wifiStatus').textContent='Select a screen to connect.'};
-window.gbWifiFinished=(error)=>{if(error){$('wifiStatus').textContent=error;return}$('wifiStatus').textContent=wifiDevices.size?'Select a screen to connect.':'No screens found. Keep the updated Projection or Book View app open on the same Wi-Fi.'};
+window.gbWifiFinished=(error)=>{if(error){$('wifiStatus').textContent=error;return}$('wifiStatus').textContent=wifiDevices.size?'Select a screen to connect.':'No screens found. Keep the updated Projection or Granth View app open on the same Wi-Fi.'};
 $('searchWifi').onclick=()=>{wifiDevices.clear();renderWifiDevices();if(!window.GurbaniWifi||typeof window.GurbaniWifi.search!=='function'){$('wifiStatus').textContent='Install the updated Gurbani Controller Android app for Wi-Fi search. You can still enter a code.';return}$('wifiStatus').textContent='Searching the same Wi-Fi…';try{window.GurbaniWifi.search()}catch(e){$('wifiStatus').textContent='Wi-Fi search unavailable. Use the code.'}};
 $('pair').onclick=()=>{const c=$('pairCode').value.trim();if(!/^\d{5}$/.test(c))return status('Enter five digits');connectProjection(c,c)};
 function reconnectSaved(){if(peer&&peer.open&&!peer.disconnected){for(const [key,d] of Object.entries(known))if(autoReconnect[key]!==false&&!connections.has(key))connectProjection(key,d.code)}}
@@ -712,6 +744,7 @@ function publish(payload,projectionOnly=false,force=false){
   const isObs=known[id]?.kind==='obs';
   const personal=isObs?null:deviceSettings(id);
   const packet={type:'project',token:myToken,rev,...payload};
+  if(!isObs&&packet.content)packet.content=displayContent(packet.content,id);
   if(!isObs&&preferredView(id)==='projection'&&!personal.projection.flow&&Array.isArray(packet.content?.bookLines)){
    const {bookLines,...singleLine}=packet.content;
    packet.content=singleLine;
@@ -724,12 +757,12 @@ function publish(payload,projectionOnly=false,force=false){
  if(sent===0)status('No selected online projection. Reconnect or select a screen first.');
  return sent
 }
-function settings(){return{lineSpacing:Number($('projectionSpacing').value)||135,verseSize:+$('vs').value,hindiVerseSize:+$('hsv').value,englishVerseSize:+$('esv').value,meaningSize:+$('enSize').value,englishSize:+$('enSize').value,punjabiSize:+$('paSize').value,hindiSize:+$('hiSize').value,clock:$('clock').checked,autoFit:$('projectionFit').checked,larrivaar:$('projectionLari').checked,flow:$('projectionFlow').checked,pause:$('projectionPause').checked}}
+function settings(){return{alignment:'center',lineSpacing:Number($('projectionSpacing').value)||135,verseSize:+$('vs').value,hindiVerseSize:+$('hsv').value,englishVerseSize:+$('esv').value,meaningSize:+$('enSize').value,englishSize:+$('enSize').value,punjabiSize:+$('paSize').value,hindiSize:+$('hiSize').value,clock:$('clock').checked,autoFit:$('projectionFit').checked,larrivaar:$('projectionLari').checked,flow:$('projectionFlow').checked,pause:$('projectionPause').checked}}
 let bookSaved=stored('gb-control-book-settings',{fontSize:30,lineSpacing:160}),bookPending=stored('gb-control-book-pending',false),bookDebounce;
 function bookValues(){return{fontSize:Math.max(14,Math.min(85,Number($('bookSize').value)||30)),lineSpacing:Math.max(90,Math.min(220,Number($('bookSpacing').value)||160)),larrivaar:$('bookLari').checked,flow:$('bookFlow').checked,pause:$('bookPause').checked,nightMode:$('bookNight').checked}}
 function adoptBookSettings(v){if(!v||!Number.isFinite(Number(v.fontSize))||!Number.isFinite(Number(v.lineSpacing)))return;$('bookSize').value=Math.max(14,Math.min(85,Number(v.fontSize)));$('bookSpacing').value=Math.max(90,Math.min(220,Number(v.lineSpacing)));$('bookSizeLabel').textContent=$('bookSize').value;$('bookSpacingLabel').textContent=$('bookSpacing').value;for(const [id,key] of [['bookLari','larrivaar'],['bookFlow','flow'],['bookPause','pause'],['bookNight','nightMode']])if(typeof v[key]==='boolean')$(id).checked=v[key];put('gb-control-book-settings',bookValues())}
 adoptBookSettings(bookSaved);
-function updateBookSettings(){const v=bookValues();$('bookSizeLabel').textContent=v.fontSize;$('bookSpacingLabel').textContent=v.lineSpacing;put('gb-control-book-settings',v);if(openDeviceSettingsKey){deviceSettings(openDeviceSettingsKey).book={...v};persistDeviceSettings();queueDeviceSettings(openDeviceSettingsKey)}else status('Default Book View settings saved for new screens. Use each device’s Settings for individual changes.')}
+function updateBookSettings(){const v=bookValues();$('bookSizeLabel').textContent=v.fontSize;$('bookSpacingLabel').textContent=v.lineSpacing;put('gb-control-book-settings',v);if(openDeviceSettingsKey){deviceSettings(openDeviceSettingsKey).book={...v};persistDeviceSettings();queueDeviceSettings(openDeviceSettingsKey)}else status('Default Granth View settings saved for new screens. Use each device’s Settings for individual changes.')}
 $('bookSize').addEventListener('input',updateBookSettings);$('bookSpacing').addEventListener('input',updateBookSettings);
 $('projectionSpacing').value=stored('gb-projection-spacing',135);$('projectionSpacingLabel').textContent=$('projectionSpacing').value;
 $('projectionSpacing').oninput=()=>{$('projectionSpacingLabel').textContent=$('projectionSpacing').value;put('gb-projection-spacing',Number($('projectionSpacing').value));liveSettings()};
@@ -748,7 +781,7 @@ $('projectionDay').onchange=()=>{put('gb-control-projection-day',$('projectionDa
 $('clear').onclick=()=>{lastContent=null;put('gb-last-content',null);publish({content:null})};
 $('closeReading').onclick=()=>{
  ++searchNonce;
- lines=[];active=-1;readingAng=null;readingTitle='';shabadAng=null;
+ lines=[];active=-1;readingAng=null;readingTitle='';asaStarts=[];renderReadingNavigator();shabadAng=null;
  currentShabad=null;shabadSourceInfo=null;sukhmaniSalokStarts=[];
  $('lines').replaceChildren();$('results').hidden=true;$('results').replaceChildren();
  $('readingNavigator').hidden=true;$('historyCard').hidden=true;
@@ -1437,37 +1470,82 @@ document.querySelectorAll('#keyboardLanguages button[data-lang]').forEach(b=>b.o
 });
 $('keyboard').onchange=()=>{$('query').lang=$('keyboard').value;const m={en:'7',pa:'0',hi:'2'};$('searchType').value=m[$('keyboard').value];$('query').placeholder={en:'Type first letters',pa:'ਪਹਿਲੇ ਅੱਖਰ ਲਿਖੋ',hi:'खोज के अक्षर लिखें'}[$('keyboard').value];if(keyboardOpen)buildVirtualKeyboard()};
 
-let readingAng=null,readingTitle='',shabadAng=null,sukhmaniSalokStarts=[],readingSourceInfo=null,shabadSourceInfo=null;
+let readingAng=null,readingTitle='',shabadAng=null,sukhmaniSalokStarts=[],asaStarts=[],readingSourceInfo=null,shabadSourceInfo=null;
 function sourceLabelForLine(x,i,ang){
  if(readingAng)return {name:'Sri Guru Granth Sahib Ji',ang:String(readingAng)};
- const explicit=Number(x?.pageNo??x?.verse?.pageNo??x?.source?.pageNo);
+ const explicit=getAng(x);
  if(readingTitle.startsWith('ਸੁਖਮਨੀ'))return {name:'Sri Guru Granth Sahib Ji',ang:explicit>=262&&explicit<=296?String(explicit):'262–296'};
  if(readingTitle.startsWith('ਅਨੰਦ')){
   const atEnd=i>=lines.length-7&&/ਪਵਣੁ ਗੁਰੂ ਪਾਣੀ ਪਿਤਾ/.test(lines.slice(-7).map(v=>verse(v)).join(' '));
   return {name:'Sri Guru Granth Sahib Ji',ang:atEnd?'8':explicit>=917&&explicit<=922?String(explicit):'917–922',detail:atEnd?'Japji Sahib · concluding Salok':'Anand Sahib'}
  }
  if(shabadSourceInfo){return {name:shabadSourceInfo.name||'Gurbani source',ang:ang?String(ang):shabadSourceInfo.ang||''}}
- if(ang&&shabadAng)return {name:'Sri Guru Granth Sahib Ji',ang:String(ang)};
+ if(ang)return {name:x?.source?.name||'Sri Guru Granth Sahib Ji',ang:String(ang)};
  return null
 }
 function salokIndices(items){return items.map((v,i)=>(/^\s*ਸਲੋਕੁ\s*[॥|]/.test(verse(v))?i:-1)).filter(i=>i>=0)}
 function activeSalokNumber(){if(!sukhmaniSalokStarts.length)return 0;let number=0;for(let i=0;i<sukhmaniSalokStarts.length;i++)if(sukhmaniSalokStarts[i]<=active)number=i+1;return number||1}
-function renderReadingNavigator(){const isSukhmani=readingTitle.startsWith('ਸੁਖਮਨੀ'),isAng=!!readingAng;$('readingNavigator').hidden=!(isSukhmani||isAng);$('sukhmaniNavigation').hidden=!isSukhmani;$('sehajNavigation').hidden=!isAng;$('readingKindLabel').textContent=isSukhmani?'Sukhmani Sahib · 24 Saloks':isAng?'Sehaj Path · Ang '+readingAng:'';if(isSukhmani){const n=activeSalokNumber();$('salokPosition').textContent=n?('Salok '+n+' / '+sukhmaniSalokStarts.length):'';$('salokNumber').value=n||1}if(isAng)$('angInput').value=readingAng}
+function renderReadingNavigator(){
+ const isSukhmani=readingTitle.startsWith('ਸੁਖਮਨੀ'),isAng=!!readingAng,isAsa=asaStarts.length===24;
+ $('readingNavigator').hidden=!(isSukhmani||isAng||isAsa);
+ $('sukhmaniNavigation').hidden=!isSukhmani;$('sehajNavigation').hidden=!isAng;$('asaNavigation').hidden=!isAsa;
+ $('readingKindLabel').textContent=isAsa?'Asa Di Vaar · 24 Chhakkas':isSukhmani?'Sukhmani Sahib · 24 Saloks':isAng?'Sehaj Path · Ang '+readingAng:'';
+ if(isSukhmani){const n=activeSalokNumber();$('salokPosition').textContent=n?('Salok '+n+' / '+sukhmaniSalokStarts.length):'';$('salokNumber').value=n||1}
+ if(isAng)$('angInput').value=readingAng;
+ if(isAsa){
+  const n=activePauri();
+  if(document.activeElement!==$('pauriNumber'))$('pauriNumber').value=n;
+  $('pauriPosition').textContent=n+' / 24';
+  $('prevPauri').disabled=n<=1;$('nextPauri').disabled=n>=24;
+ }
+}
+function asaChhakkaStarts(items){
+ const starts=[0];
+ for(let i=0;i<items.length;i++){
+  if(!/^ਪਉੜੀ\s*॥$/.test(verse(items[i]).trim()))continue;
+  const n=starts.length;
+  const end=items.findIndex((row,index)=>index>i&&index<=i+10&&endsPauri(verse(row),n));
+  if(end<0)return [];
+  if(n===24)return starts;
+  let next=end+1;
+  while(next<items.length&&/^\s*[❁ੴ]?\s*$/.test(verse(items[next])))next++;
+  starts.push(next);
+ }
+ return [];
+}
+function activePauri(){return asaStarts.reduce((n,start,i)=>start<=active?i+1:n,1)}
+function openPauri(value){
+ const n=Number(value);
+ if(!Number.isInteger(n)||n<1||n>asaStarts.length)return status('Enter a Chhakka number from 1 to 24');
+ $('pauriNumber').value=n;
+ show(asaStarts[n-1]);
+ $('lines').children[asaStarts[n-1]]?.scrollIntoView({block:'center',behavior:'smooth'});
+}
+$('openPauri').onclick=()=>openPauri($('pauriNumber').value);
+$('pauriNumber').onkeydown=e=>{if(e.key==='Enter')$('openPauri').click()};
+$('prevPauri').onclick=()=>openPauri(activePauri()-1);
+$('nextPauri').onclick=()=>openPauri(activePauri()+1);
 function openSalokNumber(n){if(!readingTitle.startsWith('ਸੁਖਮਨੀ'))return status('Open Sukhmani Sahib first');const k=Number(n);if(!Number.isInteger(k)||k<1||k>sukhmaniSalokStarts.length)return status('Enter a Salok from 1 to '+sukhmaniSalokStarts.length);show(sukhmaniSalokStarts[k-1]);$('salokPosition').textContent='Salok '+k+' / '+sukhmaniSalokStarts.length;const selected=$('lines').children[sukhmaniSalokStarts[k-1]];selected?.scrollIntoView({block:'center',behavior:'smooth'})}
 $('openSalok').onclick=()=>openSalokNumber($('salokNumber').value);
 $('salokNumber').onkeydown=e=>{if(e.key==='Enter')$('openSalok').click()};
 $('nextSalok').onclick=()=>openSalokNumber(activeSalokNumber()+1);
 $('prevSalok').onclick=()=>openSalokNumber(activeSalokNumber()-1);
 $('angInput').onkeydown=e=>{if(e.key==='Enter')$('angSearch').click()};
-function getAng(x){const v=x?.pageNo??x?.verse?.pageNo??x?.source?.pageNo??shabadAng;return Number.isInteger(Number(v))&&Number(v)>0?Number(v):null}
+function getAng(x){
+ for(const value of [x?.pageNo,x?.verse?.pageNo,x?.source?.pageNo,readingAng,shabadAng]){
+  const n=Number(value);
+  if(Number.isInteger(n)&&n>0)return n;
+ }
+ return null;
+}
 function markAng(n){
  const el=$('readingAngLabel');
  const label=n?String(n):((readingTitle.startsWith('ਸੁਖਮਨੀ')?'262–296':readingTitle.startsWith('ਅਨੰਦ')?'917–922':''));
  el.hidden=!label;
  el.textContent=label?'(Ang '+label+')':''
 }
-function unpackBaniLine(x){return x?.verse&&typeof x.verse==='object'?{...x.verse,...x,translation:x.verse.translation||x.translation,transliteration:x.verse.transliteration||x.transliteration}:x}
-function setReading(items,title,ang){if(!Array.isArray(items)||!items.length)throw Error('No verses returned');lines=items;active=-1;currentShabad=null;readingAng=ang||null;readingTitle=title;shabadAng=ang||null;shabadSourceInfo=null;sukhmaniSalokStarts=title.startsWith('ਸੁਖਮਨੀ')?salokIndices(lines):[];$('results').hidden=true;renderReadingNavigator();renderLines();show(0,false);$('shabadCard').scrollIntoView({behavior:'smooth',block:'start'})}
+function unpackBaniLine(x){return x?.verse?.verse?{...x,...x.verse}:x}
+function setReading(items,title,ang,sections=[]){if(!Array.isArray(items)||!items.length)throw Error('No verses returned');lines=items;asaStarts=sections;active=-1;currentShabad=null;readingAng=ang||null;readingTitle=title;shabadAng=ang||null;shabadSourceInfo=null;sukhmaniSalokStarts=title.startsWith('ਸੁਖਮਨੀ')?salokIndices(lines):[];$('results').hidden=true;renderReadingNavigator();renderLines();show(0,false);$('shabadCard').scrollIntoView({behavior:'smooth',block:'start'})}
 async function loadAng(value){const n=Number(value);if(!Number.isInteger(n)||n<1||n>1430)return status('Enter an Ang from 1 to 1430');const nonce=++searchNonce;status('Loading Ang '+n+'…');try{const d=await loadJson('https://api.banidb.com/v2/angs/'+n+'/G');if(nonce!==searchNonce)return;const arr=Array.isArray(d.page)?d.page:verses(d);setReading(arr,'ਅੰਗ / Ang '+n,n);$('angInput').value=n;put('gb-sehaj-ang',n);status('Ang '+n+' loaded · '+arr.length+' lines')}catch(e){status('Could not load Ang '+n+': '+e.message)}}
 // BaniDB reference routes. The source verses remain unmodified; no Gurbani is invented.
 const BANI_SOURCE={
@@ -1539,11 +1617,11 @@ async function loadCanonicalBani(k){
  const nonce=++searchNonce,cfg=BANI_SOURCE[k];
  status('Loading '+cfg.title+' from Sri Guru Granth Sahib Ji · Ang '+cfg.angs+'…');
  try{
-  const arr=await fetchCanonicalBani(k);
+  const arr=await addBaniReference(await fetchCanonicalBani(k),cfg.baniId);
   if(nonce!==searchNonce)return;
   let readingLines=arr;
   if(k==='anand'){
-   try{const response=await fetch('data/anand-ending-salok.json');if(!response.ok)throw Error('Salok file is missing');const data=await response.json();if(!Array.isArray(data.verses)||data.verses.length!==7)throw Error('Salok verses invalid');if(!verse(data.verses[1]).startsWith('ਪਵਣੁ ਗੁਰੂ ਪਾਣੀ ਪਿਤਾ'))throw Error('Salok beginning mismatch');readingLines=[...arr,...data.verses]}catch(error){status('Anand Sahib loaded, but ending salok unavailable: '+error.message)}
+   try{const response=await fetch('data/anand-ending-salok.json');if(!response.ok)throw Error('Salok file is missing');const data=await response.json();if(!Array.isArray(data.verses)||data.verses.length!==7)throw Error('Salok verses invalid');if(!verse(data.verses[1]).startsWith('ਪਵਣੁ ਗੁਰੂ ਪਾਣੀ ਪਿਤਾ'))throw Error('Salok beginning mismatch');readingLines=[...arr,...await addBaniReference(data.verses,2)]}catch(error){status('Anand Sahib loaded, but ending salok unavailable: '+error.message)}
   }
   if(nonce!==searchNonce)return;
   setReading(readingLines,cfg.title,null);
@@ -1564,31 +1642,43 @@ const NITNEM_SOURCES=[
  ['ardas',24,'ਅਰਦਾਸ','A'],
  ['asaVar',90,'ਆਸਾ ਦੀ ਵਾਰ','G']
 ];
+const baniReadings=new Map();
 async function fetchNitnemReading(id,title,sourceCode){
- const cfg=NITNEM_SOURCES.find(x=>x[1]===id);
- const cacheKey='gb-bani-reading-v1-'+id;
- let data=stored(cacheKey,null);
- if(!Array.isArray(data)||!data.length){
-  const result=await loadJson('https://api.banidb.com/v2/banis/'+id);
-  const body=Array.isArray(result.verses)?result.verses:verses(result);
-  if(!Array.isArray(body)||body.length<5)throw Error('No complete verses returned from Gurbani source');
-  data=body.map(x=>{
-   const v=x.verse?.verse?.unicode??x.verse?.unicode??x.pn??verse(x);
-   const transliteration=x.verse?.transliteration??x.transliteration??{};
-   const hi=x.hi??transliteration.hindi??'';
-   const en=x.en??transliteration.english??'';
-   return {verse:{unicode:v},transliteration:{english:typeof en==='string'?en:'',hindi:typeof hi==='string'?hi:''},source:{sourceId:sourceCode,name:sourceCode==='G'?'Sri Guru Granth Sahib Ji':sourceCode==='D'?'Sri Dasam Granth':title},pageNo:x.verse?.pageNo??null}
-  }).filter(v=>verse(v));
+ if(baniReadings.has(id))return baniReadings.get(id);
+ const pending=(async()=>{
+  let result;
+  try{result=await loadJson('https://api.banidb.com/v2/banis/'+id)}
+  catch(error){const old=stored('gb-bani-reading-v1-'+id,null);if(!Array.isArray(old)||id===90)throw error;result=old;}
+  const source={sourceId:sourceCode,name:sourceCode==='G'?'Sri Guru Granth Sahib Ji':sourceCode==='D'?'Sri Dasam Granth':title};
+  const data=normalizeBaniResult(result).map(row=>({...row,source:row.source||source}));
   if(data.length<5)throw Error('Gurbani source returned an incomplete Bani');
-  try{put(cacheKey,data)}catch(_){}
- }
- return data
+  return data;
+ })();
+ baniReadings.set(id,pending);
+ try{return await pending}catch(error){baniReadings.delete(id);throw error}
+}
+async function addBaniReference(lines,id){
+ try{
+  const data=await fetchNitnemReading(id,'Sri Guru Granth Sahib Ji','G');
+  const byText=new Map();
+  for(const row of data){
+   const text=verse(row).replace(/\s+/g,' ').trim();
+   if(byText.has(text))byText.set(text,null);
+   else byText.set(text,row);
+  }
+  return lines.map(row=>{
+   const source=byText.get(verse(row).replace(/\s+/g,' ').trim());
+   return source?{...source,...row,translation:row.translation||source.translation,pageNo:row.pageNo??source.pageNo}:row;
+  });
+ }catch(_){return lines}
 }
 async function openNitnemBani(id,title,src){
  const nonce=++searchNonce;status('Opening '+title+'…');
  try{
   const data=await fetchNitnemReading(id,title,src);if(nonce!==searchNonce)return;
-  setReading(data,title,null);
+  const sections=id===90?asaChhakkaStarts(data):[];
+  if(id===90&&sections.length!==24)throw Error('Could not verify all 24 Chhakka boundaries');
+  setReading(data,title,null,sections);
   shabadSourceInfo={name:src==='G'?'Sri Guru Granth Sahib Ji':src==='D'?'Sri Dasam Granth':title,ang:''};
   status(title+' · '+data.length+' lines')
  }catch(e){status(title+' unavailable: '+e.message)}
@@ -1605,9 +1695,10 @@ $('nitnem').onclick=async()=>{
    const part=await fetchNitnemReading(cfg[1],cfg[2],cfg[3]);if(nonce!==searchNonce)return;
    combined.push({verse:{unicode:'॥ '+cfg[2]+' ॥'},source:{name:cfg[2]}},...part)
   }
-  const anand=await fetchCanonicalBani('anand');if(nonce!==searchNonce)return;
+  const anand=await addBaniReference(await fetchCanonicalBani('anand'),10);if(nonce!==searchNonce)return;
   combined.push({verse:{unicode:'॥ ਅਨੰਦ ਸਾਹਿਬ · ੬ ਪਉੜੀਆਂ ॥'}},...anand);
-  try{const doc=await (await fetch('data/anand-ending-salok.json')).json();if(doc.verses?.length===7)combined.push(...doc.verses)}catch(_){}
+  try{const doc=await (await fetch('data/anand-ending-salok.json')).json();if(doc.verses?.length===7)combined.push(...await addBaniReference(doc.verses,2))}catch(_){}
+  if(nonce!==searchNonce)return;
   setReading(combined,'ਨਿਤਨੇਮ · Morning',null);
   status('Morning Nitnem loaded · '+combined.length+' lines')
  }catch(e){status('Could not load Nitnem: '+e.message)}
@@ -1620,7 +1711,7 @@ async function openShabad(x,fromHistory=false){
  try{
   const d=await loadJson('https://api.banidb.com/v2/shabads/'+encodeURIComponent(n));
   if(nonce!==searchNonce)return;
-  const fetched=verses(d);lines=Array.isArray(fetched)?fetched:[];active=-1;readingAng=null;readingTitle='';sukhmaniSalokStarts=[];renderReadingNavigator();shabadAng=d?.shabadInfo?.source?.pageNo??null;
+  const fetched=verses(d);lines=Array.isArray(fetched)?fetched:[];active=-1;readingAng=null;readingTitle='';asaStarts=[];sukhmaniSalokStarts=[];renderReadingNavigator();shabadAng=d?.shabadInfo?.source?.pageNo??null;
   const rawSource=d?.shabadInfo?.source||{};
   const sourceId=String(rawSource.sourceId??rawSource.id??rawSource.source??'');
   const rawName=rawSource.name?.english??rawSource.name??rawSource.englishName??rawSource.title??'';
@@ -1648,6 +1739,10 @@ function renderLines(){
   const row=document.createElement('div');row.className='item'+(i===active?' active':'');row.style.display='flow-root';
   const b=document.createElement('button');b.style.border='none';b.style.background='transparent';b.style.textAlign='left';b.style.width='calc(100% - 50px)';b.style.padding='4px';b.style.float='left';
   const v=document.createElement('div');v.className='verse';v.textContent=getText(x)||'Script unavailable';b.append(v);
+  if(i===active){
+   const details=GurbaniLayout.bookDetails({scripts:selectedScripts(x),meanings:selectedMeanings(x)});
+   if(details){details.removeAttribute('id');b.append(details);}
+  }
   const visited=lineVisits[visitKey(x)];if(visited){row.style.borderLeft='5px solid #dca94a';const note=document.createElement('span');note.className='small';note.textContent=' ✓ '+new Date(visited).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});b.append(note)}
   if(i===currentShabad?.mainIndex){const note=document.createElement('span');note.className='mainNote';note.textContent=' ★ MAIN';b.append(note)}
   b.onclick=()=>show(i);
@@ -1657,13 +1752,15 @@ function renderLines(){
 }
 function show(i,mark=true){
  if(!lines[i])return;
- const scripts=selectedScripts(lines[i]);if(!Object.keys(scripts).length)return status('Enable an available Shabad script in ☰ Projection Lines');
+ const scripts=selectedScripts(lines[i]);
  active=i;renderReadingNavigator();if(mark){lineVisits[visitKey(lines[i])]=Date.now();const keys=Object.keys(lineVisits);if(keys.length>1500)delete lineVisits[keys[0]];put('gb-line-visits',lineVisits)}
  if(currentShabad){currentShabad.lastIndex=i;saveHistory();renderHistory()}
  renderLines();
  const meanings=selectedMeanings(lines[i]);const ang=getAng(lines[i]);markAng(ang);
+ const start=asaStarts.length?asaStarts[activePauri()-1]:0;
+ const end=asaStarts[activePauri()]??lines.length;
  const obsData={sg:getScript(lines[i],'gurmukhi'),sh:getScript(lines[i],'hindi'),se:getScript(lines[i],'english'),mp:meaning(lines[i],'punjabi'),mh:meaning(lines[i],'hindi'),me:meaning(lines[i],'english')};
- lastContent={obsData,verse:scripts.gurmukhi||scripts.hindi||scripts.english||'',scripts,meanings,meaning:meanings.english||'',bookLines:lines.map(x=>verse(x)).filter(Boolean),activeIndex:i,ang,sourceMeta:sourceLabelForLine(lines[i],i,ang),shabadTitle:currentShabad?.title||readingTitle||''};
+ lastContent={obsData,verse:scripts.gurmukhi||scripts.hindi||scripts.english||'',scripts,meanings,meaning:meanings.english||'',bookLines:lines.slice(start,end).map(x=>verse(x)),activeIndex:i-start,ang,sourceMeta:sourceLabelForLine(lines[i],i,ang),shabadTitle:currentShabad?.title||readingTitle||''};
  put('gb-last-content',lastContent);publish({content:lastContent,settings:settings(),obsSettings:obsValues()})
 }
 $('next').onclick=()=>{if(readingAng&&active>=lines.length-1&&readingAng<1430)loadAng(readingAng+1);else show(active+1)};$('previous').onclick=()=>{if(readingAng&&active<=0&&readingAng>1)loadAng(readingAng-1);else show(active-1)};
@@ -1724,7 +1821,7 @@ if(isDesktop){
 }
 renderHistory();
 renderDevices();start();
-</script><script src="gurbani-desktop-fullscreen.js?v=1" defer></script></body></html>
+</script><script src="gurbani-desktop-fullscreen.js?v=2" defer></script></body></html>
 
 
 

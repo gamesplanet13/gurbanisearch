@@ -1,5 +1,18 @@
 /* Text presentation only: original Gurbani characters are never rewritten. */
 window.GurbaniLayout = {
+  bookDetails(content) {
+    const values = [((content.scripts || {}).hindi), ((content.scripts || {}).english)].concat(Object.values(content.meanings || {})).filter(Boolean);
+    if (!values.length) return null;
+    const details = document.createElement('div');
+    details.id = 'bookLineDetails';
+    details.className = 'book-line-extra';
+    for (const value of values) {
+      const row = document.createElement('div');
+      row.textContent = value;
+      details.appendChild(row);
+    }
+    return details;
+  },
   draw(element, text, larrivaar, pauses) {
     element.textContent = '';
     text = String(text || '');

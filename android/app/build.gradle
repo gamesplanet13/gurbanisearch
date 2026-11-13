@@ -6,40 +6,36 @@ android {
         applicationId 'in.gurbanisearch'
         minSdk 23
         targetSdk 35
-        versionCode 20261124
-        versionName '2026.11.13.13'
+        versionCode 20261128
+        versionName '2026.11.13.17'
     }
     flavorDimensions += 'role'
     productFlavors {
         controller {
             dimension 'role'
             applicationIdSuffix '.controller'
-            resValue 'string', 'app_name', 'Gurbani Controller'
+            resValue 'string', 'app_name', 'Gurbani Searching Control'
             buildConfigField 'String', 'START_PAGE', '"index.html"'
             buildConfigField 'String', 'ROLE', '"controller"'
         }
         projection {
             dimension 'role'
             applicationIdSuffix '.projection'
-            versionCode 20261127
-            versionName '2026.11.13.16'
-            resValue 'string', 'app_name', 'Gurbani Projection'
+            resValue 'string', 'app_name', 'Gurbani Searching Projection'
             buildConfigField 'String', 'START_PAGE', '"projection.html"'
             buildConfigField 'String', 'ROLE', '"projection"'
         }
         camera {
             dimension 'role'
             applicationIdSuffix '.camera'
-            resValue 'string', 'app_name', 'Gurbani Live Camera'
+            resValue 'string', 'app_name', 'Gurbani Searching Camera'
             buildConfigField 'String', 'START_PAGE', '"camera.html"'
             buildConfigField 'String', 'ROLE', '"camera"'
         }
         book {
             dimension 'role'
             applicationIdSuffix '.book'
-            versionCode 20261127
-            versionName '2026.11.13.16'
-            resValue 'string', 'app_name', 'Gurbani Book View'
+            resValue 'string', 'app_name', 'Gurbani Granth View'
             buildConfigField 'String', 'START_PAGE', '"book.html"'
             buildConfigField 'String', 'ROLE', '"book"'
         }

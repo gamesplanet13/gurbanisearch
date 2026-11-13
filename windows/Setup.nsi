@@ -6,11 +6,11 @@ RequestExecutionLevel user
 SetCompressor /SOLID lzma
 Icon "controller.ico"
 UninstallIcon "controller.ico"
-VIProductVersion "1.0.1.0"
+VIProductVersion "1.0.2.0"
 VIAddVersionKey "ProductName" "Gurbani for Windows"
 VIAddVersionKey "FileDescription" "Gurbani Windows Setup"
 VIAddVersionKey "LegalCopyright" "Copyright Rajinder Singh"
-VIAddVersionKey "FileVersion" "1.0.1.0"
+VIAddVersionKey "FileVersion" "1.0.2.0"
 
 Page instfiles
 UninstPage uninstConfirm
@@ -25,19 +25,28 @@ Section "Gurbani"
   SetShellVarContext current
   SetOutPath "$INSTDIR"
   File "Launch.vbs"
+  File "Window.ps1"
   File "controller.ico"
   File "projection.ico"
   File "book.ico"
   File "camera.ico"
   CreateDirectory "$SMPROGRAMS\Gurbani"
-  !insertmacro AddShortcut "Gurbani Controller" "controller"
-  !insertmacro AddShortcut "Gurbani Projection" "projection"
-  !insertmacro AddShortcut "Gurbani Book View" "book"
-  !insertmacro AddShortcut "Gurbani Camera" "camera"
+  Delete "$DESKTOP\Gurbani Controller.lnk"
+  Delete "$SMPROGRAMS\Gurbani\Gurbani Controller.lnk"
+  !insertmacro AddShortcut "Gurbani Searching Control" "controller"
+  Delete "$DESKTOP\Gurbani Projection.lnk"
+  Delete "$SMPROGRAMS\Gurbani\Gurbani Projection.lnk"
+  !insertmacro AddShortcut "Gurbani Searching Projection" "projection"
+  Delete "$DESKTOP\Gurbani Book View.lnk"
+  Delete "$SMPROGRAMS\Gurbani\Gurbani Book View.lnk"
+  !insertmacro AddShortcut "Gurbani Granth View" "book"
+  Delete "$DESKTOP\Gurbani Camera.lnk"
+  Delete "$SMPROGRAMS\Gurbani\Gurbani Camera.lnk"
+  !insertmacro AddShortcut "Gurbani Searching Camera" "camera"
   WriteUninstaller "$INSTDIR\Uninstall.exe"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Gurbani" "DisplayName" "Gurbani for Windows"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Gurbani" "UninstallString" '"$INSTDIR\Uninstall.exe"'
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Gurbani" "DisplayVersion" "1.0.1"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Gurbani" "DisplayVersion" "1.0.2"
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Gurbani" "NoModify" 1
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Gurbani" "NoRepair" 1
 SectionEnd
@@ -50,12 +59,13 @@ SectionEnd
 
 Section "Uninstall"
   SetShellVarContext current
-  !insertmacro RemoveShortcut "Gurbani Controller" "controller"
-  !insertmacro RemoveShortcut "Gurbani Projection" "projection"
-  !insertmacro RemoveShortcut "Gurbani Book View" "book"
-  !insertmacro RemoveShortcut "Gurbani Camera" "camera"
+  !insertmacro RemoveShortcut "Gurbani Searching Control" "controller"
+  !insertmacro RemoveShortcut "Gurbani Searching Projection" "projection"
+  !insertmacro RemoveShortcut "Gurbani Granth View" "book"
+  !insertmacro RemoveShortcut "Gurbani Searching Camera" "camera"
   RMDir "$SMPROGRAMS\Gurbani"
   Delete "$INSTDIR\Launch.vbs"
+  Delete "$INSTDIR\Window.ps1"
   Delete "$INSTDIR\Uninstall.exe"
   RMDir "$INSTDIR"
   DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Gurbani"

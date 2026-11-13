@@ -1,0 +1,6 @@
+{
+  "controller": "Gurbani Searching Control",
+  "projection": "Gurbani Searching Projection",
+  "book": "Gurbani Granth View",
+  "camera": "Gurbani Searching Camera"
+}

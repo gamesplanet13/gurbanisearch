@@ -30,7 +30,9 @@ profile = appData & "\Gurbani\Profiles\" & role
 nowTime = Now
 timestamp = Year(nowTime) & "-" & Month(nowTime) & "-" & Day(nowTime) & "-" & Hour(nowTime) & "-" & Minute(nowTime) & "-" & Second(nowTime)
 url = "https://gamesplanet13.github.io/gurbanisearch/" & page & "?desktop=windows&launch=" & timestamp
-shell.Run Quote(edge) & " --user-data-dir=" & Quote(profile) & " --no-first-run --start-fullscreen --new-window " & Quote(url), 1, False
+shell.Run "powershell.exe -NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy RemoteSigned -File " & _
+    Quote(files.BuildPath(files.GetParentFolderName(WScript.ScriptFullName), "Window.ps1")) & " " & _
+    Quote(edge) & " " & Quote(profile) & " " & Quote(url) & " " & Quote(role), 0, False
 
 Function Quote(value)
     Quote = Chr(34) & value & Chr(34)
