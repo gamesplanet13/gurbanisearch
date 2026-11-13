@@ -56,3 +56,38 @@
  .searcher #onscreenKeyboard { max-height:55dvh; }
  .searcher #keyboardKeys { grid-template-columns:repeat(20,minmax(0,1fr)); }
 }
+
+/* Search and reader modes share the compact toolbar used in the reference. */
+.searcher body { background:#2b2b2b; }
+.searcher.searcher-reading body { background:#050505; }
+.searcher-toolbar { background:#303030; border-bottom:2px solid #afafaf; }
+.searcher #searcherActions { min-height:44px; }
+.searcher #searcherActions > button { border:0; color:#f5f0df; background:transparent; }
+.searcher #searcherActions #projectionSwitch.projection-enabled { color:#7fdf84; }
+.searcher #searcherActions #projectionSwitch.projection-disabled { color:#f09b9b; }
+.searcher #searcherHeading { min-width:0; flex:1; }
+.searcher #searcherHeading strong { display:block; color:#fff; font-size:19px; line-height:1.12; }
+.searcher #searcherMode { display:block; font-size:12px; color:#ccc; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.searcher:not(.searcher-reading) #searcherActions :is(#projectionSwitch,#previous,#next,#closeReading,#searcherSearch),
+.searcher.searcher-reading #searcherActions :is(#searcherHeading,#searcherFavorites),
+.searcher.searcher-history-open #searchCard,
+.searcher.searcher-history-open #lines,
+.searcher.searcher-history-open #readingNavigator { display:none; }
+.searcher #searchCard { padding:3px 5px 10px; }
+.searcher #searchCard .row:has(#query) { margin-top:0; }
+.searcher #query { background:#f4f4f4; color:#202020; border:1px solid #aaa; border-radius:4px; }
+.searcher #query::placeholder { color:#656565; }
+.searcher #results .source-result, .searcher #historyList .historyItem { border:0; border-radius:0; background:transparent; color:#eee; min-height:40px; margin:0; text-align:start; }
+.searcher .searcher-result-row { display:grid; grid-template-columns:minmax(0,1fr) 44px; align-items:stretch; border-bottom:1px solid #555; }
+.searcher button.searcher-favorite { background:transparent; border:0; color:#ccc; font-size:23px !important; padding:0; min-height:38px; }
+.searcher button.searcher-favorite[aria-pressed=true], .searcher #searcherFavorites { color:#ffc247; }
+.searcher #searcherReaderFavorite { position:sticky; top:46px; display:flex; justify-content:flex-end; height:0; padding-inline:8px; z-index:2; }
+.searcher #searcherReaderFavorite button { align-self:flex-start; }
+.searcher #historyCard { background:#0b0b0b; }
+.searcher #historyCard > .row { background:#155347; padding:6px; color:#fff; }
+.searcher #searcherPurgeHistory { display:block; margin:4px auto; color:#9bd6c9; background:transparent; border:0; }
+.searcher #offlineToolsDetails:not([hidden]) { display:block; }
+.searcher #searcherSearchOptions { padding:3px 6px; color:#e3e3e3; }
+.searcher #searcherSearchOptions summary { cursor:pointer; font-size:12px; }
+.searcher #searchCard .row:has(#query) button { min-width:40px; }
+.searcher #searchCard .row:has(#query) #search { background:#dedede; color:#222; border-color:#aaa; font-size:22px; }

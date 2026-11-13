@@ -1,5 +1,5 @@
 /* Games Planet Gurbani — offline app shell. Search corpus stored in IndexedDB by Controller. */
-const VERSION='gurbani-shell-2026-11-13-searcher-sync-v8';
+const VERSION='gurbani-shell-2026-11-13-searcher-reference-v9';
 const CORE=[
  './','./index.html','./searcher.html','./gurbani-searcher.css','./gurbani-searcher-sync.js','./projection.html','./book.html','./obs.html','./camera.html',
  './gurbani-desktop-preview.js','./gurbani-desktop-fullscreen.js','./gurbani-screen-preview.js','./gurbani-waheguru-wide.js','./gurbani-updates.js','./gurbani-camera.js','./gurbani-layout.js','./gurbani-book-motion.js','./gurbani-peer-manager.js','./peerjs-1.5.5.min.js',

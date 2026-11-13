@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gurbani Searching Control</title><link rel="stylesheet" href="gurbani-searcher.css?v=3"><script>if(new URLSearchParams(location.search).get("view")==="searcher"){document.documentElement.classList.add("searcher");document.title="Gurbani Searcher"}</script><style>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gurbani Searching Control</title><link rel="stylesheet" href="gurbani-searcher.css?v=4"><script>if(new URLSearchParams(location.search).get("view")==="searcher"){document.documentElement.classList.add("searcher");document.title="Gurbani Searcher"}</script><style>
 *{box-sizing:border-box}body{margin:0;background:#0b101a;color:#eef5ff;font:15px system-ui,sans-serif}header{padding:16px;background:#182438;display:flex;justify-content:space-between;align-items:center;gap:10px}h1{font-size:21px;margin:0}main{max-width:1150px;margin:20px auto;padding:0 12px;display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{border:1px solid #36455e;background:#172232;padding:18px;border-radius:15px;margin-bottom:14px}h2{margin:0 0 12px;font-size:18px}input,select,button{font:inherit;color:#fff;background:#101b2d;border:1px solid #53627c;border-radius:9px;padding:11px}button{cursor:pointer;background:#28486b}button.primary{background:#1669ae}.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0}.grow{flex:1;min-width:110px}.muted{color:#b0bfd3;font-size:13px}.code{font-size:31px;letter-spacing:5px;color:#f7d48a;font-weight:bold}.list{max-height:50vh;overflow:auto}.item{display:block;text-align:left;width:100%;line-height:1.55;margin:7px 0;white-space:normal}.item.active{background:#575025;border-color:#e0bd68}.device{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:#253347;border-radius:8px;margin:7px 0;padding:10px}.device label{flex:1}.devstatus{font-size:12px;color:#89d5af}.verse{font-size:20px}.small{font-size:12px;color:#aebed4}a{color:#a7d2ff}label.field{display:block;margin:8px 0}input[type=range]{width:100%}input[type=checkbox]{accent-color:#dab66b}@media(max-width:850px){main{grid-template-columns:1fr}}#searchColumn{display:flex;flex-direction:column}#searchCard{order:0}#connectCard{order:1}#historyCard{order:2}#results[hidden]{display:none}#shabadCard label{font-size:12px}
 header{position:sticky;top:0;z-index:8}#menuButton{min-width:45px;font-size:23px;padding:7px 12px}#functionsMenu{position:fixed;right:12px;top:63px;z-index:20;max-width:min(94vw,400px);max-height:80vh;overflow-y:auto;background:#18263b;border:1px solid #6d7a96;border-radius:16px;padding:16px;box-shadow:0 15px 70px #000b}#functionsMenu[hidden]{display:none}#functionsMenu label{display:block;padding:6px 0}#menuOptions h2{font-size:16px;margin:9px 0}#connectCard,#fontCard{display:none}#functionsMenu #connectCard,#functionsMenu #fontCard{display:block;padding:10px;margin:8px 0}#functionsMenu .card{box-shadow:none}.historyItem{display:block;width:100%;text-align:left;margin:6px 0;background:#273750}.markMain{float:right;padding:4px 8px;margin-left:6px;background:#344864}.mainNote{color:#f3cc75;font-size:12px}#lines .item{overflow:auto} .gp-credit{font-size:9px;color:#7d8da4;text-align:center;padding:9px 4px 16px;opacity:.7} body.day-mode{background:#f5efe1;color:#25221c}body.day-mode header,body.day-mode #functionsMenu{background:#eee1c8;color:#25221c}body.day-mode .card{background:#fffaf0;border-color:#bcae94}body.day-mode input,body.day-mode select,body.day-mode button{background:#e7dcc6;color:#211d18;border-color:#9c896a}body.day-mode .small,body.day-mode .muted{color:#574e41}.ang-indicator{position:fixed;right:12px;bottom:18px;font-size:11px;color:#ab9a78;z-index:2;pointer-events:none}.quick-actions{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
 @media (orientation:landscape) and (min-width:650px){main{grid-template-columns:minmax(250px,42%) minmax(0,58%);align-items:start}main>div{min-width:0}#searchColumn{position:sticky;top:72px;max-height:calc(100dvh - 78px);overflow:auto}#shabadCard,#historyCard{width:100%}#lines{max-height:59dvh}#historyList{max-height:28dvh;overflow:auto}} @media (orientation:portrait),(max-width:649px){#searchColumn{position:static;max-height:none}#lines{max-height:45dvh}} #connectCard .device{flex-wrap:wrap} #connectCard .device select{max-width:150px} #customTools textarea{border-radius:9px;border:1px solid #52617a;background:#101b2d;color:#fff;padding:10px;margin:7px 0}#customTools summary{cursor:pointer;font-weight:700;padding:7px 0} #shabadCard{position:relative}#historyCard{position:absolute;top:54px;right:12px;z-index:12;width:min(360px,calc(100% - 24px));max-height:60vh;overflow:auto;box-shadow:0 16px 45px #000b;background:#202c41}#historyCard[hidden],#readingNavigator[hidden],#sukhmaniNavigation[hidden],#sehajNavigation[hidden],#asaNavigation[hidden]{display:none!important}#sukhmaniNavigation,#sehajNavigation{margin:12px 0;padding:10px;background:#223149;border-radius:12px}#readingNavigator input{min-width:90px}#historyToggle{font-size:13px;padding:8px 11px}@media(orientation:landscape) and (min-width:650px){main{grid-template-columns:minmax(260px,40%) minmax(0,60%)}#historyCard{max-height:75vh}} #devices .device{flex-wrap:wrap}#devices .device label{flex:1;min-width:135px}#devices .device select{max-width:145px}#devices .device-settings-editor{border:1px solid #7b8eab;background:#22324a;border-radius:12px;padding:12px;margin:8px 0 14px}#devices .device-settings-editor>select{width:100%;margin:5px 0}#devices .device-setting-field{display:block;margin:12px 0}#devices .device-setting-field input{display:block;width:100%;accent-color:#edc97d}#devices .device-setting-checkbox{display:block;padding:5px 0;font-size:14px}
@@ -150,6 +150,8 @@ main{width:100%;max-width:none;margin:3px auto;padding:0 4px;gap:4px;align-items
 </div><header><h1>ੴ Gurbani Searching Control</h1><button id="desktopPreviewToggle" aria-controls="desktopPreview" aria-expanded="false" hidden>Live Preview</button><button id="menuButton" class="icon-btn" title="Functions and connected devices" aria-label="Open functions" aria-expanded="false">☰</button></header>
 <nav id="searcherToolbar" class="searcher-toolbar" aria-label="Gurbani Searcher" hidden>
  <div id="searcherActions">
+  <div id="searcherHeading"><strong>Gurbani Searcher</strong><small id="searcherMode"></small></div>
+  <button id="searcherFavorites" type="button" title="ਮਨਪਸੰਦ · Favorites" aria-label="ਮਨਪਸੰਦ · Favorites">★</button>
   <button id="searcherSearch" type="button" aria-label="ਖੋਜ · Search" title="ਖੋਜ · Search">⌕</button>
   <details id="searcherSettings">
    <summary aria-label="ਸੈਟਿੰਗਾਂ · Settings">⋮</summary>
@@ -161,6 +163,7 @@ main{width:100%;max-width:none;margin:3px auto;padding:0 4px;gap:4px;align-items
     <label><input id="searcherFlow" type="checkbox" checked> ਲਗਾਤਾਰ ਪੰਕਤੀਆਂ · Continuous</label>
      <label><input id="searcherPauses" type="checkbox" checked> ਠਹਿਰਾਅ · Pause colour</label>
     </div>
+    <button id="searcherLibrary" type="button">ਆਫਲਾਈਨ ਬਾਣੀ · Offline library</button>
     <button id="searcherUpdate" type="button">ਅੱਪਡੇਟ · App update</button>
    </div>
   </details>
@@ -246,16 +249,54 @@ function meaning(x,lang){
 }
 function selectedMeanings(x){const result={};for(const [lang,id] of [['english','enCheck'],['punjabi','paCheck'],['hindi','hiCheck']]){if($(id).checked){const m=meaning(x,lang);if(m)result[lang]=m}}return result}
 function selectedScripts(x){const result={};for(const [lang,id] of [['gurmukhi','gurmukhiCheck'],['hindi','hindiShabadCheck'],['english','englishShabadCheck']]){if($(id).checked){const value=getScript(x,lang);if(value)result[lang]=value}}return result}
+let searcherFavorites=isSearcher?stored('gb-searcher-favorites',[]):[];
+let favoritesOpen=false;
 let history=stored('gb-history-v1',[]),currentShabad=null,searchNonce=0;
 function saveHistory(){put('gb-history-v1',history.slice(0,35))}
-function toggleHistory(open){$('historyCard').hidden=!open;$('historyToggle').setAttribute('aria-expanded',String(open))}
+function toggleHistory(open){
+ $('historyCard').hidden=!open;$('historyToggle').setAttribute('aria-expanded',String(open));
+ if(isSearcher)document.documentElement.classList.toggle('searcher-history-open',open);
+}
 $('historyToggle').onclick=()=>toggleHistory($('historyCard').hidden);
 $('historyClose').onclick=()=>toggleHistory(false);
-document.addEventListener('pointerdown',e=>{if(!$('historyCard').hidden&&!e.target.closest('#historyCard,#historyToggle'))toggleHistory(false)});
+document.addEventListener('pointerdown',e=>{if(!isSearcher&&!$('historyCard').hidden&&!e.target.closest('#historyCard,#historyToggle'))toggleHistory(false)});
+function favoriteButton(item){
+ const button=document.createElement('button');
+ button.type='button';button.className='searcher-favorite';button.dataset.shabadId=String(item.id);
+ const saved=searcherFavorites.some(entry=>String(entry.id)===String(item.id));
+ button.textContent=saved?'★':'☆';
+ button.setAttribute('aria-pressed',String(saved));
+ button.setAttribute('aria-label',saved?'ਮਨਪਸੰਦ ਤੋਂ ਹਟਾਓ · Remove favorite':'ਮਨਪਸੰਦ ਬਣਾਓ · Add favorite');
+ button.onclick=()=>{
+  const present=searcherFavorites.some(entry=>String(entry.id)===String(item.id));
+  searcherFavorites=present?searcherFavorites.filter(entry=>String(entry.id)!==String(item.id)):[item,...searcherFavorites];
+  put('gb-searcher-favorites',searcherFavorites);
+  if(button.closest('#searcherReaderFavorite'))renderReaderFavorite();
+  for(const star of $('results').querySelectorAll('.searcher-favorite')){
+   if(star.dataset.shabadId===String(item.id))star.replaceWith(favoriteButton(item));
+  }
+  renderHistory();
+ };
+ return button;
+}
+function renderReaderFavorite(){
+ const slot=$('searcherReaderFavorite');
+ if(slot)slot.replaceChildren(...(currentShabad?[favoriteButton(currentShabad)]:[]));
+}
 function renderHistory(){
  const box=$('historyList');box.replaceChildren();
- if(!history.length){box.textContent='No searched shabads yet.';return}
- for(const h of history){const btn=document.createElement('button');btn.className='historyItem';btn.textContent=(h.title||'Shabad')+' · Line '+((h.lastIndex??h.mainIndex??0)+1);btn.onclick=()=>{toggleHistory(false);openShabad({shabadId:h.id,verseId:h.matchId},true)};box.append(btn)}
+ const records=favoritesOpen?searcherFavorites:history;
+ if(isSearcher){
+  $('historyCard').querySelector('strong').textContent=favoritesOpen?'ਮਨਪਸੰਦ · Favorites':'ਖੋਜ ਇਤਿਹਾਸ · Search History';
+  $('searcherPurgeHistory').hidden=favoritesOpen||!history.length;
+ }
+ if(!records.length){box.textContent=favoritesOpen?'ਕੋਈ ਮਨਪਸੰਦ ਨਹੀਂ · No favorites':'ਕੋਈ ਖੋਜ ਇਤਿਹਾਸ ਨਹੀਂ · No search history';return}
+ for(const h of records){
+  const btn=document.createElement('button');btn.className='historyItem';btn.textContent=(h.title||'Shabad')+(isSearcher?'':' · Line '+((h.lastIndex??h.mainIndex??0)+1));
+  btn.onclick=()=>{toggleHistory(false);openShabad({shabadId:h.id,verseId:h.matchId},true,h)};
+  if(!isSearcher){box.append(btn);continue}
+  const row=document.createElement('div');row.className='searcher-result-row';row.append(btn,favoriteButton(h));box.append(row);
+ }
 }
 function menu(show){$('functionsMenu').hidden=!show;$('menuButton').setAttribute('aria-expanded',String(show))}
 $('menuButton').onclick=()=>menu($('functionsMenu').hidden);$('closeMenu').onclick=()=>menu(false);
@@ -808,7 +849,7 @@ $('projectionDay').checked=!!stored('gb-control-projection-day',false);
 $('projectionDay').onchange=()=>{put('gb-control-projection-day',$('projectionDay').checked);if(openDeviceSettingsKey){deviceSettings(openDeviceSettingsKey).projection.dayMode=$('projectionDay').checked;persistDeviceSettings();queueDeviceSettings(openDeviceSettingsKey)}else status('Day mode preference saved; choose a device to apply it')};
 $('clear').onclick=()=>{lastContent=null;put('gb-last-content',null);publish({content:null})};
 $('closeReading').onclick=()=>{
- if(isSearcher&&window.history.state?.searcherReading){searcherClearOnBack=true;window.history.back();return}
+ if(isSearcher&&window.history.state?.searcherReading){toggleHistory(false);searcherClearOnBack=true;window.history.back();return}
  ++searchNonce;
  lines=[];active=-1;readingAng=null;readingTitle='';asaStarts=[];renderReadingNavigator();shabadAng=null;
  currentShabad=null;shabadSourceInfo=null;sukhmaniSalokStarts=[];
@@ -1200,7 +1241,11 @@ function renderSearchResults(data,offline=false){
   badge.title={'SGGS':'Sri Guru Granth Sahib Ji','DG':'Sri Dasam Granth','BGV':'Bhai Gurdas Ji Vaaran','BNL':'Bhai Nand Lal Ji','OTH':'Other Gurbani sources','—':'Source not specified'}[badge.textContent]||'Source not specified';
   b.append(verseName,badge);
   b.onclick=offline?()=>openOfflineSearchResult(item):()=>openShabad(record);
-  box.append(b)
+  if(isSearcher&&!offline&&sid(record)){
+   const row=document.createElement('div');row.className='searcher-result-row';
+   row.append(b,favoriteButton({id:sid(record),title:verse(record),matchId:record.verseId??record.verseID??record.verse?.id}));
+   box.append(row);
+  }else box.append(b);
  }
  if(!data.length)box.textContent='No matching Shabad in available offline texts. Check source or installed database.'
 }
@@ -1341,6 +1386,7 @@ $('search').onclick=async()=>{
  if(isSearcher){toggleVirtualKeyboard(false);$('query').blur()}
  status('Searching Gurbani…');$('results').hidden=false;$('results').replaceChildren();
  const type=$('searchType').value;
+ if(isSearcher&&type==='ang')return loadAng(q.replace(/[੦-੯]/g,d=>String('੦੧੨੩੪੫੬੭੮੯'.indexOf(d))));
  // Prefer instant local search after the initial database install, even with internet.
  if(offlineCount>0){
   try{
@@ -1461,7 +1507,8 @@ let keyboardOpen=false;
 function buildVirtualKeyboard(){
  const target=$('keyboardKeys');target.replaceChildren();
  const lang=$('keyboard').value;
- const rows=isSearcher&&lang==='pa'?[
+ const angMode=isSearcher&&$('searchType').value==='ang';
+ const rows=angMode?[Array.from('1234567890')]:isSearcher&&lang==='pa'?[
   'ੳ ਅ ੲ ਸ ਹ ਕ ਖ ਗ ਘ ਙ','ਚ ਛ ਜ ਝ ਞ ਟ ਠ ਡ ਢ ਣ','ਤ ਥ ਦ ਧ ਨ ਪ ਫ ਬ ਭ ਮ',
   'ਯ ਰ ਲ ਵ ੜ ਸ਼ ਖ਼ ਗ਼ ਜ਼ ਫ਼','ਾ ਿ ੀ ੁ ੂ ੇ ੈ ੋ ੌ ੰ','ਂ ੱ ੍ ਼ ੑ ੴ'
  ].map(row=>row.split(' ')):KB_LAYOUT[lang].map(row=>Array.from(row));
@@ -1474,7 +1521,7 @@ function buildVirtualKeyboard(){
    target.append(key)
   }
  }
- const extras=isSearcher&&lang==='pa'?[]:lang==='en'?['-','.','?']:lang==='pa'?['ੳ','ਅ','ੲ','ਂ','ੱ','ੑ']:['अ','आ','इ','ई','उ','ऊ'];
+ const extras=angMode||(isSearcher&&lang==='pa')?[]:lang==='en'?['-','.','?']:lang==='pa'?['ੳ','ਅ','ੲ','ਂ','ੱ','ੑ']:['अ','आ','इ','ई','उ','ऊ'];
  for(const symbol of extras){const key=document.createElement('button');key.type='button';key.textContent=symbol;key.onclick=()=>insertVirtualText(symbol);target.append(key)}
  const space=document.createElement('button');space.type='button';space.className='kb-space';space.textContent=isSearcher&&lang==='pa'?'ਖਾਲੀ ਥਾਂ':'Space';space.onclick=()=>insertVirtualText(' ');
  const back=document.createElement('button');back.type='button';back.className='kb-delete';back.textContent='⌫';back.title='Backspace';back.onclick=()=>backspaceVirtualText();
@@ -1745,7 +1792,7 @@ $('nitnem').onclick=async()=>{
 };
 
 $('anandSix').onclick=()=>loadCanonicalBani('anand');$('sukhmani').onclick=()=>loadCanonicalBani('sukhmani');$('sehaj').onclick=()=>loadAng(stored('gb-sehaj-ang',1));$('angSearch').onclick=()=>loadAng($('angInput').value);$('prevAng').onclick=()=>loadAng((readingAng||Number($('angInput').value)||1)-1);$('nextAng').onclick=()=>loadAng((readingAng||Number($('angInput').value)||1)+1);
-async function openShabad(x,fromHistory=false){
+async function openShabad(x,fromHistory=false,savedEntry=null){
  const n=sid(x);if(!n)return status('No shabad ID available');
  const nonce=++searchNonce;
  try{
@@ -1758,7 +1805,7 @@ async function openShabad(x,fromHistory=false){
   shabadSourceInfo={name:typeof rawName==='string'&&rawName.trim()?rawName:sourceId==='G'?'Sri Guru Granth Sahib Ji':sourceId?'Source '+sourceId:'Source not specified',ang:Number(shabadAng)>0?String(shabadAng):''};
   const matchId=x?.verseId||x?.verseID||x?.verse?.verseId||x?.verse?.id;
   const match=lines.findIndex(v=>(matchId&&String(v.verseId||v.verseID||v.id)===String(matchId))||(verse(x)&&verse(v)===verse(x)));
-  const existing=history.find(h=>String(h.id)===String(n));
+  const existing=history.find(h=>String(h.id)===String(n))||savedEntry;
   const main=existing?.mainIndex??(match>=0?match:0);
   currentShabad={id:n,title:verse(x)||existing?.title||verse(lines[0])||'Shabad',mainIndex:main,lastIndex:existing?.lastIndex??main,matchId:matchId||existing?.matchId||null};
   history=[currentShabad,...history.filter(h=>String(h.id)!==String(n))].slice(0,35);
@@ -1802,6 +1849,8 @@ function renderLines(){
   selectedLine?.classList.add('active');
   selectedLine?.setAttribute('aria-current','true');
   $('searchCard').classList.toggle('searcher-search-open',!lines.length);
+  document.documentElement.classList.toggle('searcher-reading',!!lines.length);
+  renderReaderFavorite();
   if(lines.length&&keyboardOpen)toggleVirtualKeyboard(false);
   return;
  }
@@ -1928,6 +1977,7 @@ if(isSearcher){
  if(window.history.state?.searcherReading)window.history.replaceState(null,'',location.href);
  window.addEventListener('popstate',()=>{
   if(window.history.state?.searcherReading||!lines.length)return;
+  toggleHistory(false);
   ++searchNonce;
   lines=[];active=-1;readingAng=null;readingTitle='';asaStarts=[];sukhmaniSalokStarts=[];
   shabadAng=null;currentShabad=null;shabadSourceInfo=null;
@@ -1959,7 +2009,26 @@ if(isSearcher){
   applyFont,()=>put('gb-searcher-font',fontSize));
  for(const id of ['previous','next'])$(id).addEventListener('click',()=>motion.center(lineBox.children[active]));
  $('searcherMessage').hidden=false;
- $('historyCard').querySelector('strong').textContent='ਖੋਜ ਇਤਿਹਾਸ · Search History';
+ const purge=document.createElement('button');
+ purge.id='searcherPurgeHistory';purge.type='button';purge.textContent='ਇਤਿਹਾਸ ਮਿਟਾਓ · Purge History';
+ purge.onclick=()=>{if(window.confirm('ਖੋਜ ਇਤਿਹਾਸ ਮਿਟਾਉਣਾ ਹੈ? · Clear search history?')){history=[];saveHistory();renderHistory();}};
+ $('historyList').before(purge);
+ const favoriteSlot=document.createElement('div');favoriteSlot.id='searcherReaderFavorite';
+ lineBox.before(favoriteSlot);
+ $('searcherFavorites').onclick=()=>{
+  favoritesOpen=true;renderHistory();toggleVirtualKeyboard(false);toggleHistory(true);window.scrollTo(0,0);
+ };
+ $('historyToggle').onclick=()=>{
+  const open=$('historyCard').hidden||favoritesOpen;
+  favoritesOpen=false;renderHistory();toggleHistory(open);
+ };
+ $('searcherLibrary').onclick=()=>{
+  $('searcherSettings').open=false;
+  const library=$('offlineToolsDetails');
+  library.hidden=!library.hidden;
+  if(!library.hidden){$('searchCard').classList.add('searcher-search-open');window.scrollTo(0,0);}
+ };
+ $('results').before($('offlineToolsDetails'));$('offlineToolsDetails').hidden=true;
  $('searcherLinkPanel').before($('connectCard'));
  $('connectCard').append($('checkAppUpdate'),$('appUpdateStatus'));
  $('searcherControlCode').value=stored('gb-searcher-control-link','');
@@ -1985,6 +2054,23 @@ if(isSearcher){
   $('searcherSettings').open=false;$('connectCard').classList.add('searcher-devices');
   $('checkAppUpdate').click();window.scrollTo(0,0);
  };
+ const searchOptions=document.createElement('details');
+ searchOptions.id='searcherSearchOptions';
+ const searchOptionsLabel=document.createElement('summary');
+ searchOptionsLabel.textContent='ਖੋਜ ਦਾ ਤਰੀਕਾ · Search mode';
+ const sourceRow=$('corpusSource').closest('.row'), modeRow=$('searchType').closest('.row');
+ const queryRow=$('query').closest('.row');
+ queryRow.after(searchOptions);
+ searchOptions.append(searchOptionsLabel,sourceRow,modeRow);
+ queryRow.prepend($('keyboardToggle'));
+ window.gbSearcherBack=()=>{
+  if(keyboardOpen){toggleVirtualKeyboard(false);$('query').blur();return true;}
+  if($('searcherSettings').open){$('searcherSettings').open=false;return true;}
+  if(!$('historyCard').hidden){toggleHistory(false);return true;}
+  if(!$('searcherLinkPanel').hidden){$('searcherLinkPanel').hidden=true;return true;}
+  if($('connectCard').classList.contains('searcher-devices')){$('connectCard').classList.remove('searcher-devices');return true;}
+  return false;
+ };
  $('searcherToolbar').hidden=false;
  $('searcherFlow').checked=stored('gb-searcher-flow',true);
  $('searcherPauses').checked=stored('gb-searcher-pauses',true);
@@ -1999,17 +2085,48 @@ if(isSearcher){
   option.textContent={'0':'ਪਹਿਲੇ ਅੱਖਰ · Gurmukhi initials','2':'ਪੂਰਾ ਸ਼ਬਦ · Gurmukhi word',
    '7':'ਪਹਿਲੇ ਅੱਖਰ · English initials','4':'Romanized word'}[option.value];
  }
+ $('searchType').append(new Option('ਅੰਗ · Ang','ang'));
  $('keyboardToggle').title='ਕੀਬੋਰਡ · Keyboard';
  $('keyboardToggle').setAttribute('aria-label','ਕੀਬੋਰਡ · Keyboard');
  $('keyboard').value=stored('gb-searcher-keyboard','pa');
  if(!$('keyboard').value)$('keyboard').value='pa';
  $('keyboard').onchange();
+ const searchMode=()=>{
+  $('searcherMode').textContent=($('corpusSource').value==='all'?'Composite':$('corpusSource').selectedOptions[0].textContent)+' · '+({'2':'Word','4':'Word',ang:'Ang'}[$('searchType').value]||'1st Chars');
+ };
+ $('corpusSource').addEventListener('change',searchMode);
+ $('keyboard').addEventListener('change',searchMode);
+ searchMode();
  $('searchType').addEventListener('change',()=>{
-  if($('keyboard').value==='pa')$('query').placeholder=$('searchType').value==='2'?'ਪੂਰਾ ਸ਼ਬਦ ਲਿਖੋ':'ਪਹਿਲੇ ਅੱਖਰ ਲਿਖੋ';
+  searchMode();
+  const type=$('searchType').value;
+  if(type==='ang')$('query').placeholder='ਅੰਗ ਨੰਬਰ ਲਿਖੋ';
+  else if($('keyboard').value==='pa')$('query').placeholder=type==='2'?'ਪੂਰਾ ਸ਼ਬਦ ਲਿਖੋ':'ਪਹਿਲੇ ਅੱਖਰ ਲਿਖੋ';
+  if(keyboardOpen)buildVirtualKeyboard();
  });
  $('query').setAttribute('inputmode','none');
  $('query').addEventListener('click',()=>toggleVirtualKeyboard(true));
  $('query').addEventListener('focus',()=>toggleVirtualKeyboard(true));
+ let liveSearchTimer, liveSearchRevision=0;
+ $('query').addEventListener('input',()=>{
+  clearTimeout(liveSearchTimer);
+  const revision=++liveSearchRevision;
+  const text=$('query').value.trim();
+  if(!text){$('results').replaceChildren();$('results').hidden=true;$('searcherMessage').textContent='';return}
+  if(text.length<2||$('searchType').value==='ang')return;
+  liveSearchTimer=setTimeout(async()=>{
+   const type=$('searchType').value, source=corpusSource();
+   try{
+    if(offlineCount>0||navigator.onLine===false){
+     const matches=await offlineSearch(text,type);
+     if(revision!==liveSearchRevision||!keyboardOpen)return;
+     if(matches.length||navigator.onLine===false){renderSearchResults(matches,true);return;}
+    }
+    const response=await loadJson('https://api.banidb.com/v2/search/'+encodeURIComponent(text)+'?searchtype='+type+'&source='+encodeURIComponent(source)+'&results=40');
+    if(revision===liveSearchRevision&&keyboardOpen&&type===$('searchType').value&&source===corpusSource())renderSearchResults(verses(response));
+   }catch(_){}
+  },275);
+ });
  $('searcherSearch').onclick=()=>{
   if(lines.length&&window.history.state?.searcherReading){window.history.back();return;}
   toggleHistory(false);

@@ -201,7 +201,16 @@ public class MainActivity extends Activity {
                 .show();
             return;
         }
-        if(web != null && web.canGoBack()) web.goBack();
+        if ("searcher".equals(BuildConfig.ROLE) && web != null) {
+            web.evaluateJavascript("Boolean(window.gbSearcherBack && window.gbSearcherBack())", handled -> {
+                if (!"true".equals(handled) && !isFinishing()) goBackOrFinish();
+            });
+            return;
+        }
+        goBackOrFinish();
+    }
+    private void goBackOrFinish() {
+        if (web != null && web.canGoBack()) web.goBack();
         else finish();
     }
     @Override protected void onResume() {
