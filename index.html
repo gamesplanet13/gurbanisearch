@@ -420,10 +420,10 @@ if(m.type==='screen-preview-frame'||m.type==='screen-preview-error'){desktopPrev
 if(m.type==='pong'){return}if(m.type==='applied'){const p=pendingDelivery.get(conn);if(p&&m.rev===p.rev)pendingDelivery.delete(conn);return}
 if(m.type==='hello'){if(m.owner && m.owner!==myToken){status('Screen is paired to another controller. On that screen choose Reset pairing.');conn.close();return}if(m.code){if(m.deviceId&&m.deviceId!==key){connections.delete(key);key=m.deviceId}if(m.displaySession&&displaySessions.get(key)!==m.displaySession){displaySessions.set(key,m.displaySession);delete deviceView[key]}
  if(m.projectionSettings&&typeof m.projectionSettings==='object')adoptProjectionSettings(key,m.projectionSettings,true);
- known[key]={code:m.code,name:m.name||'Projection',kind:m.kind||'projection'};put('gb-known-devices',known);connections.set(key,conn);selected.add(key);put('gb-selected-devices',[...selected]);announce(conn);renderDevices();status('Projection connected')}}
+ known[key]={code:m.code,name:m.name||'Projection',kind:m.kind||'projection',localWaheguru:m.localWaheguru===true};put('gb-known-devices',known);connections.set(key,conn);selected.add(key);put('gb-selected-devices',[...selected]);announce(conn);renderDevices();status('Projection connected')}}
 if(m.type==='accepted'&&m.kind==='obs')send(conn,{type:'project',token:myToken,obsSettings:obsValues(),...(lastContent&&lastContent.mode!=='waheguru'?{content:lastContent}:{})});
 if(m.type==='accepted'&&m.kind!=='obs')setTimeout(()=>sendOneDeviceSettings(key,true),0);
-if(m.type==='accepted'){if(m.deviceId){if(m.deviceId!==key){connections.delete(key);key=m.deviceId}known[key]={code:m.code||codeValue,name:m.name||'Projection',kind:m.kind||known[key]?.kind||'projection'};put('gb-known-devices',known);selected.add(key);put('gb-selected-devices',[...selected]);connections.set(key,conn)}renderDevices();sendDeviceView(key);status('Paired successfully')}
+if(m.type==='accepted'){if(m.deviceId){if(m.deviceId!==key){connections.delete(key);key=m.deviceId}known[key]={code:m.code||codeValue,name:m.name||'Projection',kind:m.kind||known[key]?.kind||'projection',localWaheguru:known[key]?.localWaheguru===true};put('gb-known-devices',known);selected.add(key);put('gb-selected-devices',[...selected]);connections.set(key,conn)}renderDevices();sendDeviceView(key);status('Paired successfully')}
 if((m.type==='hello'||m.type==='accepted')&&m.kind==='book'&&m.bookSettings&&!perDeviceSettings[key]){const saved=deviceSettings(key);saved.book={...saved.book,...m.bookSettings};persistDeviceSettings()}
 if(m.type==='projection-settings'&&m.settings&&connections.get(key)===conn){adoptProjectionSettings(key,m.settings);if(openDeviceSettingsKey===key)renderDevices();return}
 if(m.type==='book-settings'){const saved=deviceSettings(key);saved.book={...saved.book,...Object.fromEntries(['fontSize','lineSpacing','nightMode','larrivaar','flow','pause'].filter(k=>m[k]!==undefined).map(k=>[k,m[k]]))};persistDeviceSettings();if(openDeviceSettingsKey===key)renderDevices()}
@@ -440,7 +440,7 @@ if(m.type==='code-change'&&/^\d{5}$/.test(m.code)&&known[key]){
  if(connections.get(old)===conn)connections.delete(old);connections.set(updated,conn);key=updated;
  put('gb-known-devices',known);put('gb-selected-devices',[...selected]);put('gb-auto-reconnect',autoReconnect);renderDevices();status('Display code changed to '+updated+'; reconnecting.');
 }
-if(m.type==='identify'){known[key]={code:m.code||codeValue,name:m.name||'Projection',kind:m.kind||known[key]?.kind||'projection'};put('gb-known-devices',known);renderDevices()}
+if(m.type==='identify'){known[key]={code:m.code||codeValue,name:m.name||'Projection',kind:m.kind||known[key]?.kind||'projection',localWaheguru:known[key]?.localWaheguru===true};put('gb-known-devices',known);renderDevices()}
 });
 conn.on('close',()=>{if(connections.get(key)===conn){connections.delete(key);const route=activeCameraRoutes.get(String(codeValue));if(route?.call)route.call.close();activeCameraRoutes.delete(String(codeValue))}renderDevices()});conn.on('error',e=>{if(connections.get(key)===conn)connections.delete(key);status('Connection failed: '+(e.message||'try again'));renderDevices()});}
 function connectProjection(key,codeValue){
@@ -717,7 +717,8 @@ function publish(payload,projectionOnly=false,force=false){
    packet.content=singleLine;
   }
   if(personal){delete packet.settings;delete packet.bookSettings;}
-  if(send(c,packet)){sent++;pendingDelivery.set(c,{rev,time:Date.now()})}
+  const update=known[id]?.localWaheguru&&packet.content?.mode==='waheguru'?{type:'waheguru-show',token:myToken,rev}:packet;
+  if(send(c,update)){sent++;pendingDelivery.set(c,{rev,time:Date.now()})}
  }
  status(sent+' projection screen(s) updated');
  if(sent===0)status('No selected online projection. Reconnect or select a screen first.');

@@ -46,7 +46,22 @@ public class MainActivity extends Activity {
         settings.setBuiltInZoomControls(false);
         settings.setCacheMode(WebSettings.LOAD_DEFAULT);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+        android.app.UiModeManager uiMode = getSystemService(android.app.UiModeManager.class);
+        boolean tvProjection = "projection".equals(BuildConfig.ROLE) && uiMode != null
+                && uiMode.getCurrentModeType() == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION;
         web.setWebViewClient(new WebViewClient() {
+            @Override public android.webkit.WebResourceResponse shouldInterceptRequest(
+                    WebView view, android.webkit.WebResourceRequest request) {
+                Uri uri = request.getUrl();
+                if (tvProjection && isTrustedOrigin(uri)
+                        && "/gurbanisearch/gurbani-tv-waheguru.js".equals(uri.getPath())) {
+                    try {
+                        return new android.webkit.WebResourceResponse("application/javascript", "UTF-8",
+                                getAssets().open("gurbani-tv-waheguru.js"));
+                    } catch (java.io.IOException ignored) { }
+                }
+                return super.shouldInterceptRequest(view, request);
+            }
             @Override public boolean shouldOverrideUrlLoading(WebView view, android.webkit.WebResourceRequest request) {
                 return routeWebLink(request.getUrl(), request.isForMainFrame());
             }
@@ -98,7 +113,7 @@ public class MainActivity extends Activity {
             Uri uri = Uri.parse(url);
             if (isGurbaniApk(uri)) updater.check(true);
         });
-        web.loadUrl(SITE + BuildConfig.START_PAGE + "?app=" + BuildConfig.VERSION_CODE);
+        web.loadUrl(SITE + BuildConfig.START_PAGE + "?app=" + BuildConfig.VERSION_CODE + (tvProjection ? "&display=tv" : ""));
     }
     private boolean routeWebLink(Uri uri, boolean mainFrame) {
         if (isGurbaniApk(uri)) {
