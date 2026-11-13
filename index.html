@@ -533,9 +533,9 @@ window.gbWifiFinished=(error)=>{if(error){$('wifiStatus').textContent=error;retu
 $('searchWifi').onclick=()=>{wifiDevices.clear();renderWifiDevices();if(!window.GurbaniWifi||typeof window.GurbaniWifi.search!=='function'){$('wifiStatus').textContent='Install the updated Gurbani Controller Android app for Wi-Fi search. You can still enter a code.';return}$('wifiStatus').textContent='Searching the same Wi-Fi…';try{window.GurbaniWifi.search()}catch(e){$('wifiStatus').textContent='Wi-Fi search unavailable. Use the code.'}};
 $('pair').onclick=()=>{const c=$('pairCode').value.trim();if(!/^\d{5}$/.test(c))return status('Enter five digits');connectProjection(c,c)};
 function reconnectSaved(){if(peer&&peer.open&&!peer.disconnected){for(const [key,d] of Object.entries(known))if(autoReconnect[key]!==false&&!connections.has(key))connectProjection(key,d.code)}}
-setInterval(()=>{for(const [key,c] of connections){if(!c?.open){if(c&&!c.open){connections.delete(key)}continue}const last=health.get(c)||Date.now(),pending=pendingDelivery.get(c);if((pending&&Date.now()-pending.time>7000)||(Date.now()-last>36000)){connections.delete(key);try{c.close()}catch(_){}status('Reconnecting unresponsive display '+key);continue}send(c,{type:'ping',id:Date.now(),token:myToken})}renderDevices()},12000);
+setInterval(()=>{for(const [key,c] of connections){if(!c?.open)continue;const last=health.get(c)||Date.now();if(Date.now()-last>60000){connections.delete(key);try{c.close()}catch(_){}status('Reconnecting unresponsive display '+key);continue}send(c,{type:'ping',id:Date.now(),token:myToken})}renderDevices()},12000);
 setInterval(reconnectSaved,10000);
-window.addEventListener('online',reconnectSaved);function probeAfterResume(){reconnectSaved();const sentAt=Date.now();for(const [key,c] of connections){if(!c?.open)continue;send(c,{type:'ping',id:sentAt,token:myToken});setTimeout(()=>{if(connections.get(key)===c&&(health.get(c)||0)<sentAt){connections.delete(key);try{c.close()}catch(_){}reconnectSaved()}},5000)}}window.addEventListener('focus',probeAfterResume);window.addEventListener('pageshow',probeAfterResume);
+window.addEventListener('online',reconnectSaved);function probeAfterResume(){reconnectSaved();const sentAt=Date.now();for(const [key,c] of connections){if(!c?.open)continue;send(c,{type:'ping',id:sentAt,token:myToken});setTimeout(()=>{if(connections.get(key)===c&&(health.get(c)||0)<sentAt){connections.delete(key);try{c.close()}catch(_){}reconnectSaved()}},15000)}}window.addEventListener('focus',probeAfterResume);window.addEventListener('pageshow',probeAfterResume);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)reconnectSaved()});
 $('changeControllerCode').onclick=()=>{const v=$('newControllerCode').value.trim();if(!/^\d{5}$/.test(v))return status('Enter a valid 5-digit controller code');if(v===myCode)return status('This is already your controller code');put('gb-controller-code',v);location.reload()};
 let projectionIsOn=stored('gb-projection-switch-on',true);
@@ -1562,5 +1562,6 @@ $('waheguru').onclick=()=>{const content={mode:'waheguru',verse:'ਵਾਹਿਗ
 renderHistory();
 renderDevices();start();
 </script></body></html>
+
 
 
