@@ -14,7 +14,6 @@ import android.content.ClipData;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.webkit.WebChromeClient.FileChooserParams;
 import android.graphics.Color;
 import android.content.Intent;
 import android.net.Uri;
@@ -73,7 +72,7 @@ public class MainActivity extends Activity {
             }
             @Override public void onPermissionRequest(PermissionRequest request){
                 runOnUiThread(() -> {
-                    if(!"https://gamesplanet13.github.io".equals(request.getOrigin().toString())
+                    if(!isTrustedOrigin(request.getOrigin())
                             || web.getUrl() == null || !web.getUrl().startsWith(SITE)
                             || !requestHasVideoOnly(request)){
                         request.deny(); return;
@@ -85,13 +84,20 @@ public class MainActivity extends Activity {
                     }else request.grant(new String[]{PermissionRequest.RESOURCE_VIDEO_CAPTURE});
                 });
             }
+            @Override public void onPermissionRequestCanceled(PermissionRequest request) {
+                if (pendingMediaPermission == request) pendingMediaPermission = null;
+            }
         });
         wifiDiscovery = new WifiDiscovery(this, web, BuildConfig.ROLE);
         web.addJavascriptInterface(wifiDiscovery, "GurbaniWifi");
         setContentView(web);
-        web.loadUrl(SITE + BuildConfig.START_PAGE + "?app=20261116");
+        web.loadUrl(SITE + BuildConfig.START_PAGE + "?app=" + BuildConfig.VERSION_CODE);
         updater = new Updater(this);
         updater.check();
+    }
+    private static boolean isTrustedOrigin(Uri origin) {
+        return "https".equals(origin.getScheme()) && "gamesplanet13.github.io".equals(origin.getHost())
+                && (origin.getPort() == -1 || origin.getPort() == 443);
     }
     private static boolean requestHasVideoOnly(PermissionRequest request){
         boolean video=false;
@@ -107,7 +113,8 @@ public class MainActivity extends Activity {
         PermissionRequest pending=pendingMediaPermission;
         pendingMediaPermission=null;
         if(pending!=null){
-            if(results.length>0 && results[0]==PackageManager.PERMISSION_GRANTED)
+            if(results.length>0 && results[0]==PackageManager.PERMISSION_GRANTED
+                    && web.getUrl()!=null && web.getUrl().startsWith(SITE) && isTrustedOrigin(pending.getOrigin()))
                 pending.grant(new String[]{PermissionRequest.RESOURCE_VIDEO_CAPTURE});
             else pending.deny();
         }

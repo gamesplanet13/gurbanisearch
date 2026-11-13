@@ -1,7 +1,7 @@
 /* Text presentation only: original Gurbani characters are never rewritten. */
 window.GurbaniLayout = {
   draw(element, text, larrivaar, pauses) {
-    element.replaceChildren();
+    element.textContent = '';
     text = String(text || '');
     // Highlight the word immediately before punctuation present in the source.
     // These are not independently verified traditional vishram annotations.

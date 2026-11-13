@@ -48,12 +48,20 @@
       }
       async function create() {
         if (creating) return;
+        if (typeof window.RTCPeerConnection !== 'function') { setStatus('WebRTC unavailable. Update Android System WebView.'); return; }
         if (typeof Peer === 'undefined') { setStatus('Connection library unavailable — reopen app online'); schedule(10000); return; }
         setStatus('Connecting…'); opened = false; creating = true;
         const config = await Promise.race([iceConfig(), new Promise(resolve => setTimeout(() => resolve(undefined), 2500))]);
         creating = false;
         if (current && !current.destroyed) return;
-        const p = current = new Peer(options.id(), config ? {debug: 0, config} : {debug: 0});
+        let p;
+        try {
+          p = current = new Peer(options.id(), config ? {debug: 0, config} : {debug: 0});
+        } catch (error) {
+          setStatus('Pairing could not start: ' + error.message);
+          schedule(10000);
+          return;
+        }
         options.onPeer(p);
         p.on('open', () => {
           if (p !== current) return;
@@ -82,6 +90,9 @@
             current = null; p.destroy();
             setStatus('Connection server unavailable — retrying; check internet');
             schedule(Math.min(30000, 3000 * Math.pow(2, Math.min(attempts++, 3))));
+          } else if (e.type === 'browser-incompatible') {
+            if (timer) { clearTimeout(timer); timer = null; }
+            setStatus('WebRTC unavailable. Update Android System WebView.');
           } else {
             setStatus('Connection error: ' + (e.message || e.type || 'unknown'));
           }

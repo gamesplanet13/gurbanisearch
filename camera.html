@@ -8,9 +8,9 @@
 <label>Camera Zoom: <output id="zoomNumber">1.0×</output><input type="range" id="zoom" min="1" max="4" step=".1" value="1"></label><p id="zoomNotice" class="small">Hardware zoom if supported; otherwise preview will be digitally cropped for local monitoring only.</p>
 <div class="row"><button id="recordStart">⏺ Record</button><button id="recordStop" disabled>■ Stop &amp; Save</button></div><p class="small" id="recordNotice">Recordings save on this camera phone only. Your browser may ask where to download.</p>
 <div class="row"><button id="resetPairing">Unpair Controller</button><button id="newCode">New Camera Code</button></div></section></div>
-<section class="card" style="grid-column:1/-1"><strong>Connected Displays</strong><div id="viewers" class="small">Not yet connected</div><p class="small">WebRTC PeerJS signaling requires internet to connect. Once paired, video passes peer-to-peer where possible. Browsers may stop capture if this page is backgrounded or the screen locks. Enable HTTPS camera permission.</p></section></main>
+<section class="card" style="grid-column:1/-1"><strong>Connected Displays</strong><div id="viewers" class="small">Not yet connected</div><p class="small">WebRTC PeerJS signaling requires internet to connect. Video goes to Controller, which sends it to the selected Projection screens. Browsers may stop capture if this page is backgrounded or the screen locks. Enable HTTPS camera permission.</p></section></main>
 <footer>Developed by Rajinder Singh · <a href="mailto:harjas.info@gmail.com">harjas.info@gmail.com</a> · <a href="https://www.youtube.com/results?search_query=HarjasTV" target="_blank" rel="noopener">HarjasTV</a></footer>
-<script src="peerjs-1.5.5.min.js"></script><script src="gurbani-peer-manager.js"></script><script>
+<script src="peerjs-1.5.5.min.js?v=20261118"></script><script src="gurbani-peer-manager.js?v=20261118"></script><script>
 'use strict';
 const $=id=>document.getElementById(id);
 const store=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
@@ -18,7 +18,7 @@ const read=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{retur
 const mkCode=()=>String(10000+Math.floor(Math.random()*90000));
 let cameraCode=read('gb-camera-code',null)||mkCode(),cameraName=read('gb-camera-name','Camera Phone'),controllerPeer=read('gb-camera-controller-peer',null),peer,stream=null,recording=null,recordChunks=[],allowed=new Set(),calls=new Map(),facingMode='environment',streamGeneration=0;
 store('gb-camera-code',cameraCode);$('code').textContent=cameraCode;
-const cameraPeerPrefix='gurbani-camera-v1-',controlPrefix='gurbani-control-v1-',projectionPrefix='gurbani-projection-v1-';
+const cameraPeerPrefix='gurbani-camera-v1-',controlPrefix='gurbani-control-v1-';
 function status(s){$('status').textContent=s}
 function signal(msg){for(const conn of controlConnections)if(conn.open)conn.send(msg)}
 const controlConnections=new Set();
@@ -136,7 +136,7 @@ function handleController(c){
  c.on('data',m=>{
   if(!m||typeof m!=='object'||c.peer!==controllerPeer)return;
   if(m.type==='ping'){c.send({type:'pong',id:m.id});return}
-  if(m.type==='camera-authorize'){allowed=new Set((Array.isArray(m.targets)?m.targets:[]).filter(id=>typeof id==='string'&&(id.startsWith(projectionPrefix)||id===controllerPeer)));allowed.add(controllerPeer);return}
+  if(m.type==='camera-authorize'){allowed.add(controllerPeer);return}
   if(m.type==='camera-connect'){for(const id of (Array.isArray(m.targets)?m.targets:[])){if(allowed.has(id))shareTo(id)}return}
   if(m.type==='camera-zoom'){setZoom(m.zoom);return}
   if(m.type==='camera-record-start'){startRecording();return}

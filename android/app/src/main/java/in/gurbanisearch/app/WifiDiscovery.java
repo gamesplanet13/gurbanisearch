@@ -31,7 +31,7 @@ public final class WifiDiscovery {
 
     WifiDiscovery(Activity activity, WebView web, String role) {
         this.activity = activity; this.web = web; this.role = role;
-        if (!"controller".equals(role)) listen();
+        if ("projection".equals(role) || "book".equals(role)) listen();
     }
     private void callback(String js) {
         activity.runOnUiThread(() -> { if (running && !activity.isFinishing()) web.evaluateJavascript(js, null); });

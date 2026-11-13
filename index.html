@@ -161,7 +161,7 @@ main{width:100%;max-width:none;margin:3px auto;padding:0 4px;gap:4px;align-items
  <div class="row"><button id="cameraRecord">● Record on Camera Phone</button><button id="cameraRecordStop">■ Stop &amp; Save</button></div>
  <p class="small">Recording saves on Camera Phone, not Controller. Select which Projection screens receive the video in Connected Devices above. Direct WebRTC video needs active network; Browser/Android may stop cameras in background.</p>
  </details><hr><h2>Pictures · Controller</h2><p class="small">Send photos to selected Projection screens; order and fade controlled here.</p><input id="picFiles" type="file" accept="image/*" multiple><div id="picList"></div><label><input id="picFade" type="checkbox" checked> Fade</label><label>Duration <span id="picSeconds">5</span>s<input id="picInterval" type="range" min="2" max="30" value="5"></label><div class="row"><button id="picSend">Send Slideshow</button><button id="picStop">Close Pictures</button></div><div class="row"><button id="sahibzaadeSend" class="primary">Show Sahibzaade Picture · Full Screen</button><button id="sahibzaadeClose">Close Sahibzaade Picture</button></div><p class="small">Sends the built-in picture to the selected online Projection devices, without uploading it again.</p><hr><h2>Day / Night</h2><label><input id="controlDay" type="checkbox"> Control · Day mode</label><label><input id="projectionDay" type="checkbox"> Projection · Day mode</label><label><input id="bookNight" type="checkbox"> Book View · Night mode</label><h2>Projection Lines</h2><p class="small">Gurbani Shabad</p><label><input type="checkbox" id="gurmukhiCheck" checked> Gurmukhi</label><label><input type="checkbox" id="hindiShabadCheck"> Hindi</label><label><input type="checkbox" id="englishShabadCheck"> English</label><p class="small">Gurbani Arth</p><label><input type="checkbox" id="paCheck" checked> Punjabi</label><label><input type="checkbox" id="hiCheck"> Hindi</label><label><input type="checkbox" id="enCheck"> English</label><hr><a href="projection.html" target="_blank">Open Projection Browser</a><p><a href="book.html" target="_blank">Open Book Reading Projection</a></p><hr><details><summary>OBS Live Text</summary><h2>OBS Live Text</h2><p class="small">Open this link as an OBS Browser Source, then press Connect OBS.</p><input id="obsUrl" readonly aria-label="OBS link"><div class="row"><button id="copyObs">Copy OBS link</button><button id="connectObs">Connect OBS</button></div><p class="small">Tick languages and use ↑ / ↓ to set order.</p><div id="obsOptions"></div></details><hr><details id="customTools"><summary>Custom Text & Scroll</summary><p class="small">Type or paste text. Online translation is optional and may contain errors; review before projecting.</p><textarea id="customText" rows="4" style="width:100%;font:inherit" placeholder="Gurmukhi, Hindi or English text"></textarea><label>Translate online to <select id="customTarget"><option value="pa">Punjabi (Gurmukhi)</option><option value="hi">Hindi</option><option value="en">English</option></select></label><button id="convertCustom">Translate text online</button><textarea id="customConverted" rows="3" style="width:100%;font:inherit" placeholder="Editable translated text"></textarea><button id="useConverted">Use translated text</button><label><input type="checkbox" id="customScroll"> Scroll text on Projection</label><div class="row"><button id="sendCustom">Project custom text</button></div><p class="small" id="customStatus" aria-live="polite">Online translation is sent to a third-party service; avoid private text.</p></details><hr><details id="menuDatabasePanel" class="menu-db-panel"><summary>▸ Database · Download / Storage / Version</summary><div id="menuDatabaseHost"></div><div class="row"><button id="dbDelete" class="icon-danger" title="Delete offline scripture database from this device">🗑 Delete Database</button><button id="dbReload" title="Refresh storage status">↻ Status</button></div><div class="row"><label class="small">App Version</label><strong id="appVersionNumber">2026.11.12.6 · Database v2</strong></div><p class="small">Download runs while this app remains open. If Android stops the app, it automatically resumes the next time you open it. Missing text still uses online search when internet is available.</p></details><div class="developer-menu-foot"><strong>Developed by Rajinder Singh</strong><a href="mailto:harjas.info@gmail.com">✉ harjas.info@gmail.com</a><a href="https://www.youtube.com/results?search_query=HarjasTV" target="_blank" rel="noopener noreferrer">▶ HarjasTV · YouTube</a></div></div></aside>
-<script src="peerjs-1.5.5.min.js"></script><script src="gurbani-peer-manager.js?v=20261113-stablecode"></script><script>
+<script src="peerjs-1.5.5.min.js?v=20261118"></script><script src="gurbani-peer-manager.js?v=20261118"></script><script>
 'use strict';
 const $=id=>document.getElementById(id);
 const stored=(key,def)=>{try{return JSON.parse(localStorage.getItem(key))??def}catch{return def}};
@@ -382,11 +382,12 @@ function announce(conn){send(conn,{type:'auth',token:myToken,code:myCode})}
 const health=new WeakMap(),pendingDelivery=new WeakMap();let deliveryCounter=0;
 function setupConn(conn,key,codeValue){conn.on('open',()=>{health.set(conn,Date.now());announce(conn);$('connStatus').textContent='Online';renderDevices()});
 conn.on('data',m=>{if(!m||typeof m!=='object')return;health.set(conn,Date.now());if(m.type==='camera-display-ready'){
- const wanted=activeCameraRoutes.get(String(m.code||''));
- if(wanted){
-  const camera=cameraLinks.get(wanted.camera);
-  if(camera?.open){send(camera,{type:'camera-authorize',targets:[peerPrefix+wanted.target,controlPrefix+myCode,...wanted.all]});send(camera,{type:'camera-connect',targets:[peerPrefix+wanted.target]});cameraStatus('Camera '+wanted.camera+' connected to '+wanted.target)}
- }return
+ const route=activeCameraRoutes.get(String(m.code||''));
+ if(route&&route.deviceId===key&&route.camera===String(m.cameraCode||'')){
+  route.ready=true;
+  relayCamera(route);
+ }
+ return
 }
 if(m.type==='pong'){return}if(m.type==='applied'){const p=pendingDelivery.get(conn);if(p&&m.rev===p.rev)pendingDelivery.delete(conn);return}
 if(m.type==='hello'){if(m.owner && m.owner!==myToken){status('Screen is paired to another controller. On that screen choose Reset pairing.');conn.close();return}if(m.code){const existing=connections.get(m.deviceId||key);if(m.deviceId&&m.deviceId!==key){connections.delete(key);key=m.deviceId}known[key]={code:m.code,name:m.name||'Projection',kind:m.kind||'projection'};put('gb-known-devices',known);connections.set(key,conn);selected.add(key);put('gb-selected-devices',[...selected]);announce(conn);renderDevices();status('Projection connected')}}
@@ -409,7 +410,7 @@ if(m.type==='code-change'&&/^\d{5}$/.test(m.code)&&known[key]){
 }
 if(m.type==='identify'){known[key]={code:m.code||codeValue,name:m.name||'Projection',kind:m.kind||known[key]?.kind||'projection'};put('gb-known-devices',known);renderDevices()}
 });
-conn.on('close',()=>{if(connections.get(key)===conn)connections.delete(key);renderDevices()});conn.on('error',e=>{if(connections.get(key)===conn)connections.delete(key);status('Connection failed: '+(e.message||'try again'));renderDevices()});}
+conn.on('close',()=>{if(connections.get(key)===conn){connections.delete(key);const route=activeCameraRoutes.get(String(codeValue));if(route?.call)route.call.close();activeCameraRoutes.delete(String(codeValue))}renderDevices()});conn.on('error',e=>{if(connections.get(key)===conn)connections.delete(key);status('Connection failed: '+(e.message||'try again'));renderDevices()});}
 function connectProjection(key,codeValue){
  if(!peer||peer.destroyed||peer.disconnected||!peer.open){pendingPair={key,codeValue};$('connStatus').textContent='Offline — reconnecting';status('Waiting for internet connection; pairing will retry');return}
  const existing=connections.get(key);if(existing&&existing.open)return;if(existing){connections.delete(key);try{existing.close()}catch(_){}}
@@ -420,7 +421,8 @@ function connectProjection(key,codeValue){
 
 const cameraPrefix='gurbani-camera-v1-',cameraLinks=new Map(),cameraPhones=new Map(),cameraStreams=new Map();
 const activeCameraRoutes=new Map();
-let cameraCurrent='',cameraPreviewCall=null;
+const cameraPreviewCalls=new Map();
+let cameraCurrent='';
 const cameraStatus=x=>$('cameraStatus').textContent=x;
 function cameraSelected(){return cameraLinks.get($('cameraDeviceSelect').value)}
 function refreshCameraPhones(){
@@ -432,16 +434,17 @@ function refreshCameraPhones(){
 function cameraCodeFor(id){return cameraPhones.get(id)?.code||''}
 function handleCameraConnection(c,code){
  cameraLinks.set(code,c);cameraPhones.set(code,{name:'Camera Phone',code});cameraCurrent=code;
- c.on('open',()=>{send(c,{type:'ping',id:Date.now()});cameraStatus('Connected to Camera '+code);refreshCameraPhones();$('cameraDeviceSelect').value=code;requestCameraPreview(code)});
+ c.on('open',()=>{send(c,{type:'ping',id:Date.now()});cameraStatus('Connected to Camera '+code);refreshCameraPhones();$('cameraDeviceSelect').value=code});
  c.on('data',m=>{
   if(!m||typeof m!=='object')return;
+  if(m.type==='camera-rejected'){cameraStatus('Camera is paired to another Controller. Unpair it on the Camera Phone.');return}
   if(['camera-hello','camera-ready'].includes(m.type)){
    cameraPhones.set(code,{code,name:m.name||cameraPhones.get(code)?.name||'Camera Phone',devices:m.cameras||[]});
-   cameraLinks.set(code,c);refreshCameraPhones();$('cameraDeviceSelect').value=code;refreshCameraLenses();cameraStatus('Camera '+code+' · '+(m.ready===false?'Camera permission needed':'Online'));requestCameraPreview(code)
+   cameraLinks.set(code,c);refreshCameraPhones();$('cameraDeviceSelect').value=code;refreshCameraLenses();cameraStatus('Camera '+code+' · '+(m.ready===false?'Camera permission needed':'Online'));if(m.ready!==false)requestCameraPreview(code)
   }
   if(m.type==='pong')return
  });
- c.on('close',()=>{cameraLinks.delete(code);refreshCameraPhones();cameraStatus('Camera '+code+' disconnected. Reconnect using code.')});
+ c.on('close',()=>{if(cameraLinks.get(code)!==c)return;cameraLinks.delete(code);refreshCameraPhones();cameraStatus('Camera '+code+' disconnected. Reconnect using code.')});
  c.on('error',e=>cameraStatus('Camera connection: '+(e.message||e.type)))
 }
 function connectCamera(code){
@@ -468,14 +471,38 @@ function showCameraStream(call){
  if(!call?.peer?.startsWith(cameraPrefix))return call.close();
  const code=call.peer.slice(cameraPrefix.length);
  if(!cameraLinks.get(code)?.open)return call.close();
- call.answer();
- call.on('stream',stream=>{cameraStreams.set(code,stream);if($('cameraDeviceSelect').value===code){$('cameraPreview').srcObject=stream;$('cameraPreview').play().catch(()=>{})}cameraStatus('Camera '+code+' live preview')});
- call.on('close',()=>{if(cameraPreviewCall===call)$('cameraPreview').srcObject=null;cameraStreams.delete(code)});
+ const previous=cameraPreviewCalls.get(code);
+ cameraPreviewCalls.set(code,call);
+ if(previous)previous.close();
+ call.on('stream',stream=>{
+  if(cameraPreviewCalls.get(code)!==call)return;
+  cameraStreams.set(code,stream);
+  if($('cameraDeviceSelect').value===code){$('cameraPreview').srcObject=stream;$('cameraPreview').play().catch(()=>{})}
+  cameraStatus('Camera '+code+' live preview');
+  for(const route of activeCameraRoutes.values())if(route.camera===code&&route.ready)relayCamera(route);
+ });
+ call.on('close',()=>{
+  if(cameraPreviewCalls.get(code)!==call)return;
+  cameraPreviewCalls.delete(code);cameraStreams.delete(code);
+  if($('cameraDeviceSelect').value===code)$('cameraPreview').srcObject=null;
+  for(const route of activeCameraRoutes.values())if(route.camera===code&&route.call){route.call.close();route.call=null}
+ });
  call.on('error',e=>cameraStatus('Preview: '+(e.message||e.type)));
- cameraPreviewCall=call
+ call.answer();
+}
+function relayCamera(route){
+ const stream=cameraStreams.get(route.camera);
+ if(!stream?.active||!peer?.open||!connections.get(route.deviceId)?.open)return;
+ if(route.call)route.call.close();
+ try{
+  const call=route.call=peer.call(peerPrefix+route.target,stream,{metadata:{cameraCode:route.camera}});
+  if(!call)return cameraStatus('Could not start video to Projection '+route.target);
+  call.on('error',e=>cameraStatus('Projection '+route.target+': '+(e.message||e.type)));
+  cameraStatus('Sending Camera '+route.camera+' to Projection '+route.target);
+ }catch(e){cameraStatus('Projection video: '+e.message)}
 }
 function selectedProjectionTargets(){
- return [...selected].filter(id=>known[id]?.kind!=='obs'&&connections.get(id)?.open).map(id=>({id,code:known[id].code}))
+ return [...selected].filter(id=>known[id]?.kind==='projection'&&connections.get(id)?.open).map(id=>({id,code:known[id].code}))
 }
 function sendCameraLayout(){
  const layout=$('cameraLayout').value,portion=Number($('cameraPortion').value)||50;
@@ -492,18 +519,23 @@ $('cameraProject').onclick=()=>{
  const c=cameraSelected(),code=$('cameraDeviceSelect').value,targets=selectedProjectionTargets();
  if(!c?.open)return cameraStatus('Connect and choose a Camera Phone');
  if(!targets.length)return cameraStatus('Select at least one online Projection screen');
- const peers=targets.map(x=>peerPrefix+x.code);
- send(c,{type:'camera-authorize',targets:[...peers,controlPrefix+myCode]});
- for(const t of targets){
-  activeCameraRoutes.set(t.code,{camera:code,target:t.code,all:peers});
-  send(connections.get(t.id),{type:'camera-allow',token:myToken,cameraCode:code,layout:$('cameraLayout').value,portion:+$('cameraPortion').value});
+ if(!cameraStreams.get(code)?.active)return cameraStatus('Start the Camera Phone and wait for the live preview');
+ for(const target of targets){
+  const previous=activeCameraRoutes.get(target.code);
+  if(previous?.call)previous.call.close();
+  activeCameraRoutes.set(target.code,{camera:code,target:target.code,deviceId:target.id,ready:false,call:null});
+  send(connections.get(target.id),{type:'camera-allow',token:myToken,cameraCode:code,layout:$('cameraLayout').value,portion:+$('cameraPortion').value});
  }
  cameraStatus('Waiting for '+targets.length+' Projection screen(s) to authorize live camera…')
 };
 $('cameraHide').onclick=()=>{
  const targets=selectedProjectionTargets();
- for(const t of targets){activeCameraRoutes.delete(t.code);send(connections.get(t.id),{type:'camera-hide',token:myToken})}
- for(const c of cameraLinks.values())if(c.open)send(c,{type:'camera-off',targets:targets.map(t=>peerPrefix+t.code)});
+ for(const target of targets){
+  const route=activeCameraRoutes.get(target.code);
+  if(route?.call)route.call.close();
+  activeCameraRoutes.delete(target.code);
+  send(connections.get(target.id),{type:'camera-hide',token:myToken});
+ }
  cameraStatus('Camera hidden on '+targets.length+' display(s)')
 };
 $('cameraRecord').onclick=()=>{const c=cameraSelected();if(c?.open)send(c,{type:'camera-record-start'});else cameraStatus('Choose a camera first')};
