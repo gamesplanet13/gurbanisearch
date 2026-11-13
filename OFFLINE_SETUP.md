@@ -39,3 +39,20 @@ Opening an offline match:
 - Shabad OS database is another openly documented way to build offline software: https://www.shabados.com/docs/database/usage/
 
 This implementation caches user-initiated Open Granth Ang documents in IndexedDB and a static app shell in the browser Service Worker. No additional paid hosting or Node.js server is needed.
+
+## New First-Run Automatic Setup
+
+When the Controller opens on a device without the local SGGS Ang database, it now displays **Download & Install Gurbani Database** and starts downloading automatically. The Controller stays behind a setup screen until all 1430 SGGS Angs are saved, with Retry/Resume after an interruption.
+
+- If `data/offline-packs/manifest.json` lists verified GitHub SGGS bundles, the Controller fetches those compact packs (20 Angs each).
+- Until those packs are published, the Controller uses concurrent direct downloads from the Open Granth GitHub corpus.
+- Source packs `D` (Dasam Granth), `B` (Bhai Gurdas Vaaran and Kabit Savaiye), `N` (Bhai Nand Lal Ganj Nama) are auto-installed if the public manifest lists them. If absent, the setup explicitly labels them **not yet published**, never falsely marks them complete, and offers access to the already installed SGGS library.
+- After setup, the Controller prioritizes locally stored searchable content for faster results. Settings and downloaded scripture remain in that browser/app's IndexedDB unless site data or app data is cleared. Local storage persistence is requested when the browser supports it.
+- The Offline Library panel is collapsed by default to leave room for the Gurbani line list. Portrait and landscape layouts have independent scrolling.
+- **Offline pairing of multiple devices is not implemented**; PeerJS signaling still requires network availability.
+
+## GitHub Pack Build Status
+
+The source-pack generator scripts are `scripts/build_offline_sggs.py` and `scripts/export_shabados_offline.py`. The GitHub Action at `.github/workflows/build-offline-corpora.yml` generates the manifest and packs. **The existence of scripts or workflow is not proof that the packs have already been generated.** Check `data/offline-packs/manifest.json`: `status: not-built` means source packs are not yet ready on GitHub. Do not claim all sources are available until the manifest shows published files and the download/install has been tested.
+
+Shabad OS texts are imported as original primary Gurmukhi text only. Editorial Hindi/Punjabi/English translations have separate rights and are not assumed redistributable. The Nitnem quick buttons currently include bundled Anand Sahib and Sukhmani Sahib data; the full requested Nitnem collection is not yet independently compiled into one offline package.
