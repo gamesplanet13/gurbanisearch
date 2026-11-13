@@ -2,11 +2,11 @@
 """Prepare compact, numbered Open Granth SGGS packs for the Games Planet offline installer.
 
 Source: https://github.com/opengranth/open-granth/tree/main/corpus
-Uses the upstream Open Granth Gurmukhi and DSSK English text without altering wording.
+Uses upstream Open Granth Gurmukhi and romanization; omits large editorial translations.
 Requires Python 3.11+, internet, and no third-party Python packages.
 """
 from __future__ import annotations
-import argparse, concurrent.futures, datetime, json, pathlib, re, time, urllib.request, urllib.error
+import argparse, concurrent.futures, datetime, json, pathlib, re, time, urllib.request, urllib.error, gzip, hashlib
 
 BASE = "https://raw.githubusercontent.com/opengranth/open-granth/main/corpus"
 TOTAL = 1430
@@ -32,8 +32,6 @@ def parse_ang(number: int, markdown: str) -> dict:
         line={"verse":{"unicode":text},"pageNo":number,"source":{"sourceId":"G","name":"Sri Guru Granth Sahib Ji"}}
         if latin:
             line["transliteration"]={"english":latin.group(1)}
-            translated=rest[latin.end():].split("\n---",1)[0].strip()
-            if translated:line["translation"]={"en":{"unicode":translated}}
         page.append(line)
     if len(page)<5: raise ValueError(f"Ang {number} has too few verses: {len(page)}")
     return {"number":number,"page":page}
@@ -57,7 +55,7 @@ def main():
     root=args.output
     dest=root/"G"
     dest.mkdir(parents=True,exist_ok=True)
-    for stale in dest.glob("chunk-*.json"):stale.unlink()
+    for stale in dest.glob("chunk-*.json*"):stale.unlink()
     manifest_file=root/"manifest.json"
     manifest=json.loads(manifest_file.read_text("utf-8")) if manifest_file.exists() else {
         "format":"gamesplanet-gurbani-packs-v1","sources":{}}
@@ -69,11 +67,13 @@ def main():
             pages=list(pool.map(fetch_ang,range(start,end+1)))
         assert [p["number"] for p in pages]==list(range(start,end+1))
         part=(start-1)//PACK_SIZE+1
-        filename=f"chunk-{part:04d}.json"
+        filename=f"chunk-{part:04d}.json.gz"
         pack={"format":"gamesplanet-gurbani-angs-v1","source":"G",
               "citation":CITATION,"pages":pages}
-        (dest/filename).write_text(json.dumps(pack,ensure_ascii=False,separators=(",",":")),encoding="utf-8")
-        pack_refs.append({"path":f"G/{filename}","count":len(pages),"start":start,"end":end})
+        raw=json.dumps(pack,ensure_ascii=False,separators=(",",":")).encode("utf-8")
+        compressed=gzip.compress(raw,compresslevel=9,mtime=0)
+        (dest/filename).write_bytes(compressed)
+        pack_refs.append({"path":f"G/{filename}","count":len(pages),"start":start,"end":end,"bytes":len(compressed),"sha256":hashlib.sha256(compressed).hexdigest()})
     manifest.setdefault("sources",{})["G"]={
         "label":"Sri Guru Granth Sahib Ji","pages":TOTAL,"parts":pack_refs,
         "source":"Open Granth (Shabad OS transcription)"}
