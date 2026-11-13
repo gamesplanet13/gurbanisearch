@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gurbani Searching Control</title><link rel="stylesheet" href="gurbani-searcher.css?v=2"><script>if(new URLSearchParams(location.search).get("view")==="searcher"){document.documentElement.classList.add("searcher");document.title="Gurbani Searcher"}</script><style>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gurbani Searching Control</title><link rel="stylesheet" href="gurbani-searcher.css?v=3"><script>if(new URLSearchParams(location.search).get("view")==="searcher"){document.documentElement.classList.add("searcher");document.title="Gurbani Searcher"}</script><style>
 *{box-sizing:border-box}body{margin:0;background:#0b101a;color:#eef5ff;font:15px system-ui,sans-serif}header{padding:16px;background:#182438;display:flex;justify-content:space-between;align-items:center;gap:10px}h1{font-size:21px;margin:0}main{max-width:1150px;margin:20px auto;padding:0 12px;display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{border:1px solid #36455e;background:#172232;padding:18px;border-radius:15px;margin-bottom:14px}h2{margin:0 0 12px;font-size:18px}input,select,button{font:inherit;color:#fff;background:#101b2d;border:1px solid #53627c;border-radius:9px;padding:11px}button{cursor:pointer;background:#28486b}button.primary{background:#1669ae}.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0}.grow{flex:1;min-width:110px}.muted{color:#b0bfd3;font-size:13px}.code{font-size:31px;letter-spacing:5px;color:#f7d48a;font-weight:bold}.list{max-height:50vh;overflow:auto}.item{display:block;text-align:left;width:100%;line-height:1.55;margin:7px 0;white-space:normal}.item.active{background:#575025;border-color:#e0bd68}.device{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:#253347;border-radius:8px;margin:7px 0;padding:10px}.device label{flex:1}.devstatus{font-size:12px;color:#89d5af}.verse{font-size:20px}.small{font-size:12px;color:#aebed4}a{color:#a7d2ff}label.field{display:block;margin:8px 0}input[type=range]{width:100%}input[type=checkbox]{accent-color:#dab66b}@media(max-width:850px){main{grid-template-columns:1fr}}#searchColumn{display:flex;flex-direction:column}#searchCard{order:0}#connectCard{order:1}#historyCard{order:2}#results[hidden]{display:none}#shabadCard label{font-size:12px}
 header{position:sticky;top:0;z-index:8}#menuButton{min-width:45px;font-size:23px;padding:7px 12px}#functionsMenu{position:fixed;right:12px;top:63px;z-index:20;max-width:min(94vw,400px);max-height:80vh;overflow-y:auto;background:#18263b;border:1px solid #6d7a96;border-radius:16px;padding:16px;box-shadow:0 15px 70px #000b}#functionsMenu[hidden]{display:none}#functionsMenu label{display:block;padding:6px 0}#menuOptions h2{font-size:16px;margin:9px 0}#connectCard,#fontCard{display:none}#functionsMenu #connectCard,#functionsMenu #fontCard{display:block;padding:10px;margin:8px 0}#functionsMenu .card{box-shadow:none}.historyItem{display:block;width:100%;text-align:left;margin:6px 0;background:#273750}.markMain{float:right;padding:4px 8px;margin-left:6px;background:#344864}.mainNote{color:#f3cc75;font-size:12px}#lines .item{overflow:auto} .gp-credit{font-size:9px;color:#7d8da4;text-align:center;padding:9px 4px 16px;opacity:.7} body.day-mode{background:#f5efe1;color:#25221c}body.day-mode header,body.day-mode #functionsMenu{background:#eee1c8;color:#25221c}body.day-mode .card{background:#fffaf0;border-color:#bcae94}body.day-mode input,body.day-mode select,body.day-mode button{background:#e7dcc6;color:#211d18;border-color:#9c896a}body.day-mode .small,body.day-mode .muted{color:#574e41}.ang-indicator{position:fixed;right:12px;bottom:18px;font-size:11px;color:#ab9a78;z-index:2;pointer-events:none}.quick-actions{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
 @media (orientation:landscape) and (min-width:650px){main{grid-template-columns:minmax(250px,42%) minmax(0,58%);align-items:start}main>div{min-width:0}#searchColumn{position:sticky;top:72px;max-height:calc(100dvh - 78px);overflow:auto}#shabadCard,#historyCard{width:100%}#lines{max-height:59dvh}#historyList{max-height:28dvh;overflow:auto}} @media (orientation:portrait),(max-width:649px){#searchColumn{position:static;max-height:none}#lines{max-height:45dvh}} #connectCard .device{flex-wrap:wrap} #connectCard .device select{max-width:150px} #customTools textarea{border-radius:9px;border:1px solid #52617a;background:#101b2d;color:#fff;padding:10px;margin:7px 0}#customTools summary{cursor:pointer;font-weight:700;padding:7px 0} #shabadCard{position:relative}#historyCard{position:absolute;top:54px;right:12px;z-index:12;width:min(360px,calc(100% - 24px));max-height:60vh;overflow:auto;box-shadow:0 16px 45px #000b;background:#202c41}#historyCard[hidden],#readingNavigator[hidden],#sukhmaniNavigation[hidden],#sehajNavigation[hidden],#asaNavigation[hidden]{display:none!important}#sukhmaniNavigation,#sehajNavigation{margin:12px 0;padding:10px;background:#223149;border-radius:12px}#readingNavigator input{min-width:90px}#historyToggle{font-size:13px;padding:8px 11px}@media(orientation:landscape) and (min-width:650px){main{grid-template-columns:minmax(260px,40%) minmax(0,60%)}#historyCard{max-height:75vh}} #devices .device{flex-wrap:wrap}#devices .device label{flex:1;min-width:135px}#devices .device select{max-width:145px}#devices .device-settings-editor{border:1px solid #7b8eab;background:#22324a;border-radius:12px;padding:12px;margin:8px 0 14px}#devices .device-settings-editor>select{width:100%;margin:5px 0}#devices .device-setting-field{display:block;margin:12px 0}#devices .device-setting-field input{display:block;width:100%;accent-color:#edc97d}#devices .device-setting-checkbox{display:block;padding:5px 0;font-size:14px}
@@ -154,13 +154,25 @@ main{width:100%;max-width:none;margin:3px auto;padding:0 4px;gap:4px;align-items
   <details id="searcherSettings">
    <summary aria-label="ਸੈਟਿੰਗਾਂ · Settings">⋮</summary>
    <div class="searcher-settings-panel">
-    <button id="searcherDevices" type="button">ਸਕ੍ਰੀਨਾਂ · Screens</button>
+    <button id="searcherDevices" type="button">ਜੁੜੀਆਂ ਸਕ੍ਰੀਨਾਂ · Screens</button>
+    <button id="searcherLinkMenu" type="button">ਕੰਟਰੋਲ ਨਾਲ ਜੋੜੋ · Link Control</button>
+    <button id="searcherReaderSettings" type="button">ਪੜ੍ਹਨ ਦੀਆਂ ਸੈਟਿੰਗਾਂ · Reading settings</button>
+    <div id="searcherReaderOptions" hidden>
     <label><input id="searcherFlow" type="checkbox" checked> ਲਗਾਤਾਰ ਪੰਕਤੀਆਂ · Continuous</label>
-    <label><input id="searcherPauses" type="checkbox" checked> ਠਹਿਰਾਅ · Pause colour</label>
+     <label><input id="searcherPauses" type="checkbox" checked> ਠਹਿਰਾਅ · Pause colour</label>
+    </div>
+    <button id="searcherUpdate" type="button">ਅੱਪਡੇਟ · App update</button>
    </div>
   </details>
  </div>
 </nav><main><div id="searchColumn">
+<section class="card" id="searcherLinkPanel" hidden>
+ <label for="searcherControlCode">ਕੰਟਰੋਲ ਦਾ ਪੰਜ ਅੰਕਾਂ ਵਾਲਾ ਕੋਡ · Control code</label>
+ <div class="row"><input id="searcherControlCode" class="grow" inputmode="numeric" maxlength="5">
+ <button id="searcherLink" type="button">ਜੋੜੋ · Link</button>
+ <button id="searcherUnlink" type="button">ਜੋੜ ਹਟਾਓ · Unlink</button></div>
+ <p id="searcherLinkStatus" role="status"></p>
+</section>
 <section class="card" id="connectCard"><h2><span lang="pa">ਜੁੜੀਆਂ ਸਕ੍ਰੀਨਾਂ</span> · <span lang="en">Connected Displays</span></h2><div class="row"><div class="grow"><span class="muted"><span lang="pa">ਤੁਹਾਡਾ ਕੰਟਰੋਲ ਕੋਡ</span> · <span lang="en">Your Controller code</span></span><div id="code" class="code">•••••</div></div><span id="connStatus" class="muted">Connecting…</span></div><div class="row"><input id="newControllerCode" class="grow" inputmode="numeric" maxlength="5" placeholder="ਨਵਾਂ ਕੰਟਰੋਲ ਕੋਡ / New Controller code"><button id="changeControllerCode"><span lang="pa">ਕੋਡ ਬਦਲੋ</span> · <span lang="en">Change code</span></button></div><div class="row"><button id="searchWifi" class="primary"><span lang="pa">ਵਾਈ-ਫਾਈ ’ਤੇ ਸਕ੍ਰੀਨਾਂ ਲੱਭੋ</span> · <span lang="en">Search Wi-Fi Displays</span></button></div><p id="wifiStatus" class="small" aria-live="polite"><span lang="pa">ਇੱਕੋ ਵਾਈ-ਫਾਈ ’ਤੇ ਪ੍ਰੋਜੈਕਸ਼ਨ ਜਾਂ ਗ੍ਰੰਥ ਵਿਊ ਲੱਭੋ।</span><br><span lang="en">Find Projection or Granth View on the same Wi-Fi.</span></p><div id="wifiResults"></div><div class="row"><input id="pairCode" placeholder="ਸਕ੍ਰੀਨ ਦਾ ਕੋਡ / Display code" aria-label="ਸਕ੍ਰੀਨ ਦਾ 5 ਅੰਕਾਂ ਵਾਲਾ ਕੋਡ / 5-digit display code" inputmode="numeric" maxlength="5" class="grow"><button id="pair" class="primary"><span lang="pa">ਜੋੜੋ</span> · <span lang="en">Connect</span></button></div><p class="small"><span lang="pa">ਸਕ੍ਰੀਨ ਦਾ ਪੰਜ ਅੰਕਾਂ ਵਾਲਾ ਕੋਡ ਇੱਥੇ ਪਾਓ ਜਾਂ ਕੰਟਰੋਲ ਕੋਡ ਸਕ੍ਰੀਨ ਵਿੱਚ ਪਾਓ।</span><br><span lang="en">Enter the five-digit display code here, or enter the Controller code on the display.</span></p><p id="pairStatus" class="small" aria-live="polite">Connecting…</p><div id="devices"></div></section>
 <section class="card" id="searchCard"><h2>Search Gurbani</h2><div class="row"><label for="corpusSource" class="small">Source</label><select id="corpusSource" class="grow"><option value="all">All Sources</option><option value="G">Sri Guru Granth Sahib Ji</option><option value="D">Sri Dasam Granth</option><option value="B">Bhai Gurdas Ji Vaaran</option><option value="N">Bhai Nand Lal Ji</option><option value="A">Amrit Keertan / Other</option></select></div><div class="row"><select id="keyboard" hidden aria-label="Keyboard language"><option value="en">English</option><option value="pa">Gurmukhi</option><option value="hi">Hindi</option></select><button id="keyboardToggle" class="icon-btn" title="Open language keyboard" aria-label="Open language keyboard" aria-expanded="false">⌨</button><select id="searchType"><option value="7">First letters (English)</option><option value="0">First letters (Gurmukhi)</option><option value="2">Full word (Gurmukhi)</option><option value="4">Romanized word</option></select></div><div class="row"><input id="query" class="grow" placeholder="Type first letters (e.g. ddss)"><button id="search" class="primary icon-btn" title="Search Gurbani" aria-label="Search Gurbani">⌕</button></div><div id="onscreenKeyboard" hidden><div id="keyboardLanguages" class="row"><button type="button" data-lang="en">EN</button><button type="button" data-lang="pa">ਗੁਰਮੁਖੀ</button><button type="button" data-lang="hi">हिन्दी</button><button id="keyboardHide" type="button" aria-label="Close keyboard">✕</button></div><div id="keyboardKeys"></div></div><div class="quick-actions" id="baniQuickActions"><button id="waheguru" class="waheguru-quick" aria-label="Project animated Waheguru">ਵਾਹਿਗੁਰੂ ✨</button><button id="nitnem" title="Nitnem morning Banis">ਨਿਤਨੇਮ</button><button id="japji" title="Japji Sahib">ਜਪੁਜੀ</button><button id="jaap" title="Jaap Sahib">ਜਾਪ</button><button id="tavPrasad" title="Tav Prasad Savaiye">ਤ੍ਵ ਪ੍ਰਸਾਦਿ ਸਵੱਯੇ</button><button id="deenan" title="Savaiye Deenan Ki Pratipal">ਦੀਨਨ ਕੀ ਪ੍ਰਤਿਪਾਲ</button><button id="chaupai" title="Chaupai Sahib">ਚੌਪਈ</button><button id="anandFull" title="Full Anand Sahib">ਅਨੰਦ ਸਾਹਿਬ</button><button id="anandSix" title="Anand Sahib Six Pauris">ਅਨੰਦ 6</button><button id="rehras" title="Rehras Sahib">ਰਹਿਰਾਸ</button><button id="sohila" title="Kirtan Sohila Sahib">ਸੋਹਿਲਾ</button><button id="asaVar" title="Asa Di Vaar">ਆਸਾ ਦੀ ਵਾਰ</button><button id="ardas" title="Ardas">ਅਰਦਾਸ</button><button id="sukhmani" title="Sukhmani Sahib">ਸੁਖਮਨੀ</button><button id="aapeSangat" title="ਆਪੇ ਸੰਗਤਿ ਸਦਿ ਬਹਾਲੈ">ਆਪੇ ਸੰਗਤਿ…</button><button id="sehaj" title="Sehaj Path">ਸਹਿਜ ਪਾਠ</button></div><p id="searcherMessage" class="searcher-message" role="status" hidden></p><div id="results" class="list" hidden></div><details class="offline-tools" id="offlineToolsDetails"><summary>Offline Library · Download &amp; Storage</summary><div class="row"><strong class="grow">Offline Gurbani Library</strong><span id="offlineBadge" class="small">Checking storage…</span></div><div class="row"><button id="offlineDownload" class="primary" title="Download Sri Guru Granth Sahib Ji Angs from Open Granth for offline search">↓ SGGS 1430 Angs</button><button id="offlineSourceDownload" class="primary" title="Save the chosen GitHub source pack on this device">↓ Selected Source</button><button id="offlineStop" title="Pause offline downloading">Ⅱ</button><button id="offlineRefresh" title="Check offline downloaded pages">↻</button></div><progress id="offlineProgress" value="0" max="1430"></progress><div class="row"><label class="small grow" for="offlineImport">Import vetted source pack (JSON)</label><input id="offlineImport" type="file" accept=".json,application/json" aria-label="Import locally saved scripture source pack"></div><div id="sourceAvailability" class="small" aria-live="polite"></div><p id="offlineMessage" class="small" aria-live="polite">Public-domain Gurbani text from Open Granth (Shabad OS source). Download once online; then search and read offline. English meaning is available when included in source.</p></details></section></div>
 <div><section class="card" id="shabadCard"><div class="row" style="justify-content:space-between;align-items:center"><h2 style="margin:0">Shabad · Choose a Line <span id="readingAngLabel" class="reading-ang-label" hidden></span></h2><button id="projectionSwitch" class="icon-btn projection-enabled" type="button" title="Projection ON — click to turn off" aria-label="Projection ON" aria-pressed="true">▣</button><button id="closeReading" class="icon-btn icon-danger" type="button" title="Close opened Shabad / Path" aria-label="Close opened Shabad / Path">✕</button><button id="historyToggle" class="icon-btn" type="button" aria-expanded="false" title="Recent Shabads History" aria-label="Recent Shabads History">☷</button></div><section class="card" id="historyCard" hidden><div class="row" style="justify-content:space-between"><strong>Recent Shabads</strong><button id="historyClose" type="button">✕</button></div><div id="historyList"></div></section><div class="row"><button id="mainLine" class="primary icon-btn" title="Go to Main Line" aria-label="Go to Main Line">⌂</button><span id="mainLabel" class="small">Main: —</span></div><p class="small">Tap any line to project; use ☆ to set that line as Main.</p><div id="readingNavigator" hidden><div class="small" id="readingKindLabel"></div><div id="sukhmaniNavigation" hidden class="row"><button id="prevSalok" class="icon-btn" title="Previous Salok" aria-label="Previous Salok">◀</button><input id="salokNumber" type="number" min="1" max="24" inputmode="numeric" placeholder="Salok 1–24" style="width:120px"><button id="openSalok" class="icon-btn" title="Open selected Salok" aria-label="Open selected Salok">↵</button><button id="nextSalok" class="icon-btn" title="Next Salok" aria-label="Next Salok">▶</button><span id="salokPosition" class="small"></span></div><div id="asaNavigation" class="row" style="flex-wrap:wrap" hidden><button id="prevPauri">Previous Chhakka</button><label>Chhakka <input id="pauriNumber" type="number" min="1" max="24" inputmode="numeric" value="1"></label><button id="openPauri">Open</button><button id="nextPauri">Next Chhakka</button><span id="pauriPosition"></span></div><div id="sehajNavigation" hidden><div class="row"><input id="angInput" type="number" min="1" max="1430" inputmode="numeric" placeholder="Custom Ang 1–1430" class="grow"><button id="angSearch" class="icon-btn" title="Open selected Ang" aria-label="Open selected Ang">↵</button><button id="prevAng" class="icon-btn" title="Previous Ang" aria-label="Previous Ang">◀</button><button id="nextAng" class="icon-btn" title="Next Ang" aria-label="Next Ang">▶</button></div></div></div><div id="lines" class="list"></div><div class="row"><button id="previous" class="icon-btn" type="button" title="Previous line" aria-label="Previous line">◀</button><button id="next" class="icon-btn" type="button" title="Next line" aria-label="Next line">▶</button><button id="clear" class="icon-btn icon-danger" type="button" title="Clear projection" aria-label="Clear projection">⌫</button></div></section>
@@ -190,7 +202,7 @@ main{width:100%;max-width:none;margin:3px auto;padding:0 4px;gap:4px;align-items
  <video id="desktopPreviewVideo" aria-label="Camera preview" autoplay muted playsinline hidden></video>
  <p id="desktopPreviewStatus" class="small" role="status"></p>
 </aside>
-<script src="gurbani-layout.js?v=2"></script><script src="gurbani-book-motion.js?v=3"></script><script src="gurbani-desktop-preview.js?v=1"></script>
+<script src="gurbani-layout.js?v=2"></script><script src="gurbani-book-motion.js?v=3"></script><script src="gurbani-searcher-sync.js?v=1"></script><script src="gurbani-desktop-preview.js?v=1"></script>
 <script src="gurbani-updates.js?v=20261121" defer></script><script src="peerjs-1.5.5.min.js?v=20261118"></script><script src="gurbani-peer-manager.js?v=20261119"></script><script src="gurbani-camera.js?v=20261119"></script><script>
 'use strict';
 const $=id=>document.getElementById(id);
@@ -704,8 +716,8 @@ function start(){
  if(typeof GurbaniPeer==='undefined'){ $('connStatus').textContent='Connection library unavailable';return }
  GurbaniPeer.start({id:()=>controlPrefix+myCode,onPeer:p=>{peer=p;p.on('call',showCameraStream)},
  onStatus:message=>{$('connStatus').textContent=message;status(message)},
- onOpen:()=>{$('connStatus').textContent='Online';status('Ready to connect');if(pendingCameraCode){const code=pendingCameraCode;pendingCameraCode='';connectCamera(code)}Object.entries(known).forEach(([key,d])=>{if(autoReconnect[key]!==false)connectProjection(key,d.code)});if(pendingPair){const p=pendingPair;pendingPair=null;connectProjection(p.key,p.codeValue)}},
- onConnection:c=>{if(c.peer.startsWith(cameraPrefix)){handleCameraConnection(c,c.peer.slice(cameraPrefix.length));return}const peerCode=String(c.metadata?.code||c.peer.replace(peerPrefix,''));setupConn(c,peerCode,peerCode)},
+ onOpen:()=>{searcherSync.connect();$('connStatus').textContent='Online';status('Ready to connect');if(pendingCameraCode){const code=pendingCameraCode;pendingCameraCode='';connectCamera(code)}Object.entries(known).forEach(([key,d])=>{if(autoReconnect[key]!==false)connectProjection(key,d.code)});if(pendingPair){const p=pendingPair;pendingPair=null;connectProjection(p.key,p.codeValue)}},
+ onConnection:c=>{if(searcherSync.accept(c))return;if(c.peer.startsWith(cameraPrefix)){handleCameraConnection(c,c.peer.slice(cameraPrefix.length));return}const peerCode=String(c.metadata?.code||c.peer.replace(peerPrefix,''));setupConn(c,peerCode,peerCode)},
  onCollision:()=>status('Controller code is busy. Retrying the same code; change it manually if another device uses it.'),
  onTargetUnavailable:error=>{
   const match=error.message?.match(/gurbani-camera-v1-(\d{5})/);
@@ -729,7 +741,7 @@ window.gbWifiFound=(code,name,kind)=>{if(!/^\d{5}$/.test(code)||typeof name!=='s
 window.gbWifiFinished=(error)=>{if(error){$('wifiStatus').textContent=error;return}$('wifiStatus').textContent=wifiDevices.size?'ਜੋੜਨ ਲਈ ਸਕ੍ਰੀਨ ਚੁਣੋ। · Select a screen to connect.':'ਕੋਈ ਸਕ੍ਰੀਨ ਨਹੀਂ ਮਿਲੀ। ਪ੍ਰੋਜੈਕਸ਼ਨ ਜਾਂ ਗ੍ਰੰਥ ਵਿਊ ਇੱਕੋ ਵਾਈ-ਫਾਈ ’ਤੇ ਖੁੱਲ੍ਹਾ ਰੱਖੋ। · No screens found. Keep the updated Projection or Granth View app open on the same Wi-Fi.'};
 $('searchWifi').onclick=()=>{wifiDevices.clear();renderWifiDevices();if(!window.GurbaniWifi||typeof window.GurbaniWifi.search!=='function'){$('wifiStatus').textContent='Install the updated Gurbani Controller Android app for Wi-Fi search. You can still enter a code.';return}$('wifiStatus').textContent='ਵਾਈ-ਫਾਈ ’ਤੇ ਲੱਭ ਰਹੇ ਹਾਂ… · Searching the same Wi-Fi…';try{window.GurbaniWifi.search()}catch(e){$('wifiStatus').textContent='Wi-Fi search unavailable. Use the code.'}};
 $('pair').onclick=()=>{const c=$('pairCode').value.trim();if(!/^\d{5}$/.test(c))return status('ਪੰਜ ਅੰਕ ਪਾਓ। · Enter five digits.');connectProjection(c,c)};
-function reconnectSaved(){if(peer&&peer.open&&!peer.disconnected){for(const [key,d] of Object.entries(known))if(autoReconnect[key]!==false&&!connections.has(key))connectProjection(key,d.code)}}
+function reconnectSaved(){searcherSync.connect();if(peer&&peer.open&&!peer.disconnected){for(const [key,d] of Object.entries(known))if(autoReconnect[key]!==false&&!connections.has(key))connectProjection(key,d.code)}}
 setInterval(()=>{for(const [key,c] of connections){if(!c?.open)continue;const last=health.get(c)||Date.now();if(Date.now()-last>60000){connections.delete(key);try{c.close()}catch(_){}status('Reconnecting unresponsive display '+key);continue}send(c,{type:'ping',id:Date.now(),token:myToken})}renderDevices()},12000);
 setInterval(reconnectSaved,10000);
 window.addEventListener('online',reconnectSaved);function probeAfterResume(){reconnectSaved();const sentAt=Date.now();for(const [key,c] of connections){if(!c?.open)continue;send(c,{type:'ping',id:sentAt,token:myToken});setTimeout(()=>{if(connections.get(key)===c&&(health.get(c)||0)<sentAt){connections.delete(key);try{c.close()}catch(_){}reconnectSaved()}},15000)}}window.addEventListener('focus',probeAfterResume);window.addEventListener('pageshow',probeAfterResume);
@@ -748,8 +760,9 @@ $('projectionSwitch').onclick=()=>{
  status(projectionIsOn?'Projection ON':'Projection OFF — local line selection still works')
 };
 refreshProjectionSwitch();
-function publish(payload,projectionOnly=false,force=false){
+function publish(payload,projectionOnly=false,force=false,fromSync=false){
  if(!projectionIsOn&&!force&&payload.content!==null)return 0;
+ const synced=!fromSync&&Object.hasOwn(payload,'content')&&(!payload.content||Array.isArray(payload.content.bookLines))&&searcherSync.send(payload.content);
  let sent=0;const rev=++deliveryCounter;
  for(const id of (isSearcher?connections.keys():selected)){
   if(projectionOnly&&['book','obs'].includes(known[id]?.kind))continue;
@@ -767,7 +780,7 @@ function publish(payload,projectionOnly=false,force=false){
   const update=known[id]?.localWaheguru&&packet.content?.mode==='waheguru'?{type:'waheguru-show',token:myToken,rev}:packet;
   if(send(c,update)){sent++;pendingDelivery.set(c,{rev,time:Date.now()})}
  }
- if(isSearcher)$('searcherMessage').textContent=sent?sent+' ਸਕ੍ਰੀਨਾਂ · Screens updated':'ਸਕ੍ਰੀਨ ਜੋੜੋ · Connect a display';
+ if(isSearcher)$('searcherMessage').textContent=sent?sent+' ਸਕ੍ਰੀਨਾਂ · Screens updated':synced?'ਕੰਟਰੋਲ ਨੂੰ ਭੇਜਿਆ · Sent to Control':'ਸਕ੍ਰੀਨ ਜੋੜੋ · Connect a display';
  else status(sent+' projection screen(s) updated');
  if(sent===0&&!isSearcher)status('No selected online projection. Reconnect or select a screen first.');
  return sent
@@ -795,6 +808,7 @@ $('projectionDay').checked=!!stored('gb-control-projection-day',false);
 $('projectionDay').onchange=()=>{put('gb-control-projection-day',$('projectionDay').checked);if(openDeviceSettingsKey){deviceSettings(openDeviceSettingsKey).projection.dayMode=$('projectionDay').checked;persistDeviceSettings();queueDeviceSettings(openDeviceSettingsKey)}else status('Day mode preference saved; choose a device to apply it')};
 $('clear').onclick=()=>{lastContent=null;put('gb-last-content',null);publish({content:null})};
 $('closeReading').onclick=()=>{
+ if(isSearcher&&window.history.state?.searcherReading){searcherClearOnBack=true;window.history.back();return}
  ++searchNonce;
  lines=[];active=-1;readingAng=null;readingTitle='';asaStarts=[];renderReadingNavigator();shabadAng=null;
  currentShabad=null;shabadSourceInfo=null;sukhmaniSalokStarts=[];
@@ -1571,7 +1585,7 @@ function markAng(n){
  el.textContent=label?(isSearcher?'ਅੰਗ '+label.replace(/[0-9]/g,n=>'੦੧੨੩੪੫੬੭੮੯'[n]):'(Ang '+label+')'):''
 }
 function unpackBaniLine(x){return x?.verse?.verse?{...x,...x.verse}:x}
-function setReading(items,title,ang,sections=[]){if(!Array.isArray(items)||!items.length)throw Error('No verses returned');lines=items;asaStarts=sections;active=-1;currentShabad=null;readingAng=ang||null;readingTitle=title;shabadAng=ang||null;shabadSourceInfo=null;sukhmaniSalokStarts=title.startsWith('ਸੁਖਮਨੀ')?salokIndices(lines):[];$('results').hidden=true;renderReadingNavigator();renderLines();show(0,false);$('shabadCard').scrollIntoView({behavior:'smooth',block:'start'})}
+function setReading(items,title,ang,sections=[]){if(!Array.isArray(items)||!items.length)throw Error('No verses returned');if(isSearcher)enterSearcherReading();lines=items;asaStarts=sections;active=-1;currentShabad=null;readingAng=ang||null;readingTitle=title;shabadAng=ang||null;shabadSourceInfo=null;sukhmaniSalokStarts=title.startsWith('ਸੁਖਮਨੀ')?salokIndices(lines):[];$('results').hidden=true;renderReadingNavigator();renderLines();show(0,false);$('shabadCard').scrollIntoView({behavior:'smooth',block:'start'})}
 async function loadAng(value){const n=Number(value);if(!Number.isInteger(n)||n<1||n>1430)return status('Enter an Ang from 1 to 1430');const nonce=++searchNonce;status('Loading Ang '+n+'…');try{const d=await loadJson('https://api.banidb.com/v2/angs/'+n+'/G');if(nonce!==searchNonce)return;const arr=Array.isArray(d.page)?d.page:verses(d);setReading(arr,'ਅੰਗ / Ang '+n,n);$('angInput').value=n;put('gb-sehaj-ang',n);status('Ang '+n+' loaded · '+arr.length+' lines')}catch(e){status('Could not load Ang '+n+': '+e.message)}}
 // BaniDB reference routes. The source verses remain unmodified; no Gurbani is invented.
 const BANI_SOURCE={
@@ -1737,7 +1751,7 @@ async function openShabad(x,fromHistory=false){
  try{
   const d=await loadJson('https://api.banidb.com/v2/shabads/'+encodeURIComponent(n));
   if(nonce!==searchNonce)return;
-  const fetched=verses(d);lines=Array.isArray(fetched)?fetched:[];active=-1;readingAng=null;readingTitle='';asaStarts=[];sukhmaniSalokStarts=[];renderReadingNavigator();shabadAng=d?.shabadInfo?.source?.pageNo??null;
+  const fetched=verses(d);if(isSearcher&&(!Array.isArray(fetched)||!fetched.length))throw Error('No verses returned');lines=Array.isArray(fetched)?fetched:[];active=-1;readingAng=null;readingTitle='';asaStarts=[];sukhmaniSalokStarts=[];renderReadingNavigator();shabadAng=d?.shabadInfo?.source?.pageNo??null;
   const rawSource=d?.shabadInfo?.source||{};
   const sourceId=String(rawSource.sourceId??rawSource.id??rawSource.source??'');
   const rawName=rawSource.name?.english??rawSource.name??rawSource.englishName??rawSource.title??'';
@@ -1749,7 +1763,8 @@ async function openShabad(x,fromHistory=false){
   currentShabad={id:n,title:verse(x)||existing?.title||verse(lines[0])||'Shabad',mainIndex:main,lastIndex:existing?.lastIndex??main,matchId:matchId||existing?.matchId||null};
   history=[currentShabad,...history.filter(h=>String(h.id)!==String(n))].slice(0,35);
   saveHistory();renderHistory();
-  $('results').hidden=true;$('results').replaceChildren();
+  if(isSearcher)enterSearcherReading();
+  $('results').hidden=true;if(!isSearcher)$('results').replaceChildren();
   renderLines();status(lines.length+' lines loaded');
   const index=fromHistory?currentShabad.lastIndex:(match>=0?match:currentShabad.mainIndex);
   if(lines.length)show(Math.max(0,Math.min(lines.length-1,index)),false);
@@ -1870,16 +1885,65 @@ $('useConverted').onclick=()=>{if(!$('customConverted').value.trim())return;$('c
 
 $('sendCustom').onclick=()=>{const text=$('customText').value.trim();if(!text)return status('Paste text first');const content={mode:'custom',verse:text,scripts:{gurmukhi:text},meanings:{},scroll:!!$('customScroll').checked};publish({content,settings:settings()},true)};
 $('waheguru').onclick=()=>{const content={mode:'waheguru',verse:'ਵਾਹਿਗੁਰੂ',scripts:{gurmukhi:'ਵਾਹਿਗੁਰੂ',hindi:'वाहेगुरु',english:'Waheguru'},meanings:{}};if(!projectionIsOn)return status('Turn Projection ON to show Waheguru');lastContent=content;put('gb-last-content',content);if(publish({content}))status('Waheguru sent to selected displays')};
+const searcherIdentity=isSearcher?(stored('gb-searcher-link-id','')||randomId()):'';
+if(isSearcher)put('gb-searcher-link-id',searcherIdentity);
+const searcherSync=GurbaniSearcherSync({
+ isSearcher,peer:()=>peer,savedCode:stored('gb-searcher-control-link',''),identity:searcherIdentity,
+ saveCode:value=>put('gb-searcher-control-link',value),
+ current:()=>projectionIsOn&&active>=0&&Array.isArray(lastContent?.bookLines)?lastContent:null,
+ approve:(code,identity)=>{
+  const approved=stored('gb-approved-searchers',[]);
+  if(approved.includes(identity))return true;
+  if(!window.confirm('ਕੀ Searcher '+code+' ਨੂੰ ਜੋੜਨਾ ਹੈ? · Link Searcher '+code+'?'))return false;
+  put('gb-approved-searchers',[...approved,identity].slice(-20));
+  return true;
+ },
+ status:message=>{if(isSearcher)$('searcherLinkStatus').textContent=message;status(message)},
+ receive:content=>{
+  lastContent=content;put('gb-last-content',content);
+  if(isSearcher&&content){
+   const lineIndex=lines.findIndex(line=>getText(line)===(content.obsData?.sg||content.verse)&&(!content.ang||getAng(line)===content.ang));
+   if(lineIndex>=0){active=lineIndex;renderReadingNavigator();renderLines();markAng(getAng(lines[active]));}
+  }
+  publish({content},false,false,true);
+  const message=content?'ਜੁੜੀ ਪੰਕਤੀ · Synced: '+content.verse:'ਪ੍ਰੋਜੈਕਸ਼ਨ ਸਾਫ਼ · Projection cleared';
+  if(isSearcher)$('searcherLinkStatus').textContent=message;
+  status(message);
+ }
+});
 const isDesktop=new URLSearchParams(location.search).get('desktop')==='windows';
 desktopPreview=isDesktop&&window.GurbaniDesktopPreview?GurbaniDesktopPreview({connections,known,cameraPhones,cameraStreams,send,token:myToken}):null;
 if(isDesktop){
  $('cameraLocalStart').textContent='Use This PC Camera';
  $('cameraLocalStop').textContent='Stop This PC Camera';
 }
+let searcherClearOnBack=false;
+let searcherReturnScroll=0;
+function enterSearcherReading(){
+ if(window.history.state?.searcherReading)return;
+ searcherReturnScroll=window.scrollY;
+ window.history.pushState({searcherReading:true},'',location.href);
+}
 if(isSearcher){
+ if(window.history.state?.searcherReading)window.history.replaceState(null,'',location.href);
+ window.addEventListener('popstate',()=>{
+  if(window.history.state?.searcherReading||!lines.length)return;
+  ++searchNonce;
+  lines=[];active=-1;readingAng=null;readingTitle='';asaStarts=[];sukhmaniSalokStarts=[];
+  shabadAng=null;currentShabad=null;shabadSourceInfo=null;
+  renderReadingNavigator();renderLines();markAng(null);
+  $('results').hidden=!$('results').hasChildNodes();
+  $('searcherMessage').textContent=$('results').hidden?'':$('results').childElementCount+' ਨਤੀਜੇ · Results';
+  if(searcherClearOnBack){
+   lastContent=null;put('gb-last-content',null);publish({content:null});
+  }
+  searcherClearOnBack=false;
+  requestAnimationFrame(()=>window.scrollTo(0,searcherReturnScroll));
+ });
  const controls=$('searcherActions');
  controls.prepend($('projectionSwitch'),$('previous'),$('next'));
  $('searcherSettings').before($('historyToggle'),$('closeReading'),$('readingAngLabel'));
+ $('historyToggle').title='ਖੋਜ ਇਤਿਹਾਸ · Search History';
  $('previous').textContent='‹';$('next').textContent='›';$('historyToggle').textContent='☷';
  $('historyToggle').setAttribute('aria-label','ਖੋਜ ਇਤਿਹਾਸ · Search History');
  $('closeReading').title='ਸ਼ਬਦ ਬੰਦ ਕਰੋ · Close Shabad';
@@ -1896,7 +1960,31 @@ if(isSearcher){
  for(const id of ['previous','next'])$(id).addEventListener('click',()=>motion.center(lineBox.children[active]));
  $('searcherMessage').hidden=false;
  $('historyCard').querySelector('strong').textContent='ਖੋਜ ਇਤਿਹਾਸ · Search History';
+ $('searcherLinkPanel').before($('connectCard'));
  $('connectCard').append($('checkAppUpdate'),$('appUpdateStatus'));
+ $('searcherControlCode').value=stored('gb-searcher-control-link','');
+ $('searcherControlCode').onkeydown=event=>{if(event.key==='Enter')$('searcherLink').click();};
+ $('searcherLink').onclick=()=>{
+  const code=$('searcherControlCode').value.trim();
+  if(!/^\d{5}$/.test(code)||code===myCode){
+   $('searcherLinkStatus').textContent='ਕੰਟਰੋਲ ਦਾ ਸਹੀ ਕੋਡ ਪਾਓ। · Enter the Control code.';return;
+  }
+  $('searcherLinkStatus').textContent='ਜੋੜ ਰਹੇ ਹਾਂ… · Linking…';
+  searcherSync.connect(code);
+ };
+ $('searcherUnlink').onclick=()=>{
+  searcherSync.disconnect();$('searcherControlCode').value='';
+  $('searcherLinkStatus').textContent='ਜੋੜ ਹਟਾਇਆ। · Unlinked.';
+ };
+ $('searcherLinkMenu').onclick=()=>{
+  $('searcherSettings').open=false;$('searcherLinkPanel').hidden=!$('searcherLinkPanel').hidden;
+  if(!$('searcherLinkPanel').hidden)window.scrollTo(0,0);
+ };
+ $('searcherReaderSettings').onclick=()=>$('searcherReaderOptions').hidden=!$('searcherReaderOptions').hidden;
+ $('searcherUpdate').onclick=()=>{
+  $('searcherSettings').open=false;$('connectCard').classList.add('searcher-devices');
+  $('checkAppUpdate').click();window.scrollTo(0,0);
+ };
  $('searcherToolbar').hidden=false;
  $('searcherFlow').checked=stored('gb-searcher-flow',true);
  $('searcherPauses').checked=stored('gb-searcher-pauses',true);
@@ -1923,6 +2011,7 @@ if(isSearcher){
  $('query').addEventListener('click',()=>toggleVirtualKeyboard(true));
  $('query').addEventListener('focus',()=>toggleVirtualKeyboard(true));
  $('searcherSearch').onclick=()=>{
+  if(lines.length&&window.history.state?.searcherReading){window.history.back();return;}
   toggleHistory(false);
   $('searchCard').classList.add('searcher-search-open');
   window.scrollTo(0,0);

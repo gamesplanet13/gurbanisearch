@@ -23,6 +23,11 @@
 .searcher #searcherSettings summary::-webkit-details-marker { display:none; }
 .searcher-settings-panel { position:absolute; inset-inline-end:0; z-index:2; width:min(290px,90vw); padding:8px; border:1px solid #5d5039; border-radius:8px; background:#24221d; font-size:14px; }
 .searcher-settings-panel label { display:flex; align-items:center; gap:8px; min-height:42px; }
+.searcher #searcherActions .searcher-settings-panel button { display:block; width:100%; padding:7px 9px; margin-block:3px; font-size:14px; text-align:start; }
+.searcher #searcherLinkPanel { margin:8px; background:#24221d; font-size:14px; }
+.searcher #searcherLinkPanel .row { margin-top:6px; }
+.searcher #searcherLinkPanel input { min-width:85px; font-size:16px; }
+.searcher #searcherLinkStatus { margin:5px 0 0; }
 .searcher-message { color:#d6cbb0; font-size:13px; margin:5px 0 0; min-height:1.4em; }
 
 .searcher #searchCard .row { margin:4px 0; gap:5px; }
