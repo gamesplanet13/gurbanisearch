@@ -152,7 +152,7 @@ main{width:100%;max-width:none;margin:3px auto;padding:0 4px;gap:4px;align-items
  <div class="row"><input id="cameraCodeInput" placeholder="5-digit Camera code" inputmode="numeric" maxlength="5" style="width:130px"><button id="cameraConnect" class="primary">Connect Camera</button></div>
  <select id="cameraDeviceSelect" aria-label="Choose camera phone"><option value="">Select camera phone</option></select>
  <p class="small" id="cameraStatus">No cameras connected</p>
- <video id="cameraPreview" autoplay muted playsinline style="display:block;width:100%;max-height:160px;background:#000;border-radius:6px" controls></video>
+ <video id="cameraPreview" autoplay muted playsinline style="display:block;width:100%;max-height:160px;background:#000;border-radius:6px"></video>
  <div class="row"><label>Lens <select id="cameraLens" aria-label="Camera lens"><option value="">Auto / Default</option></select></label><button id="cameraLensApply">Use Lens</button></div>
  <div class="row"><label>Layout <select id="cameraLayout"><option value="full">Full Camera</option><option value="horizontal">Side-by-side Camera + Shabad</option><option value="vertical">Top/Bottom Camera + Shabad</option></select></label></div>
  <label>Camera portion <span id="cameraPortionLabel">50%</span><input type="range" id="cameraPortion" min="15" max="85" value="50" step="5"></label>
@@ -380,7 +380,14 @@ function send(conn,payload){if(conn?.open){try{conn.send(payload);return true}ca
 function announce(conn){send(conn,{type:'auth',token:myToken,code:myCode})}
 const health=new WeakMap(),pendingDelivery=new WeakMap();let deliveryCounter=0;
 function setupConn(conn,key,codeValue){conn.on('open',()=>{health.set(conn,Date.now());announce(conn);$('connStatus').textContent='Online';renderDevices()});
-conn.on('data',m=>{if(!m||typeof m!=='object')return;health.set(conn,Date.now());if(m.type==='pong'){return}if(m.type==='applied'){const p=pendingDelivery.get(conn);if(p&&m.rev===p.rev)pendingDelivery.delete(conn);return}
+conn.on('data',m=>{if(!m||typeof m!=='object')return;health.set(conn,Date.now());if(m.type==='camera-display-ready'){
+ const wanted=activeCameraRoutes.get(String(m.code||''));
+ if(wanted){
+  const camera=cameraLinks.get(wanted.camera);
+  if(camera?.open){send(camera,{type:'camera-authorize',targets:[peerPrefix+wanted.target,controlPrefix+myCode,...wanted.all]});send(camera,{type:'camera-connect',targets:[peerPrefix+wanted.target]});cameraStatus('Camera '+wanted.camera+' connected to '+wanted.target)}
+ }return
+}
+if(m.type==='pong'){return}if(m.type==='applied'){const p=pendingDelivery.get(conn);if(p&&m.rev===p.rev)pendingDelivery.delete(conn);return}
 if(m.type==='hello'){if(m.owner && m.owner!==myToken){status('Screen is paired to another controller. On that screen choose Reset pairing.');conn.close();return}if(m.code){const existing=connections.get(m.deviceId||key);if(m.deviceId&&m.deviceId!==key){connections.delete(key);key=m.deviceId}known[key]={code:m.code,name:m.name||'Projection',kind:m.kind||'projection'};put('gb-known-devices',known);connections.set(key,conn);selected.add(key);put('gb-selected-devices',[...selected]);announce(conn);renderDevices();status('Projection connected')}}
 if(m.type==='accepted'&&m.kind==='obs')send(conn,{type:'project',token:myToken,obsSettings:obsValues(),...(lastContent?{content:lastContent}:{})});
 if(m.type==='accepted'&&m.kind!=='obs')setTimeout(()=>sendOneDeviceSettings(key,true),0);
@@ -411,6 +418,7 @@ function connectProjection(key,codeValue){
 }
 
 const cameraPrefix='gurbani-camera-v1-',cameraLinks=new Map(),cameraPhones=new Map(),cameraStreams=new Map();
+const activeCameraRoutes=new Map();
 let cameraCurrent='',cameraPreviewCall=null;
 const cameraStatus=x=>$('cameraStatus').textContent=x;
 function cameraSelected(){return cameraLinks.get($('cameraDeviceSelect').value)}
@@ -484,14 +492,16 @@ $('cameraProject').onclick=()=>{
  if(!c?.open)return cameraStatus('Connect and choose a Camera Phone');
  if(!targets.length)return cameraStatus('Select at least one online Projection screen');
  const peers=targets.map(x=>peerPrefix+x.code);
- for(const t of targets)send(connections.get(t.id),{type:'camera-allow',token:myToken,cameraCode:code,layout:$('cameraLayout').value,portion:+$('cameraPortion').value});
  send(c,{type:'camera-authorize',targets:[...peers,controlPrefix+myCode]});
- setTimeout(()=>send(c,{type:'camera-connect',targets:peers}),350);
- cameraStatus('Camera '+code+' sent to '+targets.length+' Projection(s). Internet or LAN connection required.')
+ for(const t of targets){
+  activeCameraRoutes.set(t.code,{camera:code,target:t.code,all:peers});
+  send(connections.get(t.id),{type:'camera-allow',token:myToken,cameraCode:code,layout:$('cameraLayout').value,portion:+$('cameraPortion').value});
+ }
+ cameraStatus('Waiting for '+targets.length+' Projection screen(s) to authorize live camera…')
 };
 $('cameraHide').onclick=()=>{
  const targets=selectedProjectionTargets();
- for(const t of targets)send(connections.get(t.id),{type:'camera-hide',token:myToken});
+ for(const t of targets){activeCameraRoutes.delete(t.code);send(connections.get(t.id),{type:'camera-hide',token:myToken})}
  for(const c of cameraLinks.values())if(c.open)send(c,{type:'camera-off',targets:targets.map(t=>peerPrefix+t.code)});
  cameraStatus('Camera hidden on '+targets.length+' display(s)')
 };
