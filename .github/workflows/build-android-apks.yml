@@ -25,9 +25,9 @@ jobs:
           gradle-version: '8.10.2'
       - name: Install Android SDK 35
         run: sdkmanager --install "platforms;android-35" "build-tools;35.0.0"
-      - name: Build four debug APKs
+      - name: Build five debug APKs
         working-directory: android
-        run: gradle --no-daemon assembleControllerDebug assembleProjectionDebug assembleBookDebug assembleCameraDebug
+        run: gradle --no-daemon assembleControllerDebug assembleProjectionDebug assembleBookDebug assembleCameraDebug assembleSearcherDebug
       - uses: actions/upload-artifact@v4
         with:
           name: Gurbani-Controller-APK
@@ -45,3 +45,7 @@ jobs:
         with:
           name: Gurbani-Camera-APK
           path: android/app/build/outputs/apk/camera/debug/*.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Gurbani-Searcher-APK
+          path: android/app/build/outputs/apk/searcher/debug/*.apk

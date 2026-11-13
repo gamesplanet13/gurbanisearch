@@ -37,12 +37,12 @@ public final class WifiDiscovery {
         activity.runOnUiThread(() -> { if (running && !activity.isFinishing()) web.evaluateJavascript(js, null); });
     }
     @JavascriptInterface public void advertise(String value, String name) {
-        if ("controller".equals(role) || value == null || !value.matches("[0-9]{5}")) return;
+        if (!("projection".equals(role) || "book".equals(role)) || value == null || !value.matches("[0-9]{5}")) return;
         code = value;
         deviceName = name == null ? "" : name.trim().substring(0, Math.min(name.trim().length(), 50));
     }
     @JavascriptInterface public void search() {
-        if (!"controller".equals(role)) return;
+        if (!("controller".equals(role) || "searcher".equals(role))) return;
         synchronized (this) { if (scanning) return; scanning = true; }
         new Thread(() -> {
             String error = "";

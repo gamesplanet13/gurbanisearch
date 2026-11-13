@@ -18,10 +18,18 @@ android {
             buildConfigField 'String', 'START_PAGE', '"index.html"'
             buildConfigField 'String', 'ROLE', '"controller"'
         }
+        searcher {
+            dimension 'role'
+            versionName '2026.11.14.1'
+            applicationIdSuffix '.searcher'
+            resValue 'string', 'app_name', 'Gurbani Searcher'
+            buildConfigField 'String', 'START_PAGE', '"searcher.html"'
+            buildConfigField 'String', 'ROLE', '"searcher"'
+        }
         projection {
             dimension 'role'
             versionCode 20261129
-            versionName '2026.11.13.18'
+            versionName '2026.11.14.1'
             applicationIdSuffix '.projection'
             resValue 'string', 'app_name', 'Gurbani Searching Projection'
             buildConfigField 'String', 'START_PAGE', '"projection.html"'

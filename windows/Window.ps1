@@ -15,12 +15,33 @@ public static class GurbaniWindow {
 }
 '@
     # Keep display and system awake only for the life of this Windows app.
-    [void][GurbaniWindow]::SetThreadExecutionState([uint32]0x80000003)
+    [void][GurbaniWindow]::SetThreadExecutionState([uint32]2147483651)
+    if ($Role -in @('projection', 'book')) {
+        . (Join-Path $PSScriptRoot 'Discovery.ps1')
+        $discoveryDirectory = Join-Path $env:LOCALAPPDATA 'Gurbani\Discovery'
+        $codeMutex = New-Object Threading.Mutex($false, 'Local\Gurbani-DisplayCode')
+        try {
+            try { $codeLocked = $codeMutex.WaitOne(2000) } catch [Threading.AbandonedMutexException] { $codeLocked = $true }
+            if ($codeLocked) {
+                $displayCode = Get-GurbaniDisplayCode $discoveryDirectory $Role
+                if ($displayCode) { $Url += "#lanCode=$displayCode" }
+            }
+        } catch { } finally {
+            if ($codeLocked) { $codeMutex.ReleaseMutex() }
+            $codeMutex.Dispose()
+        }
+    }
     $edgeArguments = '--user-data-dir="' + $Profile + '" --no-first-run --start-fullscreen --new-window "' + $Url + '"'
     $process = Start-Process -FilePath $Edge -ArgumentList $edgeArguments -PassThru
     for ($i=0; $i -lt 80 -and !$process.HasExited -and $process.MainWindowHandle -eq 0; $i++) {
         Start-Sleep -Milliseconds 125
         $process.Refresh()
+    }
+    if ($displayCode -and !$process.HasExited -and $process.MainWindowHandle -ne 0) {
+        $discoveryRecord = Join-Path $discoveryDirectory "$Role.active"
+        @{code=$displayCode; windowPid=$process.Id; windowStart=$process.StartTime.ToUniversalTime().Ticks.ToString()} |
+            ConvertTo-Json -Compress | Set-Content -LiteralPath $discoveryRecord -Encoding ASCII
+        $nextDiscoveryBind = [DateTime]::MinValue
     }
     # Fetch display names only. The launch target and its role arguments stay local.
     $shortcutUpdate = Start-Job -ArgumentList $PSScriptRoot -ScriptBlock {
@@ -67,14 +88,25 @@ public static class GurbaniWindow {
         [void][GurbaniWindow]::GetWindowThreadProcessId($foreground,[ref]$owner)
         if ($process.MainWindowTitle -like 'Gurbani Windows Close*' -and $window -ne 0) {
             [void][GurbaniWindow]::PostMessage($window,0x10,[IntPtr]::Zero,[IntPtr]::Zero)
-        } elseif ($owner -eq $process.Id -and ([GurbaniWindow]::GetAsyncKeyState(27) -band 0x8000)) {
+        } elseif ($Role -ne 'projection' -and $owner -eq $process.Id -and ([GurbaniWindow]::GetAsyncKeyState(27) -band 0x8000)) {
             [void][GurbaniWindow]::PostMessage($foreground,0x10,[IntPtr]::Zero,[IntPtr]::Zero)
         }
         if ($window -eq 0) { break }
+        if ($discoveryRecord) {
+            if (!$discoverySocket -and [DateTime]::UtcNow -ge $nextDiscoveryBind) {
+                $discoverySocket = Open-GurbaniDiscovery
+                $nextDiscoveryBind = [DateTime]::UtcNow.AddSeconds(1)
+            }
+            if ($discoverySocket) {
+                try { Send-GurbaniDiscoveryReplies $discoverySocket $discoveryDirectory } catch [Net.Sockets.SocketException] { }
+            }
+        }
         Start-Sleep -Milliseconds 35
     }
 } finally {
-    try { [void][GurbaniWindow]::SetThreadExecutionState([uint32]0x80000000) } catch {}
+    try { [void][GurbaniWindow]::SetThreadExecutionState([uint32]2147483648) } catch {}
+    if ($discoverySocket) { $discoverySocket.Dispose() }
+    if ($discoveryRecord) { Remove-Item -LiteralPath $discoveryRecord -ErrorAction SilentlyContinue }
     if ($shortcutUpdate) { Remove-Job -Job $shortcutUpdate -Force -ErrorAction SilentlyContinue }
     $mutex.ReleaseMutex()
     $mutex.Dispose()

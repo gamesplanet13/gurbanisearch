@@ -1,0 +1,30 @@
+.searcher body { background:#10100f; color:#f5efd9; }
+.searcher [hidden] { display:none !important; }
+.searcher header { display:none; }
+.searcher main { display:block; max-width:62rem; margin:0 auto; padding:0; }
+.searcher main > div { position:static; max-height:none; overflow:visible; }
+.searcher #searchCard, .searcher #shabadCard { width:100%; border:0; border-radius:0; background:transparent; }
+.searcher #shabadCard { padding:0; }
+.searcher #shabadCard > :first-child, .searcher #shabadCard > :nth-child(3),
+.searcher #shabadCard > p, .searcher #shabadCard > :last-child,
+.searcher #searchCard > h2, .searcher #baniQuickActions button:not(#asaVar,#sehaj,#sukhmani),
+.searcher #fontCard, .searcher #functionsMenu, .searcher #offlineToolsDetails,
+.searcher #connectCard:not(.searcher-devices), .searcher #searchCard:not(.searcher-search-open) { display:none; }
+.searcher #connectCard.searcher-devices { margin:0; border-radius:0; }
+.searcher-toolbar { position:sticky; top:0; z-index:15; background:#1c1b18; border-bottom:1px solid #5d5039; }
+.searcher-toolbar .row { gap:4px; padding:6px; flex-wrap:wrap; }
+.searcher-toolbar button, .searcher #readingNavigator button { min-width:42px; min-height:42px; }
+.searcher-toolbar .row strong { margin-inline-start:auto; color:#f2cb73; white-space:nowrap; }
+.searcher-toolbar label { display:inline-flex; align-items:center; gap:4px; padding-inline:5px; }
+.searcher #readingAngLabel { font-size:14px; color:#f2cb73; }
+.searcher #lines { max-height:none; overflow:visible; display:block; padding:12px 12px 30px; }
+.searcher #lines .searcher-line { display:block; margin:0 auto; width:100%; padding:.28em .3em; background:transparent; border:0; color:inherit; border-radius:5px; white-space:normal; text-align:center; line-height:1.55; font-size:clamp(25px,6vw,42px); }
+.searcher #lines .searcher-line.active { background:#3b3831; box-shadow:inset 0 -1px #b09357; }
+.searcher #lines.searcher-continuous { text-align:center; font-size:clamp(25px,6vw,42px); line-height:1.65; }
+.searcher #lines.searcher-continuous .searcher-line { display:inline; width:auto; margin:0; padding:.04em .13em; font:inherit; }
+.searcher #lines:not(.searcher-continuous) .searcher-line { margin-block:5px; border-bottom:1px solid #38332a; }
+.searcher #lines .pause-word { color:#f4bc62; }
+.searcher #readingNavigator { margin:0 8px; }
+.searcher #historyCard { position:static; width:100%; max-height:none; border:0; padding:12px; box-shadow:none; }
+.searcher #historyList button { font-size:18px; padding:9px; }
+.searcher-message { color:#d6cbb0; font-size:13px; margin:0; padding:3px 10px; min-height:1.5em; }

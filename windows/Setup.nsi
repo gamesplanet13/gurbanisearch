@@ -6,11 +6,11 @@ RequestExecutionLevel user
 SetCompressor /SOLID lzma
 Icon "controller.ico"
 UninstallIcon "controller.ico"
-VIProductVersion "1.0.2.0"
+VIProductVersion "1.0.3.0"
 VIAddVersionKey "ProductName" "Gurbani for Windows"
 VIAddVersionKey "FileDescription" "Gurbani Windows Setup"
 VIAddVersionKey "LegalCopyright" "Copyright Rajinder Singh"
-VIAddVersionKey "FileVersion" "1.0.2.0"
+VIAddVersionKey "FileVersion" "1.0.3.0"
 
 Page instfiles
 UninstPage uninstConfirm
@@ -26,6 +26,7 @@ Section "Gurbani"
   SetOutPath "$INSTDIR"
   File "Launch.vbs"
   File "Window.ps1"
+  File "Discovery.ps1"
   File "controller.ico"
   File "projection.ico"
   File "book.ico"
@@ -46,7 +47,7 @@ Section "Gurbani"
   WriteUninstaller "$INSTDIR\Uninstall.exe"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Gurbani" "DisplayName" "Gurbani for Windows"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Gurbani" "UninstallString" '"$INSTDIR\Uninstall.exe"'
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Gurbani" "DisplayVersion" "1.0.2"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Gurbani" "DisplayVersion" "1.0.3"
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Gurbani" "NoModify" 1
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Gurbani" "NoRepair" 1
 SectionEnd
@@ -66,6 +67,7 @@ Section "Uninstall"
   RMDir "$SMPROGRAMS\Gurbani"
   Delete "$INSTDIR\Launch.vbs"
   Delete "$INSTDIR\Window.ps1"
+  Delete "$INSTDIR\Discovery.ps1"
   Delete "$INSTDIR\Uninstall.exe"
   RMDir "$INSTDIR"
   DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Gurbani"
