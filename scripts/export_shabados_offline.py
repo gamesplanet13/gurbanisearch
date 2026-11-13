@@ -6,7 +6,7 @@ Install: Python 3.11+, no third-party dependencies.
 Do not edit or transliterate the original Gurmukhi.
 """
 from __future__ import annotations
-import argparse, json, tomllib, pathlib, datetime, re, sys
+import argparse, json, tomllib, pathlib, datetime, re, sys, gzip, hashlib
 
 SOURCE_IDS = {
     "D": ["SDGR"],
@@ -53,7 +53,7 @@ def main() -> int:
     for src, source_ids in SOURCE_IDS.items():
         target=output/src
         target.mkdir(parents=True, exist_ok=True)
-        for old in target.glob("chunk-*.json"): old.unlink()
+        for old in target.glob("chunk-*.json*"): old.unlink()
         count=0
         parts=[]
         batch=[]
@@ -62,10 +62,12 @@ def main() -> int:
         def flush():
             nonlocal serial, batch
             if not batch:return
-            filename=f"chunk-{serial:04d}.json"
+            filename=f"chunk-{serial:04d}.json.gz"
             payload={"format":"gamesplanet-gurbani-source-v1","source":src,"id":f"shabados-{src}-{serial:04d}","title":SOURCES[src]+f" · Part {serial}","citation":CITATION,"lines":batch}
-            (target/filename).write_text(json.dumps(payload,ensure_ascii=False,separators=(",",":")),encoding="utf-8")
-            parts.append({"path":f"{src}/{filename}","lines":len(batch)})
+            raw=json.dumps(payload,ensure_ascii=False,separators=(",",":")).encode("utf-8")
+            compressed=gzip.compress(raw,compresslevel=9,mtime=0)
+            (target/filename).write_bytes(compressed)
+            parts.append({"path":f"{src}/{filename}","lines":len(batch),"bytes":len(compressed),"sha256":hashlib.sha256(compressed).hexdigest()})
             serial+=1
             batch=[]
         for sid in source_ids:
