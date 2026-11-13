@@ -1,10 +1,10 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Gurbani Camera · HarjasTV</title>
 <style>
 :root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#070d17;color:#f2e8d0;font:14px/1.5 system-ui,sans-serif}header{background:linear-gradient(110deg,#192c4b,#18253b);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #766640}h1{font-size:16px;margin:0;color:#f6d793}.frame{position:relative;min-height:38dvh;background:#000}video{display:block;width:100%;max-height:60dvh;object-fit:contain;background:#000}main{padding:12px;max-width:950px;margin:auto}.card{border:1px solid #344862;background:#17243a;border-radius:12px;padding:12px;margin:10px 0}button,select,input{font:inherit;background:#223750;border:1px solid #5d7593;color:#fff;border-radius:8px;padding:9px;min-width:0}button{cursor:pointer}.row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:9px 0}.row>*{flex:1}label{display:block;margin:8px 0}select,input[type=range]{width:100%}.code{font-size:32px;color:#ffd77a;font-weight:800;letter-spacing:5px}small,.small{font-size:11px;color:#bdcbdf}.ok{color:#8ce6aa}.warning{color:#f2b88b}.recording{background:#a42b31;color:white}#recordStop:disabled{opacity:.5}footer{text-align:center;padding:15px;color:#9daecb;font-size:11px}a{color:#c3e1ff}@media(orientation:landscape){main{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(290px,1fr);gap:10px}.frame{min-height:0;grid-row:span 2;height:calc(100dvh - 110px)}video{height:100%;max-height:none}.card{margin:0}}
-</style></head><body><header><h1>ੴ Gurbani Camera · HarjasTV</h1><span class="small">Camera Phone</span></header><main><div class="frame"><video id="preview" playsinline muted autoplay></video></div>
+.camera-placeholder{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;background:#050b16;color:#d3e4fc;font-size:14px;pointer-events:none}.camera-placeholder[hidden]{display:none!important}.frame{overflow:hidden}.frame video{min-height:38dvh}.camera-start{background:#13683b;border-color:#55c987;color:#fff} </style></head><body><header><h1>ੴ Gurbani Camera · HarjasTV</h1><span class="small">Camera Phone</span></header><main><div class="frame"><video id="preview" playsinline muted autoplay></video><div id="cameraPlaceholder" class="camera-placeholder">📷 Camera not started yet. Tap Start Camera and allow access.</div></div>
 <div><section class="card"><div class="row"><strong>Camera Connection Code</strong><strong id="code" class="code">•••••</strong></div><p class="small">Controller → ☰ → Camera → enter this code. Grant camera permission on this phone. Keep this page open while broadcasting.</p><p id="status" class="warning" aria-live="polite">Starting camera…</p>
 <label>Phone camera<select id="cameraSelect"><option value="">Loading available cameras…</option></select></label>
-<div class="row"><button id="refreshCameras">↻ Cameras</button><button id="flip">⇄ Switch</button><button id="fullscreen">⛶ Preview</button></div>
+<div class="row"><button id="startCamera" class="camera-start">📷 Start Camera</button><button id="stopCamera">■ Stop</button><button id="refreshCameras">↻ Cameras</button><button id="flip">⇄ Switch</button><button id="fullscreen">⛶ Preview</button></div>
 <label>Camera Zoom: <output id="zoomNumber">1.0×</output><input type="range" id="zoom" min="1" max="4" step=".1" value="1"></label><p id="zoomNotice" class="small">Hardware zoom if supported; otherwise preview will be digitally cropped for local monitoring only.</p>
 <div class="row"><button id="recordStart">⏺ Record</button><button id="recordStop" disabled>■ Stop &amp; Save</button></div><p class="small" id="recordNotice">Recordings save on this camera phone only. Your browser may ask where to download.</p>
 <div class="row"><button id="resetPairing">Unpair Controller</button><button id="newCode">New Camera Code</button></div></section></div>
@@ -34,12 +34,19 @@ async function cameras(){
 }
 async function startCamera(deviceId){
  const generation=++streamGeneration;
- if(!navigator.mediaDevices?.getUserMedia)throw Error('Camera access needs HTTPS and a supported browser');
+ if(!window.isSecureContext || !navigator.mediaDevices?.getUserMedia)throw Error('Camera access requires an HTTPS browser or updated Android WebView.');
  const request={audio:false,video:{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:24,max:30},...(deviceId?{deviceId:{ideal:deviceId}}:{facingMode:{ideal:facingMode}})}};
- const next=await navigator.mediaDevices.getUserMedia(request);
+ let next;
+ try{next=await navigator.mediaDevices.getUserMedia(request)}
+ catch(e){
+  $('cameraPlaceholder').hidden=false;
+  $('cameraPlaceholder').textContent='📷 Camera unavailable: '+e.name+' · Tap Start Camera after granting permission.';
+  throw e
+ }
  if(generation!==streamGeneration){next.getTracks().forEach(t=>t.stop());return}
  const previous=stream;stream=next;$('preview').srcObject=next;$('preview').play().catch(()=>{});
  if(previous)previous.getTracks().forEach(t=>t.stop());
+ $('cameraPlaceholder').hidden=true;
  for(const call of calls.values())try{call.close()}catch(_){}
  calls.clear();listViewers();
  const actual=stream.getVideoTracks()[0]?.getSettings()?.deviceId;
@@ -92,6 +99,19 @@ function stopRecording(){if(recording?.state==='recording')recording.stop()}
 $('recordStart').onclick=startRecording;$('recordStop').onclick=stopRecording;
 $('cameraSelect').onchange=()=>startCamera($('cameraSelect').value).catch(e=>status('Camera change failed: '+e.message));
 $('flip').onclick=()=>{const list=[...$('cameraSelect').options].map(x=>x.value),index=list.indexOf($('cameraSelect').value);if(list.length>1)startCamera(list[(index+1)%list.length]).catch(e=>status('Camera switch failed: '+e.message))};
+$('startCamera').onclick=()=>startCamera($('cameraSelect').value).catch(e=>{
+ $('cameraPlaceholder').hidden=false;$('cameraPlaceholder').textContent='📷 Camera failed: '+e.message+' · Check Android Settings → Apps → Camera permission, then tap Start Camera.';
+ status('Camera unavailable: '+e.name+' · '+e.message)
+});
+$('stopCamera').onclick=()=>{
+ ++streamGeneration;
+ if(recording?.state==='recording')stopRecording();
+ stream?.getTracks().forEach(t=>t.stop());stream=null;
+ $('preview').srcObject=null;
+ $('cameraPlaceholder').hidden=false;$('cameraPlaceholder').textContent='Camera stopped. Tap Start Camera.';
+ for(const c of calls.values())try{c.close()}catch(_){}
+ calls.clear();listViewers();status('Camera stopped')
+};
 $('refreshCameras').onclick=()=>cameras().catch(e=>status('Camera list: '+e.message));
 $('fullscreen').onclick=()=>document.querySelector('.frame').requestFullscreen?.().catch(e=>status(e.message));
 $('newCode').onclick=()=>{cameraCode=mkCode();store('gb-camera-code',cameraCode);location.reload()};
@@ -135,5 +155,10 @@ function startPeer(){
   onCollision:()=>status('Camera code already in use. Choose New Camera Code.'),
   onTargetUnavailable:()=>status('Projection peer not available')});
 }
-(async()=>{try{await startCamera('')}catch(e){status('Camera permission required: '+e.message)}startPeer()})();
+(async()=>{
+ startPeer();
+ try{await cameras()}catch(e){status('Camera selection: '+e.message)}
+ // Permission prompts are more reliable when triggered by a direct user tap.
+ $('cameraPlaceholder').textContent='📷 Tap Start Camera and allow camera access on this phone.';
+})();
 </script></body></html>
