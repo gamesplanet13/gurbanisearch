@@ -147,21 +147,27 @@ main{width:100%;max-width:none;margin:3px auto;padding:0 4px;gap:4px;align-items
 <section class="card" id="connectCard"><h2>Connected Projections</h2><div class="row"><div class="grow"><span class="muted">Your controller code</span><div id="code" class="code">•••••</div></div><span id="connStatus" class="muted">Connecting…</span></div><div class="row"><input id="newControllerCode" class="grow" inputmode="numeric" maxlength="5" placeholder="New 5-digit controller code"><button id="changeControllerCode">Change code</button></div><div class="row"><button id="searchWifi" class="primary">Search Wi-Fi Projections</button></div><p id="wifiStatus" class="small" aria-live="polite">Find Projection or Book View on the same Wi-Fi.</p><div id="wifiResults"></div><div class="row"><input id="pairCode" placeholder="Projection 5-digit code" inputmode="numeric" maxlength="5" class="grow"><button id="pair" class="primary">Connect</button></div><p class="small">You can also type your controller code into the Projection browser. Select displays below before projecting.</p><p id="pairStatus" class="small" aria-live="polite">Connecting…</p><div id="devices"></div></section>
 <section class="card" id="searchCard"><h2>Search Gurbani</h2><div class="row"><label for="corpusSource" class="small">Source</label><select id="corpusSource" class="grow"><option value="all">All Sources</option><option value="G">Sri Guru Granth Sahib Ji</option><option value="D">Sri Dasam Granth</option><option value="B">Bhai Gurdas Ji Vaaran</option><option value="N">Bhai Nand Lal Ji</option><option value="A">Amrit Keertan / Other</option></select></div><div class="row"><select id="keyboard" hidden aria-label="Keyboard language"><option value="en">English</option><option value="pa">Gurmukhi</option><option value="hi">Hindi</option></select><button id="keyboardToggle" class="icon-btn" title="Open language keyboard" aria-label="Open language keyboard" aria-expanded="false">⌨</button><select id="searchType"><option value="7">First letters (English)</option><option value="0">First letters (Gurmukhi)</option><option value="2">Full word (Gurmukhi)</option><option value="4">Romanized word</option></select></div><div class="row"><input id="query" class="grow" placeholder="Type first letters (e.g. ddss)"><button id="search" class="primary icon-btn" title="Search Gurbani" aria-label="Search Gurbani">⌕</button></div><div id="onscreenKeyboard" hidden><div id="keyboardLanguages" class="row"><button type="button" data-lang="en">EN</button><button type="button" data-lang="pa">ਗੁਰਮੁਖੀ</button><button type="button" data-lang="hi">हिन्दी</button><button id="keyboardHide" type="button" aria-label="Close keyboard">✕</button></div><div id="keyboardKeys"></div></div><div class="quick-actions" id="baniQuickActions"><button id="waheguru" class="waheguru-quick" aria-label="Project animated Waheguru">ਵਾਹਿਗੁਰੂ ✨</button><button id="nitnem" title="Nitnem morning Banis">ਨਿਤਨੇਮ</button><button id="japji" title="Japji Sahib">ਜਪੁਜੀ</button><button id="jaap" title="Jaap Sahib">ਜਾਪ</button><button id="tavPrasad" title="Tav Prasad Savaiye">ਤ੍ਵ ਪ੍ਰਸਾਦਿ ਸਵੱਯੇ</button><button id="deenan" title="Savaiye Deenan Ki Pratipal">ਦੀਨਨ ਕੀ ਪ੍ਰਤਿਪਾਲ</button><button id="chaupai" title="Chaupai Sahib">ਚੌਪਈ</button><button id="anandFull" title="Full Anand Sahib">ਅਨੰਦ ਸਾਹਿਬ</button><button id="anandSix" title="Anand Sahib Six Pauris">ਅਨੰਦ 6</button><button id="rehras" title="Rehras Sahib">ਰਹਿਰਾਸ</button><button id="sohila" title="Kirtan Sohila Sahib">ਸੋਹਿਲਾ</button><button id="asaVar" title="Asa Di Vaar">ਆਸਾ ਦੀ ਵਾਰ</button><button id="ardas" title="Ardas">ਅਰਦਾਸ</button><button id="sukhmani" title="Sukhmani Sahib">ਸੁਖਮਨੀ</button><button id="aapeSangat" title="ਆਪੇ ਸੰਗਤਿ ਸਦਿ ਬਹਾਲੈ">ਆਪੇ ਸੰਗਤਿ…</button><button id="sehaj" title="Sehaj Path">ਸਹਿਜ ਪਾਠ</button></div><div id="results" class="list" hidden></div><details class="offline-tools" id="offlineToolsDetails"><summary>Offline Library · Download &amp; Storage</summary><div class="row"><strong class="grow">Offline Gurbani Library</strong><span id="offlineBadge" class="small">Checking storage…</span></div><div class="row"><button id="offlineDownload" class="primary" title="Download Sri Guru Granth Sahib Ji Angs from Open Granth for offline search">↓ SGGS 1430 Angs</button><button id="offlineSourceDownload" class="primary" title="Save the chosen GitHub source pack on this device">↓ Selected Source</button><button id="offlineStop" title="Pause offline downloading">Ⅱ</button><button id="offlineRefresh" title="Check offline downloaded pages">↻</button></div><progress id="offlineProgress" value="0" max="1430"></progress><div class="row"><label class="small grow" for="offlineImport">Import vetted source pack (JSON)</label><input id="offlineImport" type="file" accept=".json,application/json" aria-label="Import locally saved scripture source pack"></div><div id="sourceAvailability" class="small" aria-live="polite"></div><p id="offlineMessage" class="small" aria-live="polite">Public-domain Gurbani text from Open Granth (Shabad OS source). Download once online; then search and read offline. English meaning is available when included in source.</p></details></section></div>
 <div><section class="card" id="shabadCard"><div class="row" style="justify-content:space-between;align-items:center"><h2 style="margin:0">Shabad · Choose a Line <span id="readingAngLabel" class="reading-ang-label" hidden></span></h2><button id="projectionSwitch" class="icon-btn projection-enabled" type="button" title="Projection ON — click to turn off" aria-label="Projection ON" aria-pressed="true">▣</button><button id="closeReading" class="icon-btn icon-danger" type="button" title="Close opened Shabad / Path" aria-label="Close opened Shabad / Path">✕</button><button id="historyToggle" class="icon-btn" type="button" aria-expanded="false" title="Recent Shabads History" aria-label="Recent Shabads History">☷</button></div><section class="card" id="historyCard" hidden><div class="row" style="justify-content:space-between"><strong>Recent Shabads</strong><button id="historyClose" type="button">✕</button></div><div id="historyList"></div></section><div class="row"><button id="mainLine" class="primary icon-btn" title="Go to Main Line" aria-label="Go to Main Line">⌂</button><span id="mainLabel" class="small">Main: —</span></div><p class="small">Tap any line to project; use ☆ to set that line as Main.</p><div id="readingNavigator" hidden><div class="small" id="readingKindLabel"></div><div id="sukhmaniNavigation" hidden class="row"><button id="prevSalok" class="icon-btn" title="Previous Salok" aria-label="Previous Salok">◀</button><input id="salokNumber" type="number" min="1" max="24" inputmode="numeric" placeholder="Salok 1–24" style="width:120px"><button id="openSalok" class="icon-btn" title="Open selected Salok" aria-label="Open selected Salok">↵</button><button id="nextSalok" class="icon-btn" title="Next Salok" aria-label="Next Salok">▶</button><span id="salokPosition" class="small"></span></div><div id="sehajNavigation" hidden><div class="row"><input id="angInput" type="number" min="1" max="1430" inputmode="numeric" placeholder="Custom Ang 1–1430" class="grow"><button id="angSearch" class="icon-btn" title="Open selected Ang" aria-label="Open selected Ang">↵</button><button id="prevAng" class="icon-btn" title="Previous Ang" aria-label="Previous Ang">◀</button><button id="nextAng" class="icon-btn" title="Next Ang" aria-label="Next Ang">▶</button></div></div></div><div id="lines" class="list"></div><div class="row"><button id="previous" class="icon-btn" type="button" title="Previous line" aria-label="Previous line">◀</button><button id="next" class="icon-btn" type="button" title="Next line" aria-label="Next line">▶</button><button id="clear" class="icon-btn icon-danger" type="button" title="Clear projection" aria-label="Clear projection">⌫</button></div></section>
-<section class="card" id="fontCard"><h2>Default Settings (New Devices)</h2><p class="small">For connected screens, open ⚙ Settings beside each device. These presets do not overwrite other devices.</p><label class="field">Gurbani size <span id="vsLabel">64</span> px<input type="range" id="vs" min="24" max="200" value="64"></label><label class="field">Hindi shabad size <span id="hsvLabel">64</span> px<input type="range" id="hsv" min="24" max="200" value="64"></label><label class="field">English shabad size <span id="esvLabel">64</span> px<input type="range" id="esv" min="24" max="200" value="64"></label><label class="field">English meaning size <span id="enLabel">28</span> px<input type="range" id="enSize" min="16" max="90" value="28"></label><label class="field">Punjabi meaning size <span id="paLabel">28</span> px<input type="range" id="paSize" min="16" max="90" value="28"></label><label class="field">Hindi meaning size <span id="hiLabel">28</span> px<input type="range" id="hiSize" min="16" max="90" value="28"></label><label class="field">Projection line spacing <span id="projectionSpacingLabel">135</span>%<input type="range" id="projectionSpacing" min="90" max="220" step="5" value="135"></label><h2>Projection display</h2><label><input type="checkbox" id="projectionFit" checked> Auto-fit full screen</label><label><input type="checkbox" id="projectionLari"> ਲੜੀਵਾਰ (Larrivaar)</label><label><input type="checkbox" id="projectionFlow"> Continuous shabad lines</label><label><input type="checkbox" id="projectionPause"> Colour words before punctuation</label><h2>Book View Settings</h2><label><input type="checkbox" id="bookLari"> ਲੜੀਵਾਰ (Larrivaar)</label><label><input type="checkbox" id="bookFlow"> Continuous shabad lines</label><label><input type="checkbox" id="bookPause"> Colour words before punctuation</label><label class="field">Book font <span id="bookSizeLabel">30</span> px<input type="range" id="bookSize" min="14" max="85" value="30"></label><label class="field">Book line spacing <span id="bookSpacingLabel">160</span>%<input type="range" id="bookSpacing" min="90" max="220" step="5" value="160"></label><p class="small">Changes apply to selected Book View screens and are saved.</p><label><input id="clock" type="checkbox"> Show clock (top left)</label><p class="small">Font size changes live. No Apply needed.</p><p id="status" class="muted">Ready.</p><p class="small">Last projected line remains on the display when controller disconnects. Reconnection needs the Projection tab to remain open and online.</p></section></div></main><footer class="gp-credit">Developed by Rajinder Singh · <a href="mailto:harjas.info@gmail.com">harjas.info@gmail.com</a> · 2026</footer><aside id="functionsMenu" hidden><div class="row" style="justify-content:space-between"><strong>Functions</strong><button id="closeMenu">✕</button></div><div id="menuOptions"><details id="cameraMenu"><summary>📹 Live Camera · Multiple Phones</summary>
+<section class="card" id="fontCard"><h2>Default Settings (New Devices)</h2><p class="small">For connected screens, open ⚙ Settings beside each device. These presets do not overwrite other devices.</p><label class="field">Gurbani size <span id="vsLabel">64</span> px<input type="range" id="vs" min="24" max="200" value="64"></label><label class="field">Hindi shabad size <span id="hsvLabel">64</span> px<input type="range" id="hsv" min="24" max="200" value="64"></label><label class="field">English shabad size <span id="esvLabel">64</span> px<input type="range" id="esv" min="24" max="200" value="64"></label><label class="field">English meaning size <span id="enLabel">28</span> px<input type="range" id="enSize" min="16" max="90" value="28"></label><label class="field">Punjabi meaning size <span id="paLabel">28</span> px<input type="range" id="paSize" min="16" max="90" value="28"></label><label class="field">Hindi meaning size <span id="hiLabel">28</span> px<input type="range" id="hiSize" min="16" max="90" value="28"></label><label class="field">Projection line spacing <span id="projectionSpacingLabel">135</span>%<input type="range" id="projectionSpacing" min="90" max="220" step="5" value="135"></label><h2>Projection display</h2><label><input type="checkbox" id="projectionFit" checked> Auto-fit full screen</label><label><input type="checkbox" id="projectionLari"> ਲੜੀਵਾਰ (Larrivaar)</label><label><input type="checkbox" id="projectionFlow"> Continuous shabad lines</label><label><input type="checkbox" id="projectionPause"> Colour words before punctuation</label><h2>Book View Settings</h2><label><input type="checkbox" id="bookLari"> ਲੜੀਵਾਰ (Larrivaar)</label><label><input type="checkbox" id="bookFlow"> Continuous shabad lines</label><label><input type="checkbox" id="bookPause"> Colour words before punctuation</label><label class="field">Book font <span id="bookSizeLabel">30</span> px<input type="range" id="bookSize" min="14" max="85" value="30"></label><label class="field">Book line spacing <span id="bookSpacingLabel">160</span>%<input type="range" id="bookSpacing" min="90" max="220" step="5" value="160"></label><p class="small">Changes apply to selected Book View screens and are saved.</p><label><input id="clock" type="checkbox"> Show clock (top left)</label><p class="small">Font size changes live. No Apply needed.</p><p id="status" class="muted">Ready.</p><p class="small">Last projected line remains on the display when controller disconnects. Reconnection needs the Projection tab to remain open and online.</p></section></div></main><footer class="gp-credit">Developed by Rajinder Singh · <a href="mailto:harjas.info@gmail.com">harjas.info@gmail.com</a> · 2026</footer><aside id="functionsMenu" hidden><div class="row" style="justify-content:space-between"><strong>Functions</strong><button id="closeMenu">✕</button></div><div id="menuOptions"><details id="cameraMenu"><summary>📹 Live Camera</summary>
  <p class="small">On another phone open <a href="camera.html" target="_blank" rel="noopener">Camera Phone</a>, enable camera permission and enter its 5-digit code here.</p>
  <div class="row"><input id="cameraCodeInput" placeholder="5-digit Camera code" inputmode="numeric" maxlength="5" style="width:130px"><button id="cameraConnect" class="primary">Connect Camera</button></div>
- <select id="cameraDeviceSelect" aria-label="Choose camera phone"><option value="">Select camera phone</option></select>
- <p class="small" id="cameraStatus">No cameras connected</p>
- <video id="cameraPreview" autoplay muted playsinline style="display:block;width:100%;max-height:160px;background:#000;border-radius:6px"></video>
+ <div class="row"><button id="cameraLocalStart" class="primary">Use This Phone Camera</button><button id="cameraLocalStop">Stop This Phone Camera</button></div>
+ <select id="cameraDeviceSelect" aria-label="Choose camera phone"><option value="">Choose camera source</option></select>
+ <p class="small" id="cameraStatus">Choose this phone or pair another phone</p>
+ <div style="overflow:hidden;border-radius:6px"><video id="cameraPreview" autoplay muted playsinline style="display:block;width:100%;max-height:160px;background:#000;border-radius:6px"></video></div>
+ <p class="small">Start the camera to list the front and rear lenses available on that phone.</p>
  <div class="row"><label>Lens <select id="cameraLens" aria-label="Camera lens"><option value="">Auto / Default</option></select></label><button id="cameraLensApply">Use Lens</button></div>
  <div class="row"><label>Layout <select id="cameraLayout"><option value="full">Full Camera</option><option value="horizontal">Side-by-side Camera + Shabad</option><option value="vertical">Top/Bottom Camera + Shabad</option></select></label></div>
  <label>Camera portion <span id="cameraPortionLabel">50%</span><input type="range" id="cameraPortion" min="15" max="85" value="50" step="5"></label>
+ <label>Framing <select id="cameraFit"><option value="contain">Fit entire video</option><option value="cover">Fill area (crop edges)</option></select></label>
  <label>Zoom <span id="cameraZoomLabel">1.0×</span><input type="range" id="cameraZoom" min="1" max="4" step=".1" value="1"></label>
+ <label>Crop left / right<input type="range" id="cameraX" min="0" max="100" value="50"></label>
+ <label>Crop up / down<input type="range" id="cameraY" min="0" max="100" value="50"></label>
+ <button id="cameraResetFrame">Reset framing</button>
  <div class="row"><button id="cameraProject" class="primary">▶ Show on selected displays</button><button id="cameraHide">■ Hide Camera</button></div>
  <div class="row"><button id="cameraRecord">● Record on Camera Phone</button><button id="cameraRecordStop">■ Stop &amp; Save</button></div>
- <p class="small">Recording saves on Camera Phone, not Controller. Select which Projection screens receive the video in Connected Devices above. Direct WebRTC video needs active network; Browser/Android may stop cameras in background.</p>
+ <p class="small">Remote recordings save on the Camera Phone. Select screens in Connected Projections above.</p>
  </details><hr><h2>Pictures · Controller</h2><p class="small">Send photos to selected Projection screens; order and fade controlled here.</p><input id="picFiles" type="file" accept="image/*" multiple><div id="picList"></div><label><input id="picFade" type="checkbox" checked> Fade</label><label>Duration <span id="picSeconds">5</span>s<input id="picInterval" type="range" min="2" max="30" value="5"></label><div class="row"><button id="picSend">Send Slideshow</button><button id="picStop">Close Pictures</button></div><div class="row"><button id="sahibzaadeSend" class="primary">Show Sahibzaade Picture · Full Screen</button><button id="sahibzaadeClose">Close Sahibzaade Picture</button></div><p class="small">Sends the built-in picture to the selected online Projection devices, without uploading it again.</p><hr><h2>Day / Night</h2><label><input id="controlDay" type="checkbox"> Control · Day mode</label><label><input id="projectionDay" type="checkbox"> Projection · Day mode</label><label><input id="bookNight" type="checkbox"> Book View · Night mode</label><h2>Projection Lines</h2><p class="small">Gurbani Shabad</p><label><input type="checkbox" id="gurmukhiCheck" checked> Gurmukhi</label><label><input type="checkbox" id="hindiShabadCheck"> Hindi</label><label><input type="checkbox" id="englishShabadCheck"> English</label><p class="small">Gurbani Arth</p><label><input type="checkbox" id="paCheck" checked> Punjabi</label><label><input type="checkbox" id="hiCheck"> Hindi</label><label><input type="checkbox" id="enCheck"> English</label><hr><a href="projection.html" target="_blank">Open Projection Browser</a><p><a href="book.html" target="_blank">Open Book Reading Projection</a></p><hr><details><summary>OBS Live Text</summary><h2>OBS Live Text</h2><p class="small">Open this link as an OBS Browser Source, then press Connect OBS.</p><input id="obsUrl" readonly aria-label="OBS link"><div class="row"><button id="copyObs">Copy OBS link</button><button id="connectObs">Connect OBS</button></div><p class="small">Tick languages and use ↑ / ↓ to set order.</p><div id="obsOptions"></div></details><hr><details id="customTools"><summary>Custom Text & Scroll</summary><p class="small">Type or paste text. Online translation is optional and may contain errors; review before projecting.</p><textarea id="customText" rows="4" style="width:100%;font:inherit" placeholder="Gurmukhi, Hindi or English text"></textarea><label>Translate online to <select id="customTarget"><option value="pa">Punjabi (Gurmukhi)</option><option value="hi">Hindi</option><option value="en">English</option></select></label><button id="convertCustom">Translate text online</button><textarea id="customConverted" rows="3" style="width:100%;font:inherit" placeholder="Editable translated text"></textarea><button id="useConverted">Use translated text</button><label><input type="checkbox" id="customScroll"> Scroll text on Projection</label><div class="row"><button id="sendCustom">Project custom text</button></div><p class="small" id="customStatus" aria-live="polite">Online translation is sent to a third-party service; avoid private text.</p></details><hr><details id="menuDatabasePanel" class="menu-db-panel"><summary>▸ Database · Download / Storage / Version</summary><div id="menuDatabaseHost"></div><div class="row"><button id="dbDelete" class="icon-danger" title="Delete offline scripture database from this device">🗑 Delete Database</button><button id="dbReload" title="Refresh storage status">↻ Status</button></div><div class="row"><label class="small">App Version</label><strong id="appVersionNumber">2026.11.12.6 · Database v2</strong></div><p class="small">Download runs while this app remains open. If Android stops the app, it automatically resumes the next time you open it. Missing text still uses online search when internet is available.</p></details><div class="developer-menu-foot"><strong>Developed by Rajinder Singh</strong><a href="mailto:harjas.info@gmail.com">✉ harjas.info@gmail.com</a><a href="https://www.youtube.com/results?search_query=HarjasTV" target="_blank" rel="noopener noreferrer">▶ HarjasTV · YouTube</a></div></div></aside>
-<script src="peerjs-1.5.5.min.js?v=20261118"></script><script src="gurbani-peer-manager.js?v=20261118"></script><script>
+<script src="peerjs-1.5.5.min.js?v=20261118"></script><script src="gurbani-peer-manager.js?v=20261119"></script><script src="gurbani-camera.js?v=20261119"></script><script>
 'use strict';
 const $=id=>document.getElementById(id);
 const stored=(key,def)=>{try{return JSON.parse(localStorage.getItem(key))??def}catch{return def}};
@@ -422,70 +428,125 @@ function connectProjection(key,codeValue){
 const cameraPrefix='gurbani-camera-v1-',cameraLinks=new Map(),cameraPhones=new Map(),cameraStreams=new Map();
 const activeCameraRoutes=new Map();
 const cameraPreviewCalls=new Map();
-let cameraCurrent='';
+const pairedCameraLinks=new WeakSet();
+const localCameraId='local';
+let cameraCurrent='',pendingCameraCode='',localCaptureGeneration=0;
+function stopCameraRelay(code){
+ cameraStreams.delete(code);
+ if($('cameraDeviceSelect').value===code)$('cameraPreview').srcObject=null;
+ for(const route of activeCameraRoutes.values())if(route.camera===code&&route.call){route.call.close();route.call=null}
+}
+function showCameraPreview(code,stream){
+ cameraStreams.set(code,stream);
+ if($('cameraDeviceSelect').value===code){$('cameraPreview').srcObject=stream;$('cameraPreview').play().catch(()=>{})}
+ for(const route of activeCameraRoutes.values())if(route.camera===code&&route.ready)relayCamera(route);
+}
+async function startLocalCamera(deviceId){
+ const generation=++localCaptureGeneration;
+ GurbaniCamera.stop(cameraStreams.get(localCameraId));
+ stopCameraRelay(localCameraId);
+ cameraStatus('Opening this phone’s camera…');
+ try{
+  const stream=await GurbaniCamera.start(deviceId);
+  if(generation!==localCaptureGeneration){GurbaniCamera.stop(stream);return}
+  const track=stream.getVideoTracks()[0];
+  track.addEventListener('ended',()=>{if(cameraStreams.get(localCameraId)===stream){stopCameraRelay(localCameraId);refreshCameraPhones();cameraStatus('This phone’s camera stopped')}});
+  cameraCurrent=localCameraId;
+  if(!cameraPhones.has(localCameraId))cameraPhones.set(localCameraId,{name:'This phone',devices:[]});
+  refreshCameraPhones();
+  $('cameraDeviceSelect').value=localCameraId;
+  showCameraPreview(localCameraId,stream);
+  const devices=await GurbaniCamera.devices().catch(()=>[]);
+  if(generation!==localCaptureGeneration)return;
+  cameraPhones.set(localCameraId,{name:'This phone',devices});
+  refreshCameraPhones();
+  refreshCameraLenses(track.getSettings().deviceId);
+  cameraStatus('This phone · '+(track.label||'Camera ready'));
+ }catch(error){if(generation===localCaptureGeneration){refreshCameraPhones();cameraStatus('Could not open this phone’s camera: '+error.message)}}
+}
 const cameraStatus=x=>$('cameraStatus').textContent=x;
 function cameraSelected(){return cameraLinks.get($('cameraDeviceSelect').value)}
 function refreshCameraPhones(){
  const select=$('cameraDeviceSelect'),old=select.value;select.replaceChildren();
- const first=document.createElement('option');first.value='';first.textContent='Choose connected Camera';select.append(first);
- for(const [id,camera] of cameraPhones){const o=document.createElement('option');o.value=id;o.textContent=camera.name+' · '+camera.code+' · '+(cameraLinks.get(id)?.open?'Online':'Offline');select.append(o)}
+ const first=document.createElement('option');first.value='';first.textContent='Choose camera source';select.append(first);
+ for(const [id,camera] of cameraPhones){const o=document.createElement('option');o.value=id;o.textContent=id===localCameraId?'This phone · '+(cameraStreams.get(id)?.active?'Live':'Camera stopped'):camera.name+' · '+camera.code+' · '+(pairedCameraLinks.has(cameraLinks.get(id))?'Online':'Offline');select.append(o)}
  select.value=cameraPhones.has(old)?old:(cameraPhones.has(cameraCurrent)?cameraCurrent:'');
 }
-function cameraCodeFor(id){return cameraPhones.get(id)?.code||''}
 function handleCameraConnection(c,code){
- cameraLinks.set(code,c);cameraPhones.set(code,{name:'Camera Phone',code});cameraCurrent=code;
- c.on('open',()=>{send(c,{type:'ping',id:Date.now()});cameraStatus('Connected to Camera '+code);refreshCameraPhones();$('cameraDeviceSelect').value=code});
+ const existing=cameraLinks.get(code);
+ if(existing?.open){c.close();return}
+ cameraLinks.set(code,c);
+ if(existing)existing.close();
+ if(!cameraPhones.has(code))cameraPhones.set(code,{name:'Camera Phone',code});
+ cameraCurrent=code;
+ let accepted=false;
+ const timeout=setTimeout(()=>{
+  if(cameraLinks.get(code)!==c||accepted)return;
+  cameraLinks.delete(code);c.close();refreshCameraPhones();
+  cameraStatus('Camera '+code+' did not answer. Keep Camera Phone open or enter this Controller’s code there.');
+ },18000);
+ c.on('open',()=>{if(!accepted)cameraStatus('Waiting for Camera Phone '+code+'…');send(c,{type:'camera-pair'})});
  c.on('data',m=>{
-  if(!m||typeof m!=='object')return;
-  if(m.type==='camera-rejected'){cameraStatus('Camera is paired to another Controller. Unpair it on the Camera Phone.');return}
-  if(['camera-hello','camera-ready'].includes(m.type)){
-   cameraPhones.set(code,{code,name:m.name||cameraPhones.get(code)?.name||'Camera Phone',devices:m.cameras||[]});
-   cameraLinks.set(code,c);refreshCameraPhones();$('cameraDeviceSelect').value=code;refreshCameraLenses();cameraStatus('Camera '+code+' · '+(m.ready===false?'Camera permission needed':'Online'));if(m.ready!==false)requestCameraPreview(code)
+  if(cameraLinks.get(code)!==c||!m||typeof m!=='object')return;
+  if(m.type==='camera-rejected'){
+   clearTimeout(timeout);cameraLinks.delete(code);c.close();refreshCameraPhones();
+   return cameraStatus('Camera is paired to another Controller. Tap Unpair Controller on Camera Phone.');
   }
-  if(m.type==='pong')return
+  if(m.type==='camera-error')return cameraStatus(m.message);
+  if(m.type==='camera-stopped'){stopCameraRelay(code);return cameraStatus('Camera '+code+' stopped')}
+  if(!['camera-hello','camera-ready','camera-lenses'].includes(m.type)||m.code!==code)return;
+  const first=!accepted;
+  accepted=true;pairedCameraLinks.add(c);clearTimeout(timeout);
+  cameraPhones.set(code,{code,name:m.name||cameraPhones.get(code)?.name||'Camera Phone',devices:m.cameras||[]});
+  refreshCameraPhones();
+  if(first&&cameraCurrent===code){$('cameraDeviceSelect').value=code;$('cameraPreview').srcObject=cameraStreams.get(code)||null}
+  if($('cameraDeviceSelect').value===code)refreshCameraLenses(m.deviceId);
+  cameraStatus(m.ready===false?'Paired · tap Start Camera on the other phone':'Camera '+code+' online');
+  if(m.ready!==false&&(first||m.type==='camera-ready'))requestCameraPreview(code);
  });
- c.on('close',()=>{if(cameraLinks.get(code)!==c)return;cameraLinks.delete(code);refreshCameraPhones();cameraStatus('Camera '+code+' disconnected. Reconnect using code.')});
- c.on('error',e=>cameraStatus('Camera connection: '+(e.message||e.type)))
+ c.on('close',()=>{
+  clearTimeout(timeout);
+  if(cameraLinks.get(code)!==c)return;
+  cameraLinks.delete(code);stopCameraRelay(code);refreshCameraPhones();
+  cameraStatus('Camera '+code+' disconnected. Reconnect using its code.');
+ });
+ c.on('error',e=>cameraStatus('Camera connection: '+(e.message||e.type)));
 }
 function connectCamera(code){
- if(!/^\d{5}$/.test(code))return cameraStatus('Enter Camera Phone 5-digit pairing code');
- if(!peer?.open)return cameraStatus('Controller offline. Try reconnecting.');
- let existing=cameraLinks.get(code);
- if(existing?.open)return cameraStatus('Camera '+code+' already connected');
- const c=peer.connect(cameraPrefix+code,{reliable:true});
- handleCameraConnection(c,code)
+ if(!/^\d{5}$/.test(code))return cameraStatus('Enter Camera Phone’s 5-digit code');
+ if(!peer?.open){pendingCameraCode=code;return cameraStatus('Controller reconnecting. Camera pairing will retry.')}
+ const existing=cameraLinks.get(code);
+ if(existing?.open&&pairedCameraLinks.has(existing)){$('cameraDeviceSelect').value=code;$('cameraDeviceSelect').onchange();return cameraStatus('Camera '+code+' already connected')}
+ if(existing){cameraLinks.delete(code);existing.close()}
+ cameraStatus('Looking for Camera Phone '+code+'…');
+ try{handleCameraConnection(peer.connect(cameraPrefix+code,{reliable:true}),code)}
+ catch(error){cameraStatus('Camera connection: '+error.message)}
 }
-function refreshCameraLenses(){
- const sel=$('cameraLens'),camera=cameraPhones.get($('cameraDeviceSelect').value),lens=camera?.devices||[],old=sel.value;
- sel.replaceChildren();const defaultO=document.createElement('option');defaultO.value='';defaultO.textContent='Default camera';sel.append(defaultO);
- for(const d of lens){const o=document.createElement('option');o.value=d.id;o.textContent=d.name||'Camera';sel.append(o)}
- if(lens.some(d=>d.id===old))sel.value=old
+function refreshCameraLenses(selected){
+ const select=$('cameraLens'),camera=cameraPhones.get($('cameraDeviceSelect').value);
+ GurbaniCamera.options(select,camera?.devices||[],selected||select.value);
 }
 function requestCameraPreview(code){
  const c=cameraLinks.get(code);
- if(!c?.open)return;
+ if(!c?.open||!pairedCameraLinks.has(c))return;
  send(c,{type:'camera-authorize',targets:[controlPrefix+myCode]});
  send(c,{type:'camera-connect',targets:[controlPrefix+myCode]});
 }
 function showCameraStream(call){
  if(!call?.peer?.startsWith(cameraPrefix))return call.close();
  const code=call.peer.slice(cameraPrefix.length);
- if(!cameraLinks.get(code)?.open)return call.close();
+ if(!pairedCameraLinks.has(cameraLinks.get(code)))return call.close();
  const previous=cameraPreviewCalls.get(code);
  cameraPreviewCalls.set(code,call);
  if(previous)previous.close();
  call.on('stream',stream=>{
   if(cameraPreviewCalls.get(code)!==call)return;
-  cameraStreams.set(code,stream);
-  if($('cameraDeviceSelect').value===code){$('cameraPreview').srcObject=stream;$('cameraPreview').play().catch(()=>{})}
+  showCameraPreview(code,stream);
   cameraStatus('Camera '+code+' live preview');
-  for(const route of activeCameraRoutes.values())if(route.camera===code&&route.ready)relayCamera(route);
  });
  call.on('close',()=>{
   if(cameraPreviewCalls.get(code)!==call)return;
-  cameraPreviewCalls.delete(code);cameraStreams.delete(code);
-  if($('cameraDeviceSelect').value===code)$('cameraPreview').srcObject=null;
-  for(const route of activeCameraRoutes.values())if(route.camera===code&&route.call){route.call.close();route.call=null}
+  cameraPreviewCalls.delete(code);stopCameraRelay(code);
  });
  call.on('error',e=>cameraStatus('Preview: '+(e.message||e.type)));
  call.answer();
@@ -494,6 +555,7 @@ function relayCamera(route){
  const stream=cameraStreams.get(route.camera);
  if(!stream?.active||!peer?.open||!connections.get(route.deviceId)?.open)return;
  if(route.call)route.call.close();
+ route.call=null;
  try{
   const call=route.call=peer.call(peerPrefix+route.target,stream,{metadata:{cameraCode:route.camera}});
   if(!call)return cameraStatus('Could not start video to Projection '+route.target);
@@ -504,27 +566,51 @@ function relayCamera(route){
 function selectedProjectionTargets(){
  return [...selected].filter(id=>known[id]?.kind==='projection'&&connections.get(id)?.open).map(id=>({id,code:known[id].code}))
 }
-function sendCameraLayout(){
- const layout=$('cameraLayout').value,portion=Number($('cameraPortion').value)||50;
- $('cameraPortionLabel').textContent=portion+'%';
- for(const {id} of selectedProjectionTargets())send(connections.get(id),{type:'camera-layout',token:myToken,layout,portion})
+function cameraLayoutSettings(){
+ return {layout:$('cameraLayout').value,portion:Number($('cameraPortion').value),
+  fit:$('cameraFit').value,zoom:Number($('cameraZoom').value),x:Number($('cameraX').value),y:Number($('cameraY').value)};
 }
-$('cameraConnect').onclick=()=>{const code=$('cameraCodeInput').value.trim();connectCamera(code)};
-$('cameraDeviceSelect').onchange=()=>{cameraCurrent=$('cameraDeviceSelect').value;refreshCameraLenses();const stream=cameraStreams.get(cameraCurrent);$('cameraPreview').srcObject=stream||null;if(!stream&&cameraCurrent)requestCameraPreview(cameraCurrent)};
-$('cameraLensApply').onclick=()=>{const c=cameraSelected();if(c?.open)send(c,{type:'camera-switch',deviceId:$('cameraLens').value});else cameraStatus('Choose online Camera Phone')};
-$('cameraLayout').onchange=sendCameraLayout;
-$('cameraPortion').oninput=sendCameraLayout;
-$('cameraZoom').oninput=()=>{const zoom=Number($('cameraZoom').value);$('cameraZoomLabel').textContent=zoom.toFixed(1)+'×';send(cameraSelected(),{type:'camera-zoom',zoom})};
+function sendCameraLayout(){
+ const settings=cameraLayoutSettings();
+ $('cameraPortionLabel').textContent=settings.portion+'%';
+ $('cameraZoomLabel').textContent=settings.zoom.toFixed(1)+'×';
+ GurbaniCamera.frame($('cameraPreview'),settings);
+ for(const route of activeCameraRoutes.values())send(connections.get(route.deviceId),{type:'camera-layout',token:myToken,...settings});
+}
+$('cameraConnect').onclick=()=>connectCamera($('cameraCodeInput').value.trim());
+$('cameraLocalStart').onclick=()=>startLocalCamera();
+$('cameraLocalStop').onclick=()=>{
+ ++localCaptureGeneration;GurbaniCamera.stop(cameraStreams.get(localCameraId));stopCameraRelay(localCameraId);
+ refreshCameraPhones();cameraStatus('This phone’s camera stopped');
+};
+$('cameraDeviceSelect').onchange=()=>{
+ cameraCurrent=$('cameraDeviceSelect').value;refreshCameraLenses();
+ const stream=cameraStreams.get(cameraCurrent);
+ $('cameraPreview').srcObject=stream||null;
+ if(!stream&&cameraCurrent&&cameraCurrent!==localCameraId)requestCameraPreview(cameraCurrent);
+};
+$('cameraLensApply').onclick=()=>{
+ const id=$('cameraLens').value;
+ if($('cameraDeviceSelect').value===localCameraId)return startLocalCamera(id);
+ const c=cameraSelected();
+ if(c?.open)send(c,{type:'camera-switch',deviceId:id});
+ else cameraStatus('Choose an online Camera Phone or use this phone’s camera');
+};
+for(const id of ['cameraLayout','cameraPortion','cameraZoom','cameraFit','cameraX','cameraY'])$(id).oninput=sendCameraLayout;
+$('cameraResetFrame').onclick=()=>{
+ $('cameraFit').value='contain';$('cameraZoom').value=1;$('cameraX').value=50;$('cameraY').value=50;
+ sendCameraLayout();
+};
 $('cameraProject').onclick=()=>{
- const c=cameraSelected(),code=$('cameraDeviceSelect').value,targets=selectedProjectionTargets();
- if(!c?.open)return cameraStatus('Connect and choose a Camera Phone');
+ const code=$('cameraDeviceSelect').value,targets=selectedProjectionTargets();
+ if(!code)return cameraStatus('Choose a camera source');
  if(!targets.length)return cameraStatus('Select at least one online Projection screen');
- if(!cameraStreams.get(code)?.active)return cameraStatus('Start the Camera Phone and wait for the live preview');
+ if(!cameraStreams.get(code)?.active)return cameraStatus('Start the selected camera and wait for its live preview');
  for(const target of targets){
   const previous=activeCameraRoutes.get(target.code);
   if(previous?.call)previous.call.close();
   activeCameraRoutes.set(target.code,{camera:code,target:target.code,deviceId:target.id,ready:false,call:null});
-  send(connections.get(target.id),{type:'camera-allow',token:myToken,cameraCode:code,layout:$('cameraLayout').value,portion:+$('cameraPortion').value});
+  send(connections.get(target.id),{type:'camera-allow',token:myToken,cameraCode:code,...cameraLayoutSettings()});
  }
  cameraStatus('Waiting for '+targets.length+' Projection screen(s) to authorize live camera…')
 };
@@ -545,10 +631,16 @@ function start(){
  if(typeof GurbaniPeer==='undefined'){ $('connStatus').textContent='Connection library unavailable';return }
  GurbaniPeer.start({id:()=>controlPrefix+myCode,onPeer:p=>{peer=p;p.on('call',showCameraStream)},
  onStatus:message=>{$('connStatus').textContent=message;status(message)},
- onOpen:()=>{$('connStatus').textContent='Online';status('Ready to connect');Object.entries(known).forEach(([key,d])=>{if(autoReconnect[key]!==false)connectProjection(key,d.code)});if(pendingPair){const p=pendingPair;pendingPair=null;connectProjection(p.key,p.codeValue)}},
+ onOpen:()=>{$('connStatus').textContent='Online';status('Ready to connect');if(pendingCameraCode){const code=pendingCameraCode;pendingCameraCode='';connectCamera(code)}Object.entries(known).forEach(([key,d])=>{if(autoReconnect[key]!==false)connectProjection(key,d.code)});if(pendingPair){const p=pendingPair;pendingPair=null;connectProjection(p.key,p.codeValue)}},
  onConnection:c=>{if(c.peer.startsWith(cameraPrefix)){handleCameraConnection(c,c.peer.slice(cameraPrefix.length));return}const peerCode=String(c.metadata?.code||c.peer.replace(peerPrefix,''));setupConn(c,peerCode,peerCode)},
  onCollision:()=>status('Controller code is busy. Retrying the same code; change it manually if another device uses it.'),
- onTargetUnavailable:()=>status('Screen not found. Open Projection or Book app, wait for Online, then check its code.')});
+ onTargetUnavailable:error=>{
+  const match=error.message?.match(/gurbani-camera-v1-(\d{5})/);
+  if(!match)return status('Screen not found. Open Projection or Book app, wait for Online, then check its code.');
+  const code=match[1],link=cameraLinks.get(code);
+  if(link&&!link.open){link.close();cameraLinks.delete(code);refreshCameraPhones()}
+  cameraStatus('Camera Phone '+code+' is offline. Open the camera app or enter the Controller code there.');
+ }});
 }
 let wifiDevices=new Map();
 function renderWifiDevices(){

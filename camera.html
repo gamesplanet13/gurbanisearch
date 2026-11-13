@@ -2,59 +2,70 @@
 <style>
 :root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#070d17;color:#f2e8d0;font:14px/1.5 system-ui,sans-serif}header{background:linear-gradient(110deg,#192c4b,#18253b);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #766640}h1{font-size:16px;margin:0;color:#f6d793}.frame{position:relative;min-height:38dvh;background:#000}video{display:block;width:100%;max-height:60dvh;object-fit:contain;background:#000}main{padding:12px;max-width:950px;margin:auto}.card{border:1px solid #344862;background:#17243a;border-radius:12px;padding:12px;margin:10px 0}button,select,input{font:inherit;background:#223750;border:1px solid #5d7593;color:#fff;border-radius:8px;padding:9px;min-width:0}button{cursor:pointer}.row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:9px 0}.row>*{flex:1}label{display:block;margin:8px 0}select,input[type=range]{width:100%}.code{font-size:32px;color:#ffd77a;font-weight:800;letter-spacing:5px}small,.small{font-size:11px;color:#bdcbdf}.ok{color:#8ce6aa}.warning{color:#f2b88b}.recording{background:#a42b31;color:white}#recordStop:disabled{opacity:.5}footer{text-align:center;padding:15px;color:#9daecb;font-size:11px}a{color:#c3e1ff}@media(orientation:landscape){main{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(290px,1fr);gap:10px}.frame{min-height:0;grid-row:span 2;height:calc(100dvh - 110px)}video{height:100%;max-height:none}.card{margin:0}}
 .camera-placeholder{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;background:#050b16;color:#d3e4fc;font-size:14px;pointer-events:none}.camera-placeholder[hidden]{display:none!important}.frame{overflow:hidden}.frame video{min-height:38dvh}.camera-start{background:#13683b;border-color:#55c987;color:#fff} </style></head><body><header><h1>ੴ Gurbani Camera · HarjasTV</h1><span class="small">Camera Phone</span></header><main><div class="frame"><video id="preview" playsinline muted autoplay></video><div id="cameraPlaceholder" class="camera-placeholder">📷 Camera not started yet. Tap Start Camera and allow access.</div></div>
-<div><section class="card"><div class="row"><strong>Camera Connection Code</strong><strong id="code" class="code">•••••</strong></div><p class="small">Controller → ☰ → Camera → enter this code. Grant camera permission on this phone. Keep this page open while broadcasting.</p><p id="status" class="warning" aria-live="polite">Starting camera…</p>
+<div><section class="card"><div class="row"><strong>Camera Connection Code</strong><strong id="code" class="code">•••••</strong></div><p class="small">Enter this code in Controller → Live Camera. If pairing stalls, enter the Controller code below. Keep Camera Phone open while broadcasting.</p><p id="status" class="warning" aria-live="polite">Starting camera…</p>
+<div class="row"><input id="controllerCode" aria-label="Controller code" placeholder="5-digit Controller code" inputmode="numeric" maxlength="5"><button id="connectController">Connect to Controller</button></div>
 <label>Phone camera<select id="cameraSelect"><option value="">Loading available cameras…</option></select></label>
 <div class="row"><button id="startCamera" class="camera-start">📷 Start Camera</button><button id="stopCamera">■ Stop</button><button id="refreshCameras">↻ Cameras</button><button id="flip">⇄ Switch</button><button id="fullscreen">⛶ Preview</button></div>
 <label>Camera Zoom: <output id="zoomNumber">1.0×</output><input type="range" id="zoom" min="1" max="4" step=".1" value="1"></label><p id="zoomNotice" class="small">Hardware zoom if supported; otherwise preview will be digitally cropped for local monitoring only.</p>
 <div class="row"><button id="recordStart">⏺ Record</button><button id="recordStop" disabled>■ Stop &amp; Save</button></div><p class="small" id="recordNotice">Recordings save on this camera phone only. Your browser may ask where to download.</p>
-<div class="row"><button id="resetPairing">Unpair Controller</button><button id="newCode">New Camera Code</button></div></section></div>
+<div class="row"><button id="resetPairing">Unpair Controller</button></div></section></div>
 <section class="card" style="grid-column:1/-1"><strong>Connected Displays</strong><div id="viewers" class="small">Not yet connected</div><p class="small">WebRTC PeerJS signaling requires internet to connect. Video goes to Controller, which sends it to the selected Projection screens. Browsers may stop capture if this page is backgrounded or the screen locks. Enable HTTPS camera permission.</p></section></main>
 <footer>Developed by Rajinder Singh · <a href="mailto:harjas.info@gmail.com">harjas.info@gmail.com</a> · <a href="https://www.youtube.com/results?search_query=HarjasTV" target="_blank" rel="noopener">HarjasTV</a></footer>
-<script src="peerjs-1.5.5.min.js?v=20261118"></script><script src="gurbani-peer-manager.js?v=20261118"></script><script>
+<script src="peerjs-1.5.5.min.js?v=20261118"></script><script src="gurbani-peer-manager.js?v=20261119"></script><script src="gurbani-camera.js?v=20261119"></script><script>
 'use strict';
 const $=id=>document.getElementById(id);
 const store=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const read=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}};
 const mkCode=()=>String(10000+Math.floor(Math.random()*90000));
-let cameraCode=read('gb-camera-code',null)||mkCode(),cameraName=read('gb-camera-name','Camera Phone'),controllerPeer=read('gb-camera-controller-peer',null),peer,stream=null,recording=null,recordChunks=[],allowed=new Set(),calls=new Map(),facingMode='environment',streamGeneration=0;
+const savedCode=read('gb-camera-code','');
+const cameraCode=/^\d{5}$/.test(savedCode)?savedCode:mkCode();
+let cameraName=read('gb-camera-name','Camera Phone'),controllerPeer=read('gb-camera-controller-peer',null),peer,stream=null,recording=null,recordChunks=[],allowed=new Set(),calls=new Map(),streamGeneration=0,pendingControllerCode='';
 store('gb-camera-code',cameraCode);$('code').textContent=cameraCode;
 const cameraPeerPrefix='gurbani-camera-v1-',controlPrefix='gurbani-control-v1-';
 function status(s){$('status').textContent=s}
 function signal(msg){for(const conn of controlConnections)if(conn.open)conn.send(msg)}
 const controlConnections=new Set();
 function listViewers(){$('viewers').textContent=[...calls.keys()].length?[...calls.keys()].map(v=>v.replace(/^gurbani-(projection|control)-v1-/,'')).join(' · '):'No video recipients yet'}
-async function cameras(){
- if(!navigator.mediaDevices?.enumerateDevices)throw Error('This phone does not support camera enumeration');
- const list=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='videoinput');
- const old=$('cameraSelect').value;$('cameraSelect').replaceChildren();
- for(let i=0;i<list.length;i++){const d=list[i],option=document.createElement('option');option.value=d.deviceId;option.textContent=d.label||('Camera '+(i+1));$('cameraSelect').append(option)}
- if(list.some(d=>d.deviceId===old))$('cameraSelect').value=old;
+let cameraDevices=[];
+async function cameras(selected){
+ const list=await GurbaniCamera.devices();
+ cameraDevices=list;
+ GurbaniCamera.options($('cameraSelect'),list,selected||$('cameraSelect').value);
  $('flip').disabled=list.length<2;
- return list
+ return list;
+}
+function cameraState(type){
+ return {type,code:cameraCode,name:cameraName,ready:!!stream,cameras:cameraDevices,deviceId:stream?.getVideoTracks()[0]?.getSettings()?.deviceId};
 }
 async function startCamera(deviceId){
  const generation=++streamGeneration;
- if(!window.isSecureContext || !navigator.mediaDevices?.getUserMedia)throw Error('Camera access requires an HTTPS browser or updated Android WebView.');
- const request={audio:false,video:{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:24,max:30},...(deviceId?{deviceId:{ideal:deviceId}}:{facingMode:{ideal:facingMode}})}};
- let next;
- try{next=await navigator.mediaDevices.getUserMedia(request)}
- catch(e){
-  $('cameraPlaceholder').hidden=false;
-  $('cameraPlaceholder').textContent='📷 Camera unavailable: '+e.name+' · Tap Start Camera after granting permission.';
-  throw e
- }
- if(generation!==streamGeneration){next.getTracks().forEach(t=>t.stop());return}
- const previous=stream;stream=next;$('preview').srcObject=next;$('preview').play().catch(()=>{});
- if(previous)previous.getTracks().forEach(t=>t.stop());
- $('cameraPlaceholder').hidden=true;
- for(const call of calls.values())try{call.close()}catch(_){}
+ if(recording?.state==='recording')stopRecording();
+ GurbaniCamera.stop(stream);stream=null;
+ $('preview').srcObject=null;
+ $('cameraPlaceholder').hidden=false;
+ $('cameraPlaceholder').textContent='Opening camera…';
+ for(const call of calls.values())call.close();
  calls.clear();listViewers();
- const actual=stream.getVideoTracks()[0]?.getSettings()?.deviceId;
- await cameras();
- if(actual&&[...$('cameraSelect').options].some(o=>o.value===actual))$('cameraSelect').value=actual;
+ let next;
+ try{next=await GurbaniCamera.start(deviceId)}
+ catch(error){
+  if(generation===streamGeneration){
+   $('cameraPlaceholder').textContent='Camera unavailable: '+error.message;
+   signal({type:'camera-stopped'});signal({type:'camera-error',message:'Camera Phone: '+error.message});
+  }
+  throw error;
+ }
+ if(generation!==streamGeneration){GurbaniCamera.stop(next);return}
+ stream=next;
+ const track=next.getVideoTracks()[0];
+ track.addEventListener('ended',()=>{if(stream===next)$('stopCamera').click()});
+ $('preview').srcObject=next;$('preview').play().catch(()=>{});
+ $('cameraPlaceholder').hidden=true;
+ await cameras(track.getSettings().deviceId).catch(()=>[]);
+ if(generation!==streamGeneration)return;
  await updateZoomCapabilities();
- status('Camera ready · '+(stream.getVideoTracks()[0]?.label||'Video source'));
- signal({type:'camera-ready',code:cameraCode,cameras:[...$('cameraSelect').options].map(o=>({id:o.value,name:o.textContent}))});
+ status('Camera ready · '+(track.label||'Video source'));
+ signal(cameraState('camera-ready'));
 }
 async function updateZoomCapabilities(){
  const track=stream?.getVideoTracks()[0],caps=track?.getCapabilities?.()||{};
@@ -106,15 +117,14 @@ $('startCamera').onclick=()=>startCamera($('cameraSelect').value).catch(e=>{
 $('stopCamera').onclick=()=>{
  ++streamGeneration;
  if(recording?.state==='recording')stopRecording();
- stream?.getTracks().forEach(t=>t.stop());stream=null;
+ GurbaniCamera.stop(stream);stream=null;
  $('preview').srcObject=null;
  $('cameraPlaceholder').hidden=false;$('cameraPlaceholder').textContent='Camera stopped. Tap Start Camera.';
  for(const c of calls.values())try{c.close()}catch(_){}
- calls.clear();listViewers();status('Camera stopped')
+ calls.clear();listViewers();signal({type:'camera-stopped'});status('Camera stopped')
 };
-$('refreshCameras').onclick=()=>cameras().catch(e=>status('Camera list: '+e.message));
+$('refreshCameras').onclick=()=>cameras().then(()=>signal(cameraState('camera-lenses'))).catch(e=>status('Camera list: '+e.message));
 $('fullscreen').onclick=()=>document.querySelector('.frame').requestFullscreen?.().catch(e=>status(e.message));
-$('newCode').onclick=()=>{cameraCode=mkCode();store('gb-camera-code',cameraCode);location.reload()};
 $('resetPairing').onclick=()=>{controllerPeer=null;store('gb-camera-controller-peer',null);allowed.clear();for(const c of controlConnections)c.close();for(const c of calls.values())c.close();calls.clear();status('Camera unpaired. New controller may connect.')};
 function shareTo(peerId){
  if(!stream||!peer?.open||!allowed.has(peerId))return;
@@ -124,40 +134,75 @@ function shareTo(peerId){
   if(!call)return status('Cannot call device '+peerId);
   calls.set(peerId,call);
   call.on('close',()=>{if(calls.get(peerId)===call){calls.delete(peerId);listViewers()}});
-  call.on('error',e=>{status('Video error: '+e.message);calls.delete(peerId);listViewers()});
+  call.on('error',e=>{if(calls.get(peerId)!==call)return;status('Video error: '+e.message);calls.delete(peerId);listViewers()});
   listViewers()
  }catch(e){status('Video connection: '+e.message)}
 }
 function handleController(c){
  if(!c.peer.startsWith(controlPrefix)){c.close();return}
- if(controllerPeer&&controllerPeer!==c.peer){c.on('open',()=>{c.send({type:'camera-rejected',reason:'paired-to-other-controller'});c.close()});return}
+ const reject=()=>{if(c.open)c.send({type:'camera-rejected',reason:'paired-to-other-controller'});setTimeout(()=>c.close(),350)};
+ const announce=()=>{
+  if(!c.open)return;
+  if(controllerPeer&&controllerPeer!==c.peer){reject();return}
+  controllerPeer=c.peer;store('gb-camera-controller-peer',controllerPeer);allowed.add(controllerPeer);
+  c.send(cameraState('camera-hello'));status('Paired with Controller '+c.peer.slice(controlPrefix.length));
+ };
  controlConnections.add(c);
- c.on('open',()=>{controllerPeer=c.peer;store('gb-camera-controller-peer',controllerPeer);allowed.add(controllerPeer);c.send({type:'camera-hello',code:cameraCode,name:cameraName,ready:!!stream,cameras:[...$('cameraSelect').options].map(o=>({id:o.value,name:o.textContent}))});status('Connected to Controller')});
+ c.on('open',announce);
  c.on('data',m=>{
-  if(!m||typeof m!=='object'||c.peer!==controllerPeer)return;
+  if(!m||typeof m!=='object')return;
+  if(m.type==='camera-pair'){announce();return}
+  if(c.peer!==controllerPeer)return;
   if(m.type==='ping'){c.send({type:'pong',id:m.id});return}
   if(m.type==='camera-authorize'){allowed.add(controllerPeer);return}
-  if(m.type==='camera-connect'){for(const id of (Array.isArray(m.targets)?m.targets:[])){if(allowed.has(id))shareTo(id)}return}
+  if(m.type==='camera-connect'){
+   if(!stream){status('Paired · tap Start Camera');return}
+   if((m.targets||[]).includes(controllerPeer))shareTo(controllerPeer);
+   return;
+  }
   if(m.type==='camera-zoom'){setZoom(m.zoom);return}
   if(m.type==='camera-record-start'){startRecording();return}
   if(m.type==='camera-record-stop'){stopRecording();return}
-  if(m.type==='camera-switch'){if(typeof m.deviceId==='string'&&[...$('cameraSelect').options].some(o=>o.value===m.deviceId))startCamera(m.deviceId).catch(e=>status(e.message));return}
+  if(m.type==='camera-switch'){if(typeof m.deviceId==='string'&&(!m.deviceId||cameraDevices.some(camera=>camera.id===m.deviceId)))startCamera(m.deviceId).catch(e=>status(e.message));return}
   if(m.type==='camera-off'){for(const id of m.targets||[]){const call=calls.get(id);if(call){call.close();calls.delete(id)}}listViewers();return}
  });
- c.on('close',()=>{controlConnections.delete(c);status('Controller disconnected — camera remains ready')});
+ c.on('close',()=>{
+  controlConnections.delete(c);
+  if([...controlConnections].some(link=>link.open&&link.peer===c.peer))return;
+  const call=calls.get(c.peer);
+  if(call)call.close();
+  status('Controller disconnected — camera remains ready');
+ });
  c.on('error',e=>status('Controller link: '+e.message))
 }
+function connectController(code){
+ if(!/^\d{5}$/.test(code))return status('Enter the Controller’s 5-digit code');
+ const id=controlPrefix+code;
+ if(controllerPeer&&controllerPeer!==id)return status('Tap Unpair Controller before connecting to a different Controller');
+ if(!peer?.open){pendingControllerCode=code;return status('Connecting to pairing server…')}
+ if([...controlConnections].some(c=>c.peer===id&&c.open))return status('Already paired with Controller '+code);
+ let c;
+ try{c=peer.connect(id,{reliable:true,metadata:{cameraCode}})}
+ catch(error){return status('Could not connect to Controller: '+error.message)}
+ handleController(c);
+ status('Connecting to Controller '+code+'…');
+ setTimeout(()=>{if(controlConnections.has(c)&&!c.open){c.close();status('Controller did not answer. Keep Controller open and check its code.')}},18000);
+}
+$('connectController').onclick=()=>connectController($('controllerCode').value.trim());
 function startPeer(){
  if(!window.GurbaniPeer)return status('Peer connection library unavailable');
  GurbaniPeer.start({id:()=>cameraPeerPrefix+cameraCode,onPeer:p=>peer=p,
-  onStatus:status,onOpen:()=>status(stream?'Camera online — pair using '+cameraCode:'Connected — allow camera permission'),
+  onStatus:status,onOpen:()=>{
+   status('Online · use Camera Phone code '+cameraCode+' on Controller');
+   if(pendingControllerCode){const code=pendingControllerCode;pendingControllerCode='';connectController(code)}
+  },
   onConnection:handleController,
-  onCollision:()=>status('Camera code already in use. Choose New Camera Code.'),
-  onTargetUnavailable:()=>status('Projection peer not available')});
+  onCollision:()=>status('Camera code is busy. Close any other copy of Camera Phone and wait for it to reconnect.'),
+  onTargetUnavailable:()=>status('Controller is offline. Open Controller and check its code.')});
 }
 (async()=>{
  startPeer();
- try{await cameras()}catch(e){status('Camera selection: '+e.message)}
+ try{await cameras()}catch(e){$('cameraPlaceholder').textContent='Tap Start Camera to list available lenses.'}
  // Permission prompts are more reliable when triggered by a direct user tap.
  $('cameraPlaceholder').textContent='📷 Tap Start Camera and allow camera access on this phone.';
 })();

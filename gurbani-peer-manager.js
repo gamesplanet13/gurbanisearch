@@ -84,7 +84,7 @@
             current = null; p.destroy(); options.onCollision(); schedule(7000); return;
           }
           if (e.type === 'peer-unavailable') {
-            options.onTargetUnavailable(); return;
+            options.onTargetUnavailable(e); return;
           }
           if (e.type === 'network' || e.type === 'socket-error' || e.type === 'socket-closed' || e.type === 'server-error') {
             current = null; p.destroy();

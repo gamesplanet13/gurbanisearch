@@ -36,7 +36,7 @@ body.camera-horizontal #verseMetaBar,body.camera-vertical #verseMetaBar{left:aut
 body.camera-full #verseMetaBar{visibility:hidden}
 body.camera-full #menuButton,body.camera-horizontal #menuButton,body.camera-vertical #menuButton{z-index:20}
 </style></head><body><div id="stage"><div id="clock" hidden></div><div id="verse"></div><div id="hindiShabad" class="translation"></div><div id="englishShabad" class="translation"></div><div id="englishMeaning" class="translation"></div><div id="punjabiMeaning" class="translation"></div><div id="hindiMeaning" class="translation"></div><div id="hint" aria-hidden="true"></div><div id="rainbowScreen" aria-hidden="true"></div></div><div id="bookAlternate" hidden><div class="alt-book-heading">ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ</div><div id="alternateLines"></div></div><div id="liveCameraStage" hidden><video id="liveCameraVideo" autoplay muted playsinline></video></div><div id="photoStage" hidden><img id="photoImage" alt=""></div><div id="sahibzaadeStage" hidden role="img" aria-label="Sahibzaade family portrait"><img id="sahibzaadeImage" alt="Sahibzaade family portrait"></div><div id="verseMetaBar" class="verse-meta-bar" hidden><div id="sourceCredit" class="source-credit" hidden></div><div id="angIndicator" class="ang-indicator" hidden></div></div><footer class="gp-credit">Developed by Rajinder Singh · <a href="mailto:harjas.info@gmail.com">harjas.info@gmail.com</a> · 2026</footer><section id="mainPairing" hidden role="status" aria-live="polite"><div class="main-pair-title">Projection · Connection code</div><div id="mainPairingCode">•••••</div><div class="main-pair-help">इस कोड को Control ऐप में डालकर Connect करें</div><div id="mainPairingStatus">Connecting to pairing server…</div></section><button id="menuButton" aria-label="Projection settings" aria-expanded="false">☰</button><div id="setup"><div class="row"><b class="grow">Projection Settings</b><button id="closeMenu">✕</button></div><div class="body"><span class="muted">Share this projection code with controller:</span><div id="code" class="code">•••••</div><p class="muted" id="status">Connecting…</p><div class="row"><input id="controllerCode" placeholder="Controller 5-digit code" inputmode="numeric" maxlength="5" class="grow"><button id="join">Connect</button></div><div class="row"><input id="name" class="grow" placeholder="Display name"><button id="saveName">Save</button></div><div class="row"><input id="newCode" class="grow" inputmode="numeric" maxlength="5" placeholder="New 5-digit code"><button id="changeCode">Change code</button></div><div class="developer-menu-foot"><strong>Developed by Rajinder Singh</strong><a href="mailto:harjas.info@gmail.com">✉ Email</a><a href="https://www.youtube.com/results?search_query=HarjasTV" target="_blank" rel="noopener noreferrer">▶ HarjasTV · YouTube</a></div><button id="resetPairing" class="action">Reset pairing</button> <button id="fullscreen">Fullscreen</button><div class="small-heading">Sahibzaade Picture</div><div class="row"><button id="showSahibzaade" class="action">Show Picture · Full Screen</button><button id="hideSahibzaade" class="action">Close Picture</button></div><div class="row"><button id="chooseSahibzaade" class="action">Use Original High-Quality Picture</button><input id="sahibzaadeFile" type="file" accept="image/*" hidden></div><p class="muted">The included portrait opens with one tap. Optionally select the original high-resolution image once on this device for a sharper fullscreen display.</p><div class="small-heading">Pictures · This Projection</div><p class="muted">Choose several pictures on this device, set their order and start the slideshow.</p><input id="localPhotoFiles" type="file" accept="image/*" multiple><div id="localPhotoList"></div><label><input id="localPhotoFade" type="checkbox"> Fade</label><label class="control-slider">Duration <span id="localPhotoSecondsLabel">5</span>s<input id="localPhotoSeconds" type="range" min="2" max="30" value="5"></label><div class="row"><button id="localPhotoPlay">Start slideshow</button><button id="localPhotoStop">Close pictures</button></div><p class="muted">Pictures stay in this device's open page; choose them again after restarting.</p><div class="small-heading">Font size · live adjustments</div><label class="control-slider">Line spacing <span id="projectionSpacingValue">135</span>%<input type="range" id="projectionSpacing" min="90" max="220" step="5" value="135"></label><label class="control-slider">Gurbani <span id="vValue">64</span> px<input type="range" id="vSize" min="24" max="200" value="64"></label><label class="control-slider">Hindi Shabad <span id="hsvValue">64</span> px<input id="hsvSize" type="range" min="24" max="200" value="64"></label><label class="control-slider">English Shabad <span id="esvValue">64</span> px<input id="esvSize" type="range" min="24" max="200" value="64"></label><label class="control-slider">English meaning <span id="enValue">28</span> px<input type="range" id="enSize" min="16" max="90" value="28"></label><label class="control-slider">Punjabi meaning <span id="paValue">28</span> px<input type="range" id="paSize" min="16" max="90" value="28"></label><label class="control-slider">Hindi meaning <span id="hiValue">28</span> px<input type="range" id="hiSize" min="16" max="90" value="28"></label><label><input type="checkbox" id="projectionDay"> Day mode</label><br><label><input type="checkbox" id="projectionFit" checked> Auto-fit full screen</label><br><label><input type="checkbox" id="projectionLari"> ਲੜੀਵਾਰ</label><br><label><input type="checkbox" id="projectionFlow"> Continuous shabad lines</label><br><label><input type="checkbox" id="projectionPause"> Colour words before punctuation</label><p class="muted">Colour marks source punctuation, not verified ਵਿਸਰਾਮ.</p><p class="muted">Latest slide is stored locally, even if the controller disconnects. Keep this browser running for live updates.</p></div></div>
-<script src="gurbani-layout.js?v=1"></script><script src="peerjs-1.5.5.min.js?v=20261118"></script><script src="gurbani-peer-manager.js?v=20261118"></script><script>
+<script src="gurbani-layout.js?v=1"></script><script src="peerjs-1.5.5.min.js?v=20261118"></script><script src="gurbani-peer-manager.js?v=20261119"></script><script src="gurbani-camera.js?v=20261119"></script><script>
 'use strict';
 const $=id=>document.getElementById(id);
 const read=(k,def)=>{try{const value=JSON.parse(localStorage.getItem(k));return value==null?def:value}catch(_){return def}};
@@ -239,6 +239,7 @@ function send(c,m){try{if(c.open)c.send(m)}catch(_){ }}
 function hello(c){send(c,{type:'hello',deviceId:code,code:code,name:name,owner:owner})}
 
 let allowedCameraCode=null,allowedCameraController=null,cameraCall=null,cameraFeed=null,cameraLayout='full',cameraPortion=50;
+let cameraFrame={};
 function clearCamera(){
  const previousCall=cameraCall;cameraCall=null;cameraFeed=null;
  if(previousCall)previousCall.close();
@@ -250,6 +251,7 @@ function applyCameraLayout(){
  document.body.classList.remove('camera-full','camera-horizontal','camera-vertical');
  document.body.classList.add('camera-'+cameraLayout);
  document.documentElement.style.setProperty('--camera-portion',cameraPortion+(cameraLayout==='horizontal'?'vw':'vh'));
+ GurbaniCamera.frame($('liveCameraVideo'),cameraFrame);
  $('liveCameraStage').hidden=false;
 }
 function acceptCameraCall(call){
@@ -271,15 +273,17 @@ function handle(c){connections.add(c);c.on('open',()=>{hello(c);setPairingStatus
 c.on('data',m=>{if(!m||typeof m!=='object')return;if(m.type==='ping'){send(c,{type:'pong',id:m.id});return}
 if(m.type==='display-mode'&&owner&&m.token===owner){displayMode=m.mode==='book'?'book':'projection';localStorage.setItem('gb-projection-view-mode',displayMode);render();send(c,{type:'applied',rev:m.rev});return}
 if(m.type==='camera-allow'&&owner&&m.token===owner){
- if(!/^\d{5}$/.test(String(m.cameraCode)))return;
+ if(m.cameraCode!=='local'&&!/^\d{5}$/.test(String(m.cameraCode)))return;
  allowedCameraCode=String(m.cameraCode);allowedCameraController=c.peer;
  cameraLayout=['full','horizontal','vertical'].includes(m.layout)?m.layout:'full';
  cameraPortion=Math.max(15,Math.min(85,Number(m.portion)||50));
+ cameraFrame=m;
  applyCameraLayout();send(c,{type:'camera-display-ready',code,cameraCode:allowedCameraCode});return
 }
 if(m.type==='camera-layout'&&owner&&m.token===owner){
  cameraLayout=['full','horizontal','vertical'].includes(m.layout)?m.layout:'full';
  cameraPortion=Math.max(15,Math.min(85,Number(m.portion)||50));
+ cameraFrame=m;
  applyCameraLayout();return
 }
 if(m.type==='camera-hide'&&owner&&m.token===owner){allowedCameraCode=null;allowedCameraController=null;clearCamera();return}
