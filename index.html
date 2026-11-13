@@ -449,6 +449,13 @@ async function offlineStoreAng(n,data){
  await offlineStore('angs','readwrite',store=>store.put({number:n,page:angLines,updatedAt:Date.now()}));
 }
 async function offlineLoadJson(url){
+ if(navigator.onLine===false){
+  const local=await offlineGet('requests',url).catch(()=>null);
+  if(local?.data)return local.data;
+  const match=url.match(/\/v2\/angs\/(\d+)\/G(?:\?|$)/);
+  if(match){const ang=await offlineGet('angs',Number(match[1])).catch(()=>null);if(ang?.page)return {page:ang.page}}
+  throw Error('Offline data not downloaded for this shabad / Ang')
+ }
  try{
   const response=await fetch(url,{cache:'no-store'});
   if(!response.ok)throw Error('BaniDB response '+response.status);
@@ -526,12 +533,37 @@ function renderSearchResults(data,offline=false){
  }
  if(!data.length)box.textContent='No matching results in downloaded offline pages. Download more Angs online.'
 }
+function explicitShabadId(x){
+ return x?.shabadId||x?.shabadID||x?.shabad_id||x?.verse?.shabadId||x?.verse?.shabadID||x?.shabad?.shabadId||x?.shabad?.id||null
+}
 async function openOfflineSearchResult(item){
  if(item.kind==='ang'){
   const ang=await offlineGet('angs',item.ang);
   if(!ang?.page)return status('Ang not downloaded');
+  const id=explicitShabadId(item.row);
+  if(id){
+   // A cached full Shabad has the most faithful verse boundaries.
+   const cached=await offlineGet('requests','https://api.banidb.com/v2/shabads/'+encodeURIComponent(id)).catch(()=>null);
+   if(cached?.data){await openShabad({shabadId:id,verse:verse(item.row)});return}
+   // Otherwise group Ang verses by source-provided Shabad ID, including adjacent Angs.
+   const angs=await offlineAllAngs(),group=[];
+   for(const page of angs)for(const line of page.page){
+    if(String(explicitShabadId(line)||'')===String(id))group.push({...line,pageNo:page.number})
+   }
+   if(group.length){
+    setReading(group,'ਸ਼ਬਦ · Offline',null);
+    shabadSourceInfo={name:'Sri Guru Granth Sahib Ji',ang:String(item.ang)};
+    shabadAng=item.ang;
+    const match=group.findIndex(x=>verse(x)===verse(item.row));
+    show(match>=0?match:0,false);
+    status('Offline Shabad · '+group.length+' saved lines'+(offlineCount<1430?' (download the full library for complete cross-Ang coverage)':''));
+    return
+   }
+  }
+  // No reliable Shabad identifier: present the containing Ang, not an invented Shabad.
   setReading(ang.page,'ਅੰਗ / Ang '+item.ang,item.ang);
   show(item.index,false);
+  status('Offline Ang '+item.ang+' · selected matching line');
   return
  }
  if(item.kind==='anand'||item.kind==='sukhmani'){
