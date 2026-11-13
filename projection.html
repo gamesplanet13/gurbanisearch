@@ -238,7 +238,7 @@ function acceptCameraCall(call){
   applyCameraLayout()
  });
  call.on('close',()=>{if(cameraCall===call)clearCamera()});
- call.on('error',()=>{if(cameraCall===call)clearCamera()})
+ call.on('error',e=>{if(cameraCall===call){$('status').textContent='Camera video failed: '+(e.message||e.type||'WebRTC unavailable');clearCamera()}})
 }
 
 function handle(c){connections.add(c);c.on('open',()=>{hello(c);$('status').textContent='Waiting for controller authorization'});
@@ -249,7 +249,7 @@ if(m.type==='camera-allow'&&owner&&m.token===owner){
  allowedCameraCode=String(m.cameraCode);
  cameraLayout=['full','horizontal','vertical'].includes(m.layout)?m.layout:'full';
  cameraPortion=Math.max(15,Math.min(85,Number(m.portion)||50));
- applyCameraLayout();return
+ applyCameraLayout();send(c,{type:'camera-display-ready',code});return
 }
 if(m.type==='camera-layout'&&owner&&m.token===owner){
  cameraLayout=['full','horizontal','vertical'].includes(m.layout)?m.layout:'full';
