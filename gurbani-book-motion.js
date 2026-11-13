@@ -8,31 +8,26 @@ window.GurbaniBookMotion = function (surface, scroller, fontSize, previewSize, s
   scrollFrame = 0;
  }
 
- function viewport() {
-  return page ? {top:0,height:window.innerHeight} : {top:scroller.getBoundingClientRect().top,height:scroller.clientHeight};
- }
-
  function center(line) {
   stopScroll();
   if (!line) { pendingLine = null; return; }
   if (pinch) { pendingLine = line; return; }
-  scrollFrame = requestAnimationFrame(startTime => {
-   if (!surface.contains(line) || !surface.getClientRects().length) { scrollFrame = 0; return; }
-   const view = viewport(), bounds = line.getBoundingClientRect(), from = scroller.scrollTop;
-   const to = Math.max(0, Math.min(scroller.scrollHeight - view.height,
-     from + bounds.top + bounds.height / 2 - view.top - view.height / 2));
-   const duration = Math.min(520, Math.max(240, Math.abs(to - from) * .65));
-   if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    scroller.scrollTop = to;
-    scrollFrame = 0;
-    return;
+  scrollFrame = requestAnimationFrame(() => {
+   scrollFrame = 0;
+   if (!surface.contains(line) || !surface.getClientRects().length) return;
+   const top = page ? 0 : scroller.getBoundingClientRect().top;
+   const height = page ? window.innerHeight : scroller.clientHeight;
+   const bounds = line.getBoundingClientRect();
+   const target = Math.max(0, Math.min(scroller.scrollHeight - height,
+     scroller.scrollTop + bounds.top + bounds.height / 2 - top - height / 2));
+   if (Math.abs(scroller.scrollTop - target) < 2) return;
+   const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+   const nativeScroller = page ? window : scroller;
+   if (!reduced && 'scrollBehavior' in document.documentElement.style && typeof nativeScroller.scrollTo === 'function') {
+    nativeScroller.scrollTo({top:target,behavior:'smooth'});
+   } else {
+    scroller.scrollTop = target;
    }
-   function step(now) {
-    const progress = Math.min(1, (now - startTime) / duration);
-    scroller.scrollTop = from + (to - from) * (1 - Math.pow(1 - progress, 3));
-    scrollFrame = progress < 1 ? requestAnimationFrame(step) : 0;
-   }
-   step(startTime);
   });
  }
 
