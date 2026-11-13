@@ -152,7 +152,7 @@ function renderAlternateBook(){
 function render(){
  const c=slide.content||{},settings=slide.settings||{};const source=c.sourceMeta||null;const credit=$('sourceCredit');credit.textContent=(source&&source.name)?('['+GurbaniLayout.sourceCode(source)+']'):'';credit.hidden=!credit.textContent;document.body.classList.toggle('day-mode',!!settings.dayMode);$('projectionDay').checked=!!settings.dayMode;const angVal=(source&&source.ang)||c.ang||'';$('angIndicator').hidden=!angVal;$('angIndicator').textContent=angVal?'(Ang '+angVal+')':'';$('verseMetaBar').hidden=credit.hidden&&!angVal;
  document.body.classList.toggle('projection-top',settings.alignment==='top');
- requestAnimationFrame(()=>GurbaniLayout.protectMetadata($('verseMetaBar'),['#verse','#hindiShabad','#englishShabad','#englishMeaning','#punjabiMeaning','#hindiMeaning','#alternateLines']));
+ 
  const waheguru=c.mode==='waheguru';document.body.classList.toggle('waheguru-live',waheguru);rainbow(waheguru||(displayMode==='projection'&&!c.verse));document.body.classList.toggle('custom-scrolling',c.mode==='custom'&&!!c.scroll);document.body.style.setProperty('--projection-leading',String((settings.lineSpacing||135)/100));$('projectionSpacing').value=settings.lineSpacing||135;$('projectionSpacingValue').textContent=$('projectionSpacing').value;
  const scripts=c.scripts||{gurmukhi:c.verse||''};
  const text=settings.flow&&!!scripts.gurmukhi&&Array.isArray(c.bookLines)&&c.bookLines.length?c.bookLines.join(' '):(c.bookLineDetails?scripts.gurmukhi||'':scripts.gurmukhi||c.verse||'');GurbaniLayout.draw($('verse'),text,!!settings.larrivaar,!!settings.pause);
@@ -173,7 +173,11 @@ function render(){
   $(label).textContent=$(id).value
  }
  if(waheguru){alternateMotion.center(null);alternateCurrent=null;}else{renderAlternateBook();if(displayMode==='projection')scheduleProjectionFit()}
+ requestAnimationFrame(()=>requestAnimationFrame(checkGurbaniMeta));
 }
+function checkGurbaniMeta(){GurbaniLayout.protectMetadata($('verseMetaBar'),['#verse','#hindiShabad','#englishShabad','#englishMeaning','#punjabiMeaning','#hindiMeaning','#alternateLines'])}
+window.addEventListener('resize',()=>requestAnimationFrame(checkGurbaniMeta));
+document.addEventListener('scroll',()=>requestAnimationFrame(checkGurbaniMeta),{passive:true,capture:true});
 function updateSize(){
  const settings=slide.settings||(slide.settings={});
  settings.verseSize=+$('vSize').value;settings.hindiVerseSize=+$('hsvSize').value;settings.englishVerseSize=+$('esvSize').value;
