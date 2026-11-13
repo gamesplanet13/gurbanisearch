@@ -20,6 +20,8 @@ android {
         }
         projection {
             dimension 'role'
+            versionCode 20261129
+            versionName '2026.11.13.18'
             applicationIdSuffix '.projection'
             resValue 'string', 'app_name', 'Gurbani Searching Projection'
             buildConfigField 'String', 'START_PAGE', '"projection.html"'
