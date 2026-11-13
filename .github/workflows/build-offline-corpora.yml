@@ -1,0 +1,54 @@
+name: Prepare Offline Gurbani Source Packs
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "scripts/export_shabados_offline.py"
+      - ".github/workflows/build-offline-corpora.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gurbani-offline-pack-builder
+  cancel-in-progress: false
+
+jobs:
+  export-corpora:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - name: Checkout Games Planet project
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Obtain official Shabad OS Unicode source corpus
+        run: |
+          git clone --depth=1 --filter=blob:none --sparse https://github.com/shabados/shabados.git /tmp/shabados
+          cd /tmp/shabados
+          git sparse-checkout set --no-cone 'database/collections/**' '/.gitignore'
+          test -f database/collections/sources/SDGR.toml
+          test -f database/collections/sources/VBGJ.toml
+      - name: Export Dasam, Bhai Gurdas, Bhai Nand Lal to compact Unicode packs
+        run: |
+          python3 scripts/export_shabados_offline.py --collections /tmp/shabados/database/collections --output data/offline-packs
+          python3 - <<'PY'
+          import json
+          m=json.load(open('data/offline-packs/manifest.json'))
+          for k in ('D','B','N'):
+              assert m['sources'][k]['lines']>0
+              assert m['sources'][k]['parts']
+          print({k:(v['lines'],len(v['parts'])) for k,v in m['sources'].items()})
+          PY
+      - name: Upload packs to this GitHub repository
+        run: |
+          git config user.name "gamesplanet-offline-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/offline-packs/
+          if git diff --cached --quiet; then
+            echo "No source pack changes"
+          else
+            git commit -m "Publish Shabad OS source-separated offline Gurmukhi packs"
+            git push
+          fi
