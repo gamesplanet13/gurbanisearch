@@ -1,0 +1,139 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Gurbani Camera · HarjasTV</title>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#070d17;color:#f2e8d0;font:14px/1.5 system-ui,sans-serif}header{background:linear-gradient(110deg,#192c4b,#18253b);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #766640}h1{font-size:16px;margin:0;color:#f6d793}.frame{position:relative;min-height:38dvh;background:#000}video{display:block;width:100%;max-height:60dvh;object-fit:contain;background:#000}main{padding:12px;max-width:950px;margin:auto}.card{border:1px solid #344862;background:#17243a;border-radius:12px;padding:12px;margin:10px 0}button,select,input{font:inherit;background:#223750;border:1px solid #5d7593;color:#fff;border-radius:8px;padding:9px;min-width:0}button{cursor:pointer}.row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:9px 0}.row>*{flex:1}label{display:block;margin:8px 0}select,input[type=range]{width:100%}.code{font-size:32px;color:#ffd77a;font-weight:800;letter-spacing:5px}small,.small{font-size:11px;color:#bdcbdf}.ok{color:#8ce6aa}.warning{color:#f2b88b}.recording{background:#a42b31;color:white}#recordStop:disabled{opacity:.5}footer{text-align:center;padding:15px;color:#9daecb;font-size:11px}a{color:#c3e1ff}@media(orientation:landscape){main{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(290px,1fr);gap:10px}.frame{min-height:0;grid-row:span 2;height:calc(100dvh - 110px)}video{height:100%;max-height:none}.card{margin:0}}
+</style></head><body><header><h1>ੴ Gurbani Camera · HarjasTV</h1><span class="small">Camera Phone</span></header><main><div class="frame"><video id="preview" playsinline muted autoplay></video></div>
+<div><section class="card"><div class="row"><strong>Camera Connection Code</strong><strong id="code" class="code">•••••</strong></div><p class="small">Controller → ☰ → Camera → enter this code. Grant camera permission on this phone. Keep this page open while broadcasting.</p><p id="status" class="warning" aria-live="polite">Starting camera…</p>
+<label>Phone camera<select id="cameraSelect"><option value="">Loading available cameras…</option></select></label>
+<div class="row"><button id="refreshCameras">↻ Cameras</button><button id="flip">⇄ Switch</button><button id="fullscreen">⛶ Preview</button></div>
+<label>Camera Zoom: <output id="zoomNumber">1.0×</output><input type="range" id="zoom" min="1" max="4" step=".1" value="1"></label><p id="zoomNotice" class="small">Hardware zoom if supported; otherwise preview will be digitally cropped for local monitoring only.</p>
+<div class="row"><button id="recordStart">⏺ Record</button><button id="recordStop" disabled>■ Stop &amp; Save</button></div><p class="small" id="recordNotice">Recordings save on this camera phone only. Your browser may ask where to download.</p>
+<div class="row"><button id="resetPairing">Unpair Controller</button><button id="newCode">New Camera Code</button></div></section></div>
+<section class="card" style="grid-column:1/-1"><strong>Connected Displays</strong><div id="viewers" class="small">Not yet connected</div><p class="small">WebRTC PeerJS signaling requires internet to connect. Once paired, video passes peer-to-peer where possible. Browsers may stop capture if this page is backgrounded or the screen locks. Enable HTTPS camera permission.</p></section></main>
+<footer>Developed by Rajinder Singh · <a href="mailto:harjas.info@gmail.com">harjas.info@gmail.com</a> · <a href="https://www.youtube.com/results?search_query=HarjasTV" target="_blank" rel="noopener">HarjasTV</a></footer>
+<script src="peerjs-1.5.5.min.js"></script><script src="gurbani-peer-manager.js"></script><script>
+'use strict';
+const $=id=>document.getElementById(id);
+const store=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+const read=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}};
+const mkCode=()=>String(10000+Math.floor(Math.random()*90000));
+let cameraCode=read('gb-camera-code',null)||mkCode(),cameraName=read('gb-camera-name','Camera Phone'),controllerPeer=read('gb-camera-controller-peer',null),peer,stream=null,recording=null,recordChunks=[],allowed=new Set(),calls=new Map(),facingMode='environment',streamGeneration=0;
+store('gb-camera-code',cameraCode);$('code').textContent=cameraCode;
+const cameraPeerPrefix='gurbani-camera-v1-',controlPrefix='gurbani-control-v1-',projectionPrefix='gurbani-projection-v1-';
+function status(s){$('status').textContent=s}
+function signal(msg){for(const conn of controlConnections)if(conn.open)conn.send(msg)}
+const controlConnections=new Set();
+function listViewers(){$('viewers').textContent=[...calls.keys()].length?[...calls.keys()].map(v=>v.replace(/^gurbani-(projection|control)-v1-/,'')).join(' · '):'No video recipients yet'}
+async function cameras(){
+ if(!navigator.mediaDevices?.enumerateDevices)throw Error('This phone does not support camera enumeration');
+ const list=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='videoinput');
+ const old=$('cameraSelect').value;$('cameraSelect').replaceChildren();
+ for(let i=0;i<list.length;i++){const d=list[i],option=document.createElement('option');option.value=d.deviceId;option.textContent=d.label||('Camera '+(i+1));$('cameraSelect').append(option)}
+ if(list.some(d=>d.deviceId===old))$('cameraSelect').value=old;
+ $('flip').disabled=list.length<2;
+ return list
+}
+async function startCamera(deviceId){
+ const generation=++streamGeneration;
+ if(!navigator.mediaDevices?.getUserMedia)throw Error('Camera access needs HTTPS and a supported browser');
+ const request={audio:false,video:{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:24,max:30},...(deviceId?{deviceId:{ideal:deviceId}}:{facingMode:{ideal:facingMode}})}};
+ const next=await navigator.mediaDevices.getUserMedia(request);
+ if(generation!==streamGeneration){next.getTracks().forEach(t=>t.stop());return}
+ const previous=stream;stream=next;$('preview').srcObject=next;$('preview').play().catch(()=>{});
+ if(previous)previous.getTracks().forEach(t=>t.stop());
+ for(const call of calls.values())try{call.close()}catch(_){}
+ calls.clear();listViewers();
+ const actual=stream.getVideoTracks()[0]?.getSettings()?.deviceId;
+ await cameras();
+ if(actual&&[...$('cameraSelect').options].some(o=>o.value===actual))$('cameraSelect').value=actual;
+ await updateZoomCapabilities();
+ status('Camera ready · '+(stream.getVideoTracks()[0]?.label||'Video source'));
+ signal({type:'camera-ready',code:cameraCode,cameras:[...$('cameraSelect').options].map(o=>({id:o.value,name:o.textContent}))});
+}
+async function updateZoomCapabilities(){
+ const track=stream?.getVideoTracks()[0],caps=track?.getCapabilities?.()||{};
+ const z=$('zoom');
+ if(caps.zoom){z.min=Math.max(1,caps.zoom.min||1);z.max=caps.zoom.max;z.step=caps.zoom.step||.1;z.value=Math.max(+z.min,Math.min(+z.max,track.getSettings().zoom||1));$('zoomNotice').textContent='Native camera hardware zoom';z.disabled=false}
+ else{z.min=1;z.max=4;z.value=1;$('zoomNotice').textContent='Hardware zoom unavailable. Zoom is simulated on this camera preview only.';z.disabled=false}
+ $('zoomNumber').textContent=(+z.value).toFixed(1)+'×'
+}
+async function setZoom(v){
+ const z=Math.max(1,Math.min(8,Number(v)||1));$('zoom').value=Math.max(+$('zoom').min,Math.min(+$('zoom').max,z));$('zoomNumber').textContent=(+$('zoom').value).toFixed(1)+'×';
+ const track=stream?.getVideoTracks()[0],caps=track?.getCapabilities?.()||{};
+ if(caps.zoom&&track){try{await track.applyConstraints({advanced:[{zoom:+$('zoom').value}]});$('preview').style.transform='';$('preview').style.objectFit='contain';return}catch(e){status('Hardware zoom failed: '+e.message)}}
+ $('preview').style.transform='scale('+(+$('zoom').value)+')';$('preview').parentElement.style.overflow='hidden'
+}
+$('zoom').oninput=()=>setZoom($('zoom').value);
+function supportedRecordingType(){
+ for(const type of ['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm','video/mp4']){
+  if(MediaRecorder.isTypeSupported(type))return type
+ }return ''
+}
+function startRecording(){
+ if(!stream)return status('Start the camera first');
+ if(!('MediaRecorder' in window))return status('Recording unsupported in this browser');
+ if(recording?.state==='recording')return;
+ const mime=supportedRecordingType();
+ try{
+  const rec=recording=new MediaRecorder(stream,mime?{mimeType:mime}:undefined);
+  recordChunks=[];
+  rec.ondataavailable=e=>{if(e.data?.size)recordChunks.push(e.data)};
+  rec.onstop=()=>{
+   const blob=new Blob(recordChunks,{type:rec.mimeType||'video/webm'});
+   const url=URL.createObjectURL(blob),a=document.createElement('a');
+   a.href=url;a.download='HarjasTV-Camera-'+new Date().toISOString().replace(/[:.]/g,'-')+(blob.type.includes('mp4')?'.mp4':'.webm');
+   document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
+   $('recordStart').disabled=false;$('recordStop').disabled=true;status('Recording saved on the camera phone');
+  };
+  rec.onerror=e=>status('Recording error: '+(e.error?.message||'unknown'));
+  rec.start(2000);$('recordStart').disabled=true;$('recordStop').disabled=false;status('Recording on camera phone');
+ }catch(e){status('Recording unavailable: '+e.message)}
+}
+function stopRecording(){if(recording?.state==='recording')recording.stop()}
+$('recordStart').onclick=startRecording;$('recordStop').onclick=stopRecording;
+$('cameraSelect').onchange=()=>startCamera($('cameraSelect').value).catch(e=>status('Camera change failed: '+e.message));
+$('flip').onclick=()=>{const list=[...$('cameraSelect').options].map(x=>x.value),index=list.indexOf($('cameraSelect').value);if(list.length>1)startCamera(list[(index+1)%list.length]).catch(e=>status('Camera switch failed: '+e.message))};
+$('refreshCameras').onclick=()=>cameras().catch(e=>status('Camera list: '+e.message));
+$('fullscreen').onclick=()=>document.querySelector('.frame').requestFullscreen?.().catch(e=>status(e.message));
+$('newCode').onclick=()=>{cameraCode=mkCode();store('gb-camera-code',cameraCode);location.reload()};
+$('resetPairing').onclick=()=>{controllerPeer=null;store('gb-camera-controller-peer',null);allowed.clear();for(const c of controlConnections)c.close();for(const c of calls.values())c.close();calls.clear();status('Camera unpaired. New controller may connect.')};
+function shareTo(peerId){
+ if(!stream||!peer?.open||!allowed.has(peerId))return;
+ const old=calls.get(peerId);if(old){try{old.close()}catch(_){}}
+ try{
+  const call=peer.call(peerId,stream,{metadata:{cameraCode}});
+  if(!call)return status('Cannot call device '+peerId);
+  calls.set(peerId,call);
+  call.on('close',()=>{if(calls.get(peerId)===call){calls.delete(peerId);listViewers()}});
+  call.on('error',e=>{status('Video error: '+e.message);calls.delete(peerId);listViewers()});
+  listViewers()
+ }catch(e){status('Video connection: '+e.message)}
+}
+function handleController(c){
+ if(!c.peer.startsWith(controlPrefix)){c.close();return}
+ if(controllerPeer&&controllerPeer!==c.peer){c.on('open',()=>{c.send({type:'camera-rejected',reason:'paired-to-other-controller'});c.close()});return}
+ controlConnections.add(c);
+ c.on('open',()=>{controllerPeer=c.peer;store('gb-camera-controller-peer',controllerPeer);allowed.add(controllerPeer);c.send({type:'camera-hello',code:cameraCode,name:cameraName,ready:!!stream,cameras:[...$('cameraSelect').options].map(o=>({id:o.value,name:o.textContent}))});status('Connected to Controller')});
+ c.on('data',m=>{
+  if(!m||typeof m!=='object'||c.peer!==controllerPeer)return;
+  if(m.type==='ping'){c.send({type:'pong',id:m.id});return}
+  if(m.type==='camera-authorize'){allowed=new Set((Array.isArray(m.targets)?m.targets:[]).filter(id=>typeof id==='string'&&(id.startsWith(projectionPrefix)||id===controllerPeer)));allowed.add(controllerPeer);return}
+  if(m.type==='camera-connect'){for(const id of (Array.isArray(m.targets)?m.targets:[])){if(allowed.has(id))shareTo(id)}return}
+  if(m.type==='camera-zoom'){setZoom(m.zoom);return}
+  if(m.type==='camera-record-start'){startRecording();return}
+  if(m.type==='camera-record-stop'){stopRecording();return}
+  if(m.type==='camera-switch'){if(typeof m.deviceId==='string'&&[...$('cameraSelect').options].some(o=>o.value===m.deviceId))startCamera(m.deviceId).catch(e=>status(e.message));return}
+  if(m.type==='camera-off'){for(const id of m.targets||[]){const call=calls.get(id);if(call){call.close();calls.delete(id)}}listViewers();return}
+ });
+ c.on('close',()=>{controlConnections.delete(c);status('Controller disconnected — camera remains ready')});
+ c.on('error',e=>status('Controller link: '+e.message))
+}
+function startPeer(){
+ if(!window.GurbaniPeer)return status('Peer connection library unavailable');
+ GurbaniPeer.start({id:()=>cameraPeerPrefix+cameraCode,onPeer:p=>peer=p,
+  onStatus:status,onOpen:()=>status(stream?'Camera online — pair using '+cameraCode:'Connected — allow camera permission'),
+  onConnection:handleController,
+  onCollision:()=>status('Camera code already in use. Choose New Camera Code.'),
+  onTargetUnavailable:()=>status('Projection peer not available')});
+}
+(async()=>{try{await startCamera('')}catch(e){status('Camera permission required: '+e.message)}startPeer()})();
+</script></body></html>
