@@ -38,6 +38,7 @@ final class Updater {
     private boolean waitingForPermission;
     private AlertDialog dialog;
     private boolean checking;
+    private boolean startupChecked;
 
     Updater(Activity activity) {
         this.activity = activity;
@@ -64,7 +65,8 @@ final class Updater {
                 }
                 handler.post(() -> {
                     checking = false;
-                    if (closed || !active) return;
+                    if (closed) return;
+                    if (!active) { if (!manual) startupChecked = false; return; }
                     if (version <= BuildConfig.VERSION_CODE) {
                         if (manual) showError("Latest on GitHub: " + filename + "\nThis app is up to date.");
                     } else if (state.getLong("version", 0) == version && state.getLong("download", -1) >= 0) {
@@ -140,6 +142,7 @@ final class Updater {
     void resume() {
         active = true;
         if (downloads == null) return;
+        if (!startupChecked) { startupChecked = true; check(false); }
         if (state.getLong("version", 0) <= BuildConfig.VERSION_CODE) forgetDownload();
         if (waitingForPermission) {
             waitingForPermission = false;
@@ -212,7 +215,7 @@ final class Updater {
         prompted = true;
         if (dialog != null) dialog.dismiss();
         dialog = new AlertDialog.Builder(activity).setTitle("Update ready")
-                .setMessage("The update has downloaded. Install it now?")
+                .setMessage("Gurbani update " + state.getLong("version", 0) + " has downloaded. Install it now?")
                 .setPositiveButton("Install", (d, w) -> install(uri))
                 .setNegativeButton("Later", null).show();
     }
@@ -238,10 +241,10 @@ final class Updater {
                 .setNegativeButton("Later", null).show();
     }
 
+    @SuppressWarnings("deprecation")
     private void launchInstaller(Uri uri) {
         try {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setDataAndType(uri, APK_TYPE);
+            Intent intent = new Intent(Intent.ACTION_INSTALL_PACKAGE, uri);
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             activity.startActivity(intent);
         } catch (RuntimeException error) {

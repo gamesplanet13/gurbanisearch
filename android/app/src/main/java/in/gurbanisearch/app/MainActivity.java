@@ -48,16 +48,11 @@ public class MainActivity extends Activity {
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         web.setWebViewClient(new WebViewClient() {
             @Override public boolean shouldOverrideUrlLoading(WebView view, android.webkit.WebResourceRequest request) {
-                Uri uri=request.getUrl();
-                if (isTrustedOrigin(uri) && uri.getPath() != null && uri.getPath().startsWith("/gurbanisearch/")) {
-                    if (uri.getPath().startsWith("/gurbanisearch/apk/")) {
-                        if (updater != null && request.isForMainFrame()) updater.check(true);
-                        return true;
-                    }
-                    return false;
-                }
-                try { startActivity(new Intent(Intent.ACTION_VIEW,uri)); }catch(Exception ignored){}
-                return true;
+                return routeWebLink(request.getUrl(), request.isForMainFrame());
+            }
+            @SuppressWarnings("deprecation")
+            @Override public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                return routeWebLink(Uri.parse(url), true);
             }
         });
         web.setWebChromeClient(new WebChromeClient() {
@@ -101,12 +96,26 @@ public class MainActivity extends Activity {
         web.addJavascriptInterface(new UpdateBridge(), "GurbaniUpdates");
         web.setDownloadListener((url, userAgent, contentDisposition, mimeType, contentLength) -> {
             Uri uri = Uri.parse(url);
-            if (isTrustedOrigin(uri) && uri.getPath() != null && uri.getPath().startsWith("/gurbanisearch/apk/")) {
-                updater.check(true);
-            }
+            if (isGurbaniApk(uri)) updater.check(true);
         });
         web.loadUrl(SITE + BuildConfig.START_PAGE + "?app=" + BuildConfig.VERSION_CODE);
-        updater.check(false);
+    }
+    private boolean routeWebLink(Uri uri, boolean mainFrame) {
+        if (isGurbaniApk(uri)) {
+            if (mainFrame && updater != null) updater.check(true);
+            return true;
+        }
+        if (isTrustedOrigin(uri) && uri.getPath() != null && uri.getPath().startsWith("/gurbanisearch/")) return false;
+        if (mainFrame) {
+            try { startActivity(new Intent(Intent.ACTION_VIEW, uri)); }
+            catch (android.content.ActivityNotFoundException ignored) { }
+        }
+        return true;
+    }
+    private static boolean isGurbaniApk(Uri uri) {
+        String path = uri.getPath();
+        return isTrustedOrigin(uri) && path != null && path.startsWith("/gurbanisearch/apk/")
+                && path.endsWith(".apk");
     }
     public final class UpdateBridge {
         @android.webkit.JavascriptInterface public void check() {
