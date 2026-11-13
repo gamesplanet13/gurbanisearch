@@ -9,9 +9,9 @@
 <label>Camera Zoom: <output id="zoomNumber">1.0×</output><input type="range" id="zoom" min="1" max="4" step=".1" value="1"></label><p id="zoomNotice" class="small">Hardware zoom if supported; otherwise preview will be digitally cropped for local monitoring only.</p>
 <div class="row"><button id="recordStart">⏺ Record</button><button id="recordStop" disabled>■ Stop &amp; Save</button></div><p class="small" id="recordNotice">Recordings save on this camera phone only. Your browser may ask where to download.</p>
 <div class="row"><button id="resetPairing">Unpair Controller</button></div></section></div>
-<section class="card" style="grid-column:1/-1"><strong>Connected Displays</strong><div id="viewers" class="small">Not yet connected</div><p class="small">WebRTC PeerJS signaling requires internet to connect. Video goes to Controller, which sends it to the selected Projection screens. Browsers may stop capture if this page is backgrounded or the screen locks. Enable HTTPS camera permission.</p></section></main>
+<section class="card" style="grid-column:1/-1"><strong>Connected Displays</strong><div id="viewers" class="small">Not yet connected</div><p class="small">WebRTC PeerJS signaling requires internet to connect. Video goes to Controller, which sends it to the selected Projection screens. Browsers may stop capture if this page is backgrounded or the screen locks. Enable HTTPS camera permission.</p><div class="app-update-menu"><hr><button type="button" id="checkAppUpdate">Check for App Update</button><p id="appUpdateStatus" role="status"></p></div></section></main>
 <footer>Developed by Rajinder Singh · <a href="mailto:harjas.info@gmail.com">harjas.info@gmail.com</a> · <a href="https://www.youtube.com/results?search_query=HarjasTV" target="_blank" rel="noopener">HarjasTV</a></footer>
-<script src="peerjs-1.5.5.min.js?v=20261118"></script><script src="gurbani-peer-manager.js?v=20261119"></script><script src="gurbani-camera.js?v=20261119"></script><script>
+<script src="gurbani-updates.js?v=20261121" defer></script><script src="peerjs-1.5.5.min.js?v=20261118"></script><script src="gurbani-peer-manager.js?v=20261119"></script><script src="gurbani-camera.js?v=20261119"></script><script>
 'use strict';
 const $=id=>document.getElementById(id);
 const store=(k,v)=>localStorage.setItem(k,JSON.stringify(v));

@@ -91,9 +91,19 @@ public class MainActivity extends Activity {
         wifiDiscovery = new WifiDiscovery(this, web, BuildConfig.ROLE);
         web.addJavascriptInterface(wifiDiscovery, "GurbaniWifi");
         setContentView(web);
-        web.loadUrl(SITE + BuildConfig.START_PAGE + "?app=" + BuildConfig.VERSION_CODE);
         updater = new Updater(this);
-        updater.check();
+        web.addJavascriptInterface(new UpdateBridge(), "GurbaniUpdates");
+        web.loadUrl(SITE + BuildConfig.START_PAGE + "?app=" + BuildConfig.VERSION_CODE);
+        updater.check(false);
+    }
+    public final class UpdateBridge {
+        @android.webkit.JavascriptInterface public void check() {
+            runOnUiThread(() -> {
+                if (updater != null && web.getUrl() != null && web.getUrl().startsWith(SITE)) {
+                    updater.check(true);
+                }
+            });
+        }
     }
     private static boolean isTrustedOrigin(Uri origin) {
         return "https".equals(origin.getScheme()) && "gamesplanet13.github.io".equals(origin.getHost())
@@ -161,7 +171,10 @@ public class MainActivity extends Activity {
         if(fileCallback != null) { fileCallback.onReceiveValue(null); fileCallback = null; }
         if(updater!=null) updater.close();
         if(wifiDiscovery!=null) wifiDiscovery.close();
-        if(web!=null) web.removeJavascriptInterface("GurbaniWifi");
+        if(web!=null) {
+            web.removeJavascriptInterface("GurbaniWifi");
+            web.removeJavascriptInterface("GurbaniUpdates");
+        }
         if(web!=null){web.loadUrl("about:blank");web.destroy();}
         super.onDestroy();
     }

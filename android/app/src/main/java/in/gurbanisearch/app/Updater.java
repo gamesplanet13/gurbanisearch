@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
@@ -18,6 +20,7 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -34,6 +37,7 @@ final class Updater {
     private boolean prompted;
     private boolean waitingForPermission;
     private AlertDialog dialog;
+    private boolean checking;
 
     Updater(Activity activity) {
         this.activity = activity;
@@ -41,20 +45,48 @@ final class Updater {
         state = activity.getSharedPreferences("app-update", Activity.MODE_PRIVATE);
     }
 
-    void check() {
-        if (downloads == null) return;
+    void check(boolean manual) {
+        if (downloads == null) {
+            if (manual) showError("Android Download Manager is unavailable on this device.");
+            return;
+        }
+        if (checking) return;
+        checking = true;
         new Thread(() -> {
             try {
-                JSONObject update = readManifest().optJSONObject(BuildConfig.ROLE);
-                if (update == null) return;
-                long version = update.optLong("versionCode");
-                Uri uri = Uri.parse(update.optString("apkUrl"));
-                String expectedPath = "/gurbanisearch/apk/Gurbani_" + BuildConfig.ROLE + "_" + version + ".apk";
-                if (version <= BuildConfig.VERSION_CODE || !"https".equals(uri.getScheme())
-                        || !HOST.equals(uri.getAuthority()) || !expectedPath.equals(uri.getPath())) return;
-                handler.post(() -> enqueue(version, uri));
+                JSONObject update = readManifest().getJSONObject(BuildConfig.ROLE);
+                long version = update.getLong("versionCode");
+                Uri uri = Uri.parse(update.getString("apkUrl"));
+                String filename = "Gurbani_" + BuildConfig.ROLE + "_" + version + ".apk";
+                if (!"https".equals(uri.getScheme()) || !HOST.equals(uri.getAuthority())
+                        || !("/gurbanisearch/apk/" + filename).equals(uri.getPath())) {
+                    throw new IllegalStateException("Unexpected update URL");
+                }
+                handler.post(() -> {
+                    checking = false;
+                    if (closed || !active) return;
+                    if (version <= BuildConfig.VERSION_CODE) {
+                        if (manual) showError("Latest on GitHub: " + filename + "\nThis app is up to date.");
+                    } else if (state.getLong("version", 0) == version && state.getLong("download", -1) >= 0) {
+                        prompted = false;
+                        poll();
+                        if (manual && !prompted && state.getLong("download", -1) >= 0) {
+                            showError("Downloading " + filename + "… The Install button appears when it is ready.");
+                        }
+                    } else {
+                        if (dialog != null) dialog.dismiss();
+                        dialog = new AlertDialog.Builder(activity).setTitle("Update available")
+                                .setMessage(filename)
+                                .setPositiveButton("Update", (d, w) -> enqueue(version, uri))
+                                .setNegativeButton("Later", null).show();
+                    }
+                });
             } catch (Exception error) {
                 Log.w("GurbaniUpdater", "Update check failed", error);
+                handler.post(() -> {
+                    checking = false;
+                    if (manual) showError("Could not check GitHub for updates. Try again when online.");
+                });
             }
         }, "gurbani-update-check").start();
     }
@@ -89,12 +121,14 @@ final class Updater {
             try {
                 DownloadManager.Request request = new DownloadManager.Request(uri)
                         .setTitle("Gurbani app update")
+                        .setAllowedOverRoaming(false)
                         .setMimeType(APK_TYPE)
                         .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
                         .setDestinationInExternalFilesDir(activity, Environment.DIRECTORY_DOWNLOADS,
                                 "gurbani-update-" + version + "-" + System.currentTimeMillis() + ".apk");
                 state.edit().putLong("download", downloads.enqueue(request)).putLong("version", version).apply();
                 prompted = false;
+                showError("Downloading update… The Install button appears when it is ready.");
             } catch (RuntimeException error) {
                 Log.w("GurbaniUpdater", "Update download could not start", error);
                 showError("Could not start the update download. Reopen the app to try again.");
@@ -139,8 +173,13 @@ final class Updater {
             int status = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS));
             if (status == DownloadManager.STATUS_SUCCESSFUL) {
                 Uri uri = downloads.getUriForDownloadedFile(id);
-                if (uri != null) showInstall(uri);
-                else forgetDownload();
+                String location = cursor.getString(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_LOCAL_URI));
+                if (uri != null && isMatchingUpdate(location, state.getLong("version", 0))) {
+                    showInstall(uri);
+                } else {
+                    forgetDownload();
+                    showError("The download did not match this app’s package, version, or signing certificate.");
+                }
             } else if (status == DownloadManager.STATUS_FAILED) {
                 forgetDownload();
                 showError("Update download failed. Reopen the app to try again.");
@@ -152,8 +191,26 @@ final class Updater {
         }
     }
 
+    @SuppressWarnings("deprecation")
+    private boolean isMatchingUpdate(String location, long version) {
+        if (location == null) return false;
+        Uri file = Uri.parse(location);
+        if (!"file".equals(file.getScheme()) || file.getPath() == null) return false;
+        PackageManager packages = activity.getPackageManager();
+        PackageInfo apk = packages.getPackageArchiveInfo(file.getPath(), PackageManager.GET_SIGNATURES);
+        if (apk == null || !activity.getPackageName().equals(apk.packageName)
+                || (Build.VERSION.SDK_INT >= 28 ? apk.getLongVersionCode() : apk.versionCode) != version) return false;
+        try {
+            PackageInfo installed = packages.getPackageInfo(activity.getPackageName(), PackageManager.GET_SIGNATURES);
+            return apk.signatures != null && installed.signatures != null && Arrays.equals(apk.signatures, installed.signatures);
+        } catch (PackageManager.NameNotFoundException error) {
+            return false;
+        }
+    }
+
     private void showInstall(Uri uri) {
         prompted = true;
+        if (dialog != null) dialog.dismiss();
         dialog = new AlertDialog.Builder(activity).setTitle("Update ready")
                 .setMessage("The update has downloaded. Install it now?")
                 .setPositiveButton("Install", (d, w) -> install(uri))
@@ -199,8 +256,9 @@ final class Updater {
     }
 
     private void showError(String message) {
-        if (active && !closed) dialog = new AlertDialog.Builder(activity)
-                .setMessage(message).setPositiveButton("OK", null).show();
+        if (!active || closed) return;
+        if (dialog != null) dialog.dismiss();
+        dialog = new AlertDialog.Builder(activity).setMessage(message).setPositiveButton("OK", null).show();
     }
 
     void close() {
