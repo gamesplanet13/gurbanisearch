@@ -662,6 +662,24 @@ async function refreshSourcesAvailability(){
  }catch(e){$('sourceAvailability').textContent='Offline source status unavailable: '+e.message}
 }
 
+async function readCompressedGurbaniPack(path,expected){
+ const response=await fetch('data/offline-packs/'+path,{cache:'no-store'});
+ if(!response.ok)throw Error('GitHub Gurbani pack unavailable: '+path+' · HTTP '+response.status);
+ const bytes=await response.arrayBuffer();
+ if(expected?.bytes&&bytes.byteLength!==expected.bytes)throw Error('Incomplete Gurbani pack: '+path);
+ if(expected?.sha256){
+  if(!crypto?.subtle?.digest)throw Error('Secure checksum support unavailable');
+  const digest=await crypto.subtle.digest('SHA-256',bytes);
+  const actual=Array.from(new Uint8Array(digest),v=>v.toString(16).padStart(2,'0')).join('');
+  if(actual!==expected.sha256)throw Error('Gurbani pack checksum mismatch: '+path)
+ }
+ if(path.endsWith('.json.gz')){
+  if(typeof DecompressionStream==='undefined')throw Error('Please update Android WebView or browser for compressed offline library support');
+  const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+  return JSON.parse(await new Response(stream).text())
+ }
+ return JSON.parse(new TextDecoder('utf-8').decode(bytes))
+}
 async function readGithubPackManifest(){
  const response=await fetch('data/offline-packs/manifest.json',{cache:'no-store'});
  if(!response.ok)throw Error('GitHub source manifest unavailable');
@@ -683,12 +701,10 @@ async function installGithubOfflineSource(){
   let done=0;
   for(const part of item.parts){
    if(offlineStopRequested)break;
-   if(!/^[DBNA]\/chunk-\d{4}\.json$/.test(part.path)||!part.path.startsWith(src+'/'))throw Error('Invalid source pack path');
-   const filename=part.path.slice(src.length+1),key=src+':shabados-'+src+'-'+filename.replace(/^chunk-|\.json$/g,'');
+   if(!/^[DBNA]\/chunk-\d{4}\.json(?:\.gz)?$/.test(part.path)||!part.path.startsWith(src+'/'))throw Error('Invalid source pack path');
+   const filename=part.path.slice(src.length+1),key=src+':shabados-'+src+'-'+filename.replace(/^chunk-|\.json(?:\.gz)?$/g,'');
    if(await offlineGet('corpora',key).catch(()=>null)){done++;continue}
-   const response=await fetch('data/offline-packs/'+part.path,{cache:'no-store'});
-   if(!response.ok)throw Error('GitHub pack '+part.path+' HTTP '+response.status);
-   const pack=await response.json();
+   const pack=await readCompressedGurbaniPack(part.path,part);
    if(pack.source!==src||pack.format!=='gamesplanet-gurbani-source-v1')throw Error('Pack source does not match manifest');
    const lines=pack.lines?.map(verifyImportRow);
    if(!Array.isArray(lines)||!lines.length||lines.some(v=>!v))throw Error('Invalid Gurbani in '+part.path);
@@ -822,15 +838,13 @@ async function downloadOfflineLibrary(){
    // Fast first run: 20 verified Angs per GitHub bundle, resume skips already saved pages.
    for(const part of published){
     if(offlineStopRequested)break;
-    if(!/^G\/chunk-\d{4}\.json$/.test(part.path))throw Error('Invalid SGGS pack path');
+    if(!/^G\/chunk-\d{4}\.json(?:\.gz)?$/.test(part.path))throw Error('Invalid SGGS pack path');
     let complete=true;
     for(let n=part.start;n<=part.end;n++){
      if(!(await offlineGet('angs',n))){complete=false;break}
     }
     if(complete)continue;
-    const response=await fetch('data/offline-packs/'+part.path,{cache:'no-store'});
-    if(!response.ok)throw Error('GitHub Gurbani pack unavailable: '+part.path+' HTTP '+response.status);
-    const pack=await response.json();
+    const pack=await readCompressedGurbaniPack(part.path,part);
     if(pack.format!=='gamesplanet-gurbani-angs-v1'||pack.source!=='G'||!Array.isArray(pack.pages)||pack.pages.length!==part.count)throw Error('Invalid SGGS pack: '+part.path);
     for(const ang of pack.pages){
      if(!Number.isInteger(ang.number)||ang.number<part.start||ang.number>part.end||!Array.isArray(ang.page)||ang.page.length<5)throw Error('Unverified Ang in '+part.path);
@@ -925,7 +939,7 @@ async function sourcePackInstalled(k,manifest){
  if(!parts.length)return false;
  const entries=await offlineSourceRecords();
  return parts.every(part=>{
-  const suffix=part.path.split('/').at(-1).replace(/^chunk-/,'').replace(/\.json$/,'');
+  const suffix=part.path.split('/').at(-1).replace(/^chunk-/,'').replace(/\.json(?:\.gz)?$/,'');
   return entries.some(entry=>entry.key===k+':shabados-'+k+'-'+suffix&&entry.lines?.length===part.lines)
  })
 }
