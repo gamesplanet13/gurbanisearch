@@ -1,0 +1,39 @@
+# Gurbani Searcher — Offline Search & Reading
+
+The Controller is now **offline-first for already-downloaded Sri Guru Granth Sahib Ji (SGGS) Angs**. Its Pages shell, bundled six-pauri Anand Sahib, Sukhmani Sahib, and the concluding Japji Sahib Salok are cached for offline use by `sw.js`.
+
+## Download the SGGS library once
+
+1. Open [Controller](https://gamesplanet13.github.io/gurbanisearch/) **while online**.
+2. Find **Offline Gurbani Library** under Search Gurbani.
+3. Tap **↓ Save 1430 Angs**. The progress indicator shows the number saved.
+4. Use Pause as needed; tap Save again to resume. Angs already saved are skipped.
+5. When **1430/1430** appears, SGGS Ang verses downloaded from BaniDB are available to search locally using IndexedDB. Search works in Airplane Mode after the app's shell has been cached.
+
+The local search includes Gurmukhi first letters and full-word matches. English initial-letter/romanized matches require transliteration in the saved source data. If the source lacks Roman data, those particular search modes cannot find it offline.
+
+Opening an offline match:
+- When a complete cached Shabad response exists, it opens that Shabad.
+- Otherwise, if the source includes a reliable Shabad ID, downloaded Ang lines with the same ID are grouped as the Shabad.
+- When no reliable Shabad ID is present, the exact matching **Ang** and verse are shown (not an invented Shabad boundary).
+
+## Limits
+
+- **One-time internet download required for full SGGS coverage.** Simply installing a new APK or visiting the Pages site is **not** a preloaded 1430-Ang database.
+- The bulk download depends on BaniDB availability, response formats, CORS, rate limits, phone storage quota, and reliable network. It is resumable; missing Angs remain unavailable offline until saved.
+- The downloaded SGGS Ang library is scoped to **1430 Angs**, not every historic or additional text supported by BaniDB.
+- Meanings/transliterations are available only if present in downloaded source responses. They are not AI-generated or guaranteed in every language.
+- IndexedDB storage is **local to each browser/app profile**; downloading on one device does not transfer the corpus to another. Clearing site/app data deletes it.
+- Saved previously opened Shabads can also be reopened offline through their cached response.
+- **Projection pairing / live multi-screen sync is not offline yet.** It currently requires PeerJS signaling/network connectivity. Offline search does not imply offline WebRTC pairing.
+- A service worker needs an initial online load to install/cache the site shell. APK users may need an updated build for a new version to be seen, but the pages served by GitHub Pages are updated directly.
+- Downloading does not alter the Gurbani text. Verify against the canonical Sri Guru Granth Sahib Ji for religious/study accuracy.
+
+## Sources and attribution
+
+- BaniDB API: https://api.banidb.com/
+- Sri Guru Granth Sahib Ji: 1430 Angs
+- Locally bundled Bani files: see data/banis/ and their source attributions.
+- Shabad OS database is another openly documented way to build offline software: https://www.shabados.com/docs/database/usage/
+
+This implementation caches user-initiated download responses in IndexedDB and a static app shell in the browser Service Worker. No additional paid hosting or Node.js server is needed.
