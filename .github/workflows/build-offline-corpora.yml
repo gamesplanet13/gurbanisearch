@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - "scripts/export_shabados_offline.py"
+      - "scripts/build_offline_sggs.py"
       - ".github/workflows/build-offline-corpora.yml"
 
 permissions:
@@ -40,6 +41,17 @@ jobs:
               assert m['sources'][k]['lines']>0
               assert m['sources'][k]['parts']
           print({k:(v['lines'],len(v['parts'])) for k,v in m['sources'].items()})
+          PY
+      - name: Build compact SGGS 1430-Ang GitHub packs from Open Granth
+        run: |
+          python3 scripts/build_offline_sggs.py --output data/offline-packs
+          python3 - <<'PY'
+          import json
+          m=json.load(open("data/offline-packs/manifest.json"))
+          g=m["sources"]["G"]
+          assert g["pages"]==1430 and sum(p["count"] for p in g["parts"])==1430
+          assert all(m["sources"][k]["parts"] for k in ("D","B","N"))
+          print("Valid SGGS packs:",len(g["parts"]))
           PY
       - name: Upload packs to this GitHub repository
         run: |
