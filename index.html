@@ -216,7 +216,8 @@ function renderHistory(){
 }
 function menu(show){$('functionsMenu').hidden=!show;$('menuButton').setAttribute('aria-expanded',String(show))}
 $('menuButton').onclick=()=>menu($('functionsMenu').hidden);$('closeMenu').onclick=()=>menu(false);
-$('functionsMenu').append($('connectCard'),$('fontCard'));
+$('menuOptions').prepend($('connectCard'));
+$('menuOptions').append($('fontCard'));
 document.addEventListener('pointerdown',e=>{if(!e.target.closest('#functionsMenu,#menuButton'))menu(false)});
 
 let pics=[];
