@@ -753,10 +753,15 @@ async function openOfflineSearchResult(item){
  if(item.kind==='corpus'){
   const pack=await offlineGet('corpora',item.key);
   if(!pack?.lines)return status('Offline source pack unavailable');
-  setReading(pack.lines,pack.title,null);
+  const selected=pack.lines[item.index],groupId=explicitShabadId(selected);
+  // Exported Shabad OS source packs never split a Shabad across pack boundaries.
+  const excerpt=groupId?pack.lines.filter(v=>String(explicitShabadId(v)||'')===String(groupId)):[selected];
+  const lineIndex=Math.max(0,excerpt.findIndex(v=>v.verseId===selected.verseId));
+  setReading(excerpt,pack.title+(selected.section?' · '+selected.section:''),null);
   shabadSourceInfo={name:SOURCE_META[pack.source]?.label||pack.title,ang:''};
-  show(item.index,false);
-  status(pack.title+' · local offline source');
+  if(Number.isInteger(selected.pageNo)&&selected.pageNo>0)shabadAng=selected.pageNo;
+  show(lineIndex,false);
+  status(pack.title+' · '+excerpt.length+' lines · offline Shabad');
   return
  }
  if(item.kind==='ang'){
