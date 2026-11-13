@@ -191,6 +191,16 @@ public class MainActivity extends Activity {
             View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
     }
     @Override public void onBackPressed() {
+        // Projection on Android TV: back must never quit without confirmation.
+        if("projection".equals(BuildConfig.ROLE)) {
+            new android.app.AlertDialog.Builder(this)
+                .setTitle("Exit Projection?")
+                .setMessage("Do you want to close Gurbani Projection?")
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .setPositiveButton("Exit", (dialog, which) -> finish())
+                .show();
+            return;
+        }
         if(web != null && web.canGoBack()) web.goBack();
         else finish();
     }
