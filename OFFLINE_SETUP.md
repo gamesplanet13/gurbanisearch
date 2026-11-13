@@ -68,3 +68,29 @@ Open Controller **☰ → bottom → Database · Download / Storage / Version**.
 - Delete requires confirmation. It removes IndexedDB Angs, source packs, and cached online Shabads **from that device only**. It pauses auto-download until the user presses Download again.
 - Deletion of database data does not remove the app, stored device pairing settings, or the static application cache.
 - The main source pack manifest at `data/offline-packs/manifest.json` must be populated before a complete all-source offline database can be claimed.
+
+
+## Compact mobile-first database — November 2026
+
+The Controller now supports compact, integrity-checked `*.json.gz` packages. GitHub data pack scripts generate:
+- **G — Sri Guru Granth Sahib Ji:** Unicode Gurmukhi, Ang numbers and Roman transliteration from Open Granth; large editorial English meanings are omitted from the core pack. The 1430 Angs are bundled into 20-Ang chunks.
+- **D — Sri Dasam Granth:** Unicode Gurmukhi with Shabad grouping from Shabad OS.
+- **B — Bhai Gurdas Ji:** Vaaran and Kabit Savaiye, separate source pack.
+- **N — Bhai Nand Lal Ji:** indexed source pack.
+
+The scripts compress each chunk with reproducible gzip and record **SHA-256** and byte length in the manifest. The Controller checks the hash, expands the payload on device using `DecompressionStream`, verifies source IDs and stores searchable text locally in IndexedDB. This is a much lighter transfer than PDFs, a full editorial SQLite library or downloading tens of thousands of source-file TOMLs to a phone.
+
+The offline database has a persistent Gurmukhi/Roman three-character **first-letter search index**, built after the complete SGGS install. Short queries, full-word and other sources still use a validated local text scan. A device can use its saved data with no internet after download. Search works independently from PeerJS display pairing, which still requires network signaling.
+
+The source pack **generator is committed**, but the download manifest in `data/offline-packs/manifest.json` must show actual source entries and `status: published` before the app can use GitHub bundled packs. A manifest with `status: not-built` means **no prebuilt data yet**; do not claim the whole corpus has already been published. The SGGS code can fall back to downloading the Ang files from Open Granth when an internet connection is available.
+
+These packs exclude editorial translations by default. Users who need Hindi, Punjabi or English meanings can request or import separately licensed/cited optional translation packs. **Never fabricate Gurbani or silently merge disagreeing editions.**
+
+The unrelated **Gurbani Searcher Android** Play Store app by Surinder Pal Singh demonstrates multi-source search, but this Games Planet app does not reuse or decompile that proprietary APK's database. Source texts are built independently from Shabad OS and Open Granth.
+
+Build-time entrypoints:
+- `scripts/build_offline_sggs.py`
+- `scripts/export_shabados_offline.py`
+- `.github/workflows/build-offline-corpora.yml`
+
+**Important:** actual pack sizes, installation time and Android device performance must be measured after a successful complete corpus build. No size or speed guarantee is implied.
