@@ -64,7 +64,74 @@ main{grid-template-columns:minmax(220px,39%) minmax(0,61%);gap:7px}
 #historyCard{max-height:75dvh}
 }
 @media(max-width:649px){main{grid-template-columns:1fr}#lines{max-height:48dvh}}
-.offline-tools{border:1px solid #3a4d66;border-radius:8px;padding:6px;margin:5px 0;background:#19293c} .offline-tools .row{margin:3px 0;gap:5px}.offline-tools strong{font-size:11px}.offline-tools progress{width:100%;height:8px;display:block;accent-color:#73cda0}.offline-tools #offlineBadge{white-space:nowrap}.offline-tools .small{font-size:10px} </style></head><body><header><h1>ੴ Gurbani Searcher · Control</h1><button id="menuButton" class="icon-btn" title="Functions and connected devices" aria-label="Open functions" aria-expanded="false">☰</button></header><main><div id="searchColumn">
+.offline-tools{border:1px solid #3a4d66;border-radius:8px;padding:6px;margin:5px 0;background:#19293c} .offline-tools .row{margin:3px 0;gap:5px}.offline-tools strong{font-size:11px}.offline-tools progress{width:100%;height:8px;display:block;accent-color:#73cda0}.offline-tools #offlineBadge{white-space:nowrap}.offline-tools .small{font-size:10px} 
+/* Fill device screen with usable content, keep long Shabad list independently scrollable. */
+html,body{min-height:100%;overflow-x:hidden}
+body{font-size:11px}
+header{position:sticky;top:0;z-index:15;padding:4px 7px}
+header h1{font-size:13px}
+main{width:100%;max-width:none;margin:3px auto;padding:0 4px;gap:4px;align-items:start}
+#searchColumn{min-width:0;gap:0}
+#searchCard,#shabadCard{min-width:0;margin:0 0 4px;padding:5px}
+#searchCard .row,#shabadCard .row{gap:3px;margin:3px 0}
+#searchCard h2,#shabadCard h2{font-size:12px;margin:0 0 3px}
+#searchCard input,#searchCard select,#searchCard button,#shabadCard input,#shabadCard button{font-size:10px;padding:3px 5px;min-height:23px}
+#searchCard .quick-actions button{min-height:22px}
+#searchCard .small,#shabadCard .small{font-size:9px}
+#shabadCard>p.small{display:none}
+#shabadCard .list{overflow:auto;overscroll-behavior:contain;scrollbar-width:thin}
+#lines .item{margin:2px 0;padding:4px 3px}
+#lines .verse{font-size:16px;line-height:1.42}
+#shabadCard .markMain{min-height:22px}
+#readingNavigator{margin:2px 0}
+#readingNavigator .row{margin:2px 0}
+#searchCard .offline-tools{margin-top:3px;padding:4px}
+#searchCard .offline-tools .row{margin:2px 0}
+#searchCard .offline-tools>p{font-size:9px}
+#searchCard .offline-tools progress{height:5px}
+#searchCard .offline-tools input[type=file]{max-width:100%}
+#results{max-height:30vh}
+#mainLabel{min-width:0}
+@media (orientation:landscape) and (min-width:600px){
+ main{grid-template-columns:minmax(225px,38%) minmax(0,62%);gap:4px;height:calc(100dvh - 36px);overflow:hidden}
+ #searchColumn{min-height:0;max-height:100%;overflow-y:auto;scrollbar-width:thin}
+ main>div:nth-child(2){min-height:0;height:100%;display:flex;flex-direction:column}
+ #shabadCard{flex:1;min-height:0;display:flex;flex-direction:column}
+ #shabadCard #lines{flex:1;min-height:0;max-height:none;overflow-y:auto}
+ #results{max-height:26vh}
+}
+@media (orientation:portrait), (max-width:599px){
+ main{display:flex;flex-direction:column;min-height:calc(100dvh - 33px);gap:2px}
+ #searchColumn{width:100%;flex:0 0 auto}
+ #searchCard{width:100%}
+ main>div:nth-child(2){width:100%;flex:1;min-height:0}
+ #shabadCard{display:flex;flex-direction:column}
+ #shabadCard #lines{height:min(56dvh,calc(100dvh - 210px));min-height:150px;max-height:none;overflow-y:auto}
+}
+.database-install{position:fixed;inset:0;z-index:1000;background:#060b14f7;display:flex;align-items:center;justify-content:center;padding:12px;overflow-y:auto}
+.database-install[hidden],#installRetry[hidden]{display:none!important}
+.install-card{width:min(96vw,510px);max-height:94dvh;overflow-y:auto;background:#17253a;border:1px solid #6381a5;box-shadow:0 12px 60px #000b;border-radius:14px;padding:18px;text-align:center}
+.install-card h2{font-size:18px;margin:4px 0 10px}
+.install-card .small{font-size:11px;color:#c6d2e5;line-height:1.6}
+.install-symbol{font-size:38px;color:#edca78}
+.install-status{font-weight:650;color:#e9d393;font-size:13px;margin:10px 0 6px}
+.install-card progress{width:100%;height:13px;accent-color:#75dbab}
+.install-count{font-size:17px;font-variant-numeric:tabular-nums;font-weight:700}
+.install-actions{justify-content:center;margin:10px 0}
+.install-card button{min-height:30px;font-size:12px}
+</style></head><body><div id="databaseInstall" class="database-install" role="dialog" aria-modal="true" aria-labelledby="databaseInstallTitle" hidden>
+ <div class="install-card">
+  <div class="install-symbol">ੴ</div>
+  <h2 id="databaseInstallTitle">Download &amp; Install Gurbani Database</h2>
+  <p class="small">First-time setup. The complete Sri Guru Granth Sahib Ji (1,430 Angs) will be stored on this device. Other published source packs will also be installed automatically.</p>
+  <div class="install-status" id="installPhase">Checking local Gurbani database…</div>
+  <progress id="installProgress" max="1430" value="0"></progress>
+  <div class="install-count" id="installCount">0 / 1430 Angs</div>
+  <p id="installDetails" class="small" aria-live="polite">Please keep this app open and connected to the internet for initial setup. Already saved pages won't be downloaded twice.</p>
+  <div class="row install-actions"><button id="installRetry" class="primary" hidden>↻ Retry / Resume</button><button id="installRefresh">↻ Recheck Storage</button></div>
+  <p id="installOtherSources" class="small">Dasam Granth · Bhai Gurdas Ji · Bhai Nand Lal Ji: Checking GitHub source packs…</p>
+ </div>
+</div><header><h1>ੴ Gurbani Searcher · Control</h1><button id="menuButton" class="icon-btn" title="Functions and connected devices" aria-label="Open functions" aria-expanded="false">☰</button></header><main><div id="searchColumn">
 <section class="card" id="connectCard"><h2>Connected Projections</h2><div class="row"><div class="grow"><span class="muted">Your controller code</span><div id="code" class="code">•••••</div></div><span id="connStatus" class="muted">Connecting…</span></div><div class="row"><input id="newControllerCode" class="grow" inputmode="numeric" maxlength="5" placeholder="New 5-digit controller code"><button id="changeControllerCode">Change code</button></div><div class="row"><button id="searchWifi" class="primary">Search Wi-Fi Projections</button></div><p id="wifiStatus" class="small" aria-live="polite">Find Projection or Book View on the same Wi-Fi.</p><div id="wifiResults"></div><div class="row"><input id="pairCode" placeholder="Projection 5-digit code" inputmode="numeric" maxlength="5" class="grow"><button id="pair" class="primary">Connect</button></div><p class="small">You can also type your controller code into the Projection browser. Select displays below before projecting.</p><p id="pairStatus" class="small" aria-live="polite">Connecting…</p><div id="devices"></div></section>
 <section class="card" id="searchCard"><h2>Search Gurbani</h2><div class="row"><label for="corpusSource" class="small">Source</label><select id="corpusSource" class="grow"><option value="all">All Sources</option><option value="G">Sri Guru Granth Sahib Ji</option><option value="D">Sri Dasam Granth</option><option value="B">Bhai Gurdas Ji Vaaran</option><option value="N">Bhai Nand Lal Ji</option><option value="A">Amrit Keertan / Other</option></select></div><div class="row"><select id="keyboard"><option value="en">English keyboard</option><option value="pa">Gurmukhi keyboard</option><option value="hi">Hindi keyboard</option></select><select id="searchType"><option value="7">First letters (English)</option><option value="0">First letters (Gurmukhi)</option><option value="2">Full word (Gurmukhi)</option><option value="4">Romanized word</option></select></div><div class="row"><input id="query" class="grow" placeholder="Type first letters (e.g. ddss)"><button id="search" class="primary icon-btn" title="Search Gurbani" aria-label="Search Gurbani">⌕</button><button id="waheguru" style="background:linear-gradient(120deg,#ff9d59,#a75dff,#24c6ad);font-weight:750" aria-label="Project animated Waheguru">ਵਾਹਿਗੁਰੂ ✨</button></div><div class="quick-actions"><button id="aapeSangat" title="ਆਪੇ ਸੰਗਤਿ ਸਦਿ ਬਹਾਲੈ">ਆਪੇ ਸੰਗਤਿ…</button><button id="anandSix" title="ਅਨੰਦ ਸਾਹਿਬ — 6 ਪਉੜੀਆਂ">ਅਨੰਦ 6</button><button id="sukhmani" title="ਸੁਖਮਨੀ ਸਾਹਿਬ">ਸੁਖਮਨੀ</button><button id="sehaj" title="ਸਹਿਜ ਪਾਠ">ਸਹਿਜ ਪਾਠ</button></div><div id="results" class="list" hidden></div><div class="offline-tools"><div class="row"><strong class="grow">Offline Gurbani Library</strong><span id="offlineBadge" class="small">Checking storage…</span></div><div class="row"><button id="offlineDownload" class="primary" title="Download Sri Guru Granth Sahib Ji Angs from Open Granth for offline search">↓ SGGS 1430 Angs</button><button id="offlineSourceDownload" class="primary" title="Save the chosen GitHub source pack on this device">↓ Selected Source</button><button id="offlineStop" title="Pause offline downloading">Ⅱ</button><button id="offlineRefresh" title="Check offline downloaded pages">↻</button></div><progress id="offlineProgress" value="0" max="1430"></progress><div class="row"><label class="small grow" for="offlineImport">Import vetted source pack (JSON)</label><input id="offlineImport" type="file" accept=".json,application/json" aria-label="Import locally saved scripture source pack"></div><div id="sourceAvailability" class="small" aria-live="polite"></div><p id="offlineMessage" class="small" aria-live="polite">Public-domain Gurbani text from Open Granth (Shabad OS source). Download once online; then search and read offline. English meaning is available when included in source.</p></div><p class="small">Results from the BaniDB public API. Internet required for Gurbani search.</p></section></div>
 <div><section class="card" id="shabadCard"><div class="row" style="justify-content:space-between;align-items:center"><h2 style="margin:0">Shabad · Choose a Line</h2><button id="historyToggle" class="icon-btn" type="button" aria-expanded="false" title="Recent Shabads History" aria-label="Recent Shabads History">☷</button></div><section class="card" id="historyCard" hidden><div class="row" style="justify-content:space-between"><strong>Recent Shabads</strong><button id="historyClose" type="button">✕</button></div><div id="historyList"></div></section><div class="row"><button id="mainLine" class="primary icon-btn" title="Go to Main Line" aria-label="Go to Main Line">⌂</button><span id="mainLabel" class="small">Main: —</span></div><p class="small">Tap any line to project; use ☆ to set that line as Main.</p><div id="readingNavigator" hidden><div class="small" id="readingKindLabel"></div><div id="sukhmaniNavigation" hidden class="row"><button id="prevSalok" class="icon-btn" title="Previous Salok" aria-label="Previous Salok">◀</button><input id="salokNumber" type="number" min="1" max="24" inputmode="numeric" placeholder="Salok 1–24" style="width:120px"><button id="openSalok" class="icon-btn" title="Open selected Salok" aria-label="Open selected Salok">↵</button><button id="nextSalok" class="icon-btn" title="Next Salok" aria-label="Next Salok">▶</button><span id="salokPosition" class="small"></span></div><div id="sehajNavigation" hidden><div class="row"><input id="angInput" type="number" min="1" max="1430" inputmode="numeric" placeholder="Custom Ang 1–1430" class="grow"><button id="angSearch" class="icon-btn" title="Open selected Ang" aria-label="Open selected Ang">↵</button><button id="prevAng" class="icon-btn" title="Previous Ang" aria-label="Previous Ang">◀</button><button id="nextAng" class="icon-btn" title="Next Ang" aria-label="Next Ang">▶</button></div></div></div><div id="lines" class="list"></div><div class="row"><button id="previous" class="icon-btn" type="button" title="Previous line" aria-label="Previous line">◀</button><button id="next" class="icon-btn" type="button" title="Next line" aria-label="Next line">▶</button><button id="clear" class="icon-btn icon-danger" type="button" title="Clear projection" aria-label="Clear projection">⌫</button></div></section>
