@@ -54,10 +54,10 @@ public class MainActivity extends Activity {
                     WebView view, android.webkit.WebResourceRequest request) {
                 Uri uri = request.getUrl();
                 if (tvProjection && isTrustedOrigin(uri)
-                        && "/gurbanisearch/gurbani-tv-waheguru.js".equals(uri.getPath())) {
+                        && "/gurbanisearch/gurbani-tv-waheguru-glow.js".equals(uri.getPath())) {
                     try {
                         return new android.webkit.WebResourceResponse("application/javascript", "UTF-8",
-                                getAssets().open("gurbani-tv-waheguru.js"));
+                                getAssets().open("gurbani-tv-waheguru-glow.js"));
                     } catch (java.io.IOException ignored) { }
                 }
                 return super.shouldInterceptRequest(view, request);
