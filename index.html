@@ -455,7 +455,7 @@ $('clear').onclick=()=>{lastContent=null;put('gb-last-content',null);publish({co
    user must explicitly download 1430 Angs online to enable complete SGGS Ang search. */
 const OFFLINE_DB_NAME='gamesplanet-gurbani-offline-v1';
 if(navigator.storage?.persist)navigator.storage.persist().catch(()=>{});
-const OFFLINE_DB_VERSION=2;
+const OFFLINE_DB_VERSION=3;
 let offlineDbPromise=null,offlineStopRequested=false,offlineDownloading=false,offlineCount=0;
 function offlineDb(){
  if(offlineDbPromise)return offlineDbPromise;
@@ -466,7 +466,8 @@ function offlineDb(){
    const db=req.result;
    if(!db.objectStoreNames.contains('angs'))db.createObjectStore('angs',{keyPath:'number'});
    if(!db.objectStoreNames.contains('requests'))db.createObjectStore('requests',{keyPath:'url'});
-   if(!db.objectStoreNames.contains('corpora'))db.createObjectStore('corpora',{keyPath:'key'})
+   if(!db.objectStoreNames.contains('corpora'))db.createObjectStore('corpora',{keyPath:'key'});
+   if(!db.objectStoreNames.contains('fastIndex'))db.createObjectStore('fastIndex',{keyPath:'key'})
   };
   req.onsuccess=()=>resolve(req.result);
   req.onerror=()=>reject(req.error||Error('Offline storage failed'));
@@ -621,13 +622,63 @@ async function offlineSourceRecords(){
  }).catch(e=>{cachedOfflineCorpora=null;throw e});
  return cachedOfflineCorpora
 }
+let offlineIndexPromise=null;
+async function prepareAngFirstLetterIndex(){
+ if(offlineCount!==1430)return null;
+ if(offlineIndexPromise)return offlineIndexPromise;
+ offlineIndexPromise=(async()=>{
+  const saved=await offlineGet('fastIndex','SGGS-trigrams-v1').catch(()=>null);
+  if(saved?.pages===1430&&saved?.gurmukhi&&saved?.roman)return saved;
+  const angs=await offlineAllAngs(),gurmukhi=Object.create(null),roman=Object.create(null);
+  function addTerms(target,txt,ang,i){
+   // Three-character chunks preserve first-letter substring matching.
+   const seen=new Set();
+   for(let j=0;j+2<txt.length;j++){
+    const gram=txt.slice(j,j+3);if(seen.has(gram))continue;
+    seen.add(gram);(target[gram]||(target[gram]=[])).push([ang,i])
+   }
+  }
+  for(const page of angs)for(let i=0;i<page.page.length;i++){
+   const x=indexedOfflineRow(page.page[i]);
+   addTerms(gurmukhi,x.first,page.number,i);
+   addTerms(roman,x.romanFirst,page.number,i)
+  }
+  const entry={key:'SGGS-trigrams-v1',pages:1430,gurmukhi,roman};
+  try{await offlineStore('fastIndex','readwrite',store=>store.put(entry))}catch(e){console.warn('Fast-index persistence unavailable',e)}
+  return entry
+ })().catch(e=>{offlineIndexPromise=null;throw e});
+ return offlineIndexPromise
+}
+async function fastAngSearch(query,type,limit){
+ const needle=normalizeOfflineText(query);
+ if(needle.length<3||!['0','7'].includes(type)||offlineCount!==1430)return null;
+ const idx=await prepareAngFirstLetterIndex();
+ if(!idx)return null;
+ const hits=(type==='0'?idx.gurmukhi:idx.roman)[needle.slice(0,3)]||[];
+ const matched=[],cache=new Map();
+ for(const [n,i] of hits){
+  let ang=cache.get(n);
+  if(!ang){ang=await offlineGet('angs',n);cache.set(n,ang)}
+  const row=ang?.page?.[i];
+  if(row&&offlineMatch(row,query,type)){
+   matched.push({row,ang:n,index:i,kind:'ang',source:'G'});
+   if(matched.length>=limit)break
+  }
+ }
+ return matched
+}
 async function offlineSearch(query,type,limit=40){
  const source=corpusSource(),results=[];
  if(source==='all'||source==='G'){
-  const angs=await offlineAllAngs();
-  for(const ang of angs)for(let i=0;i<ang.page.length;i++){
-   const row=ang.page[i];
-   if(offlineMatch(row,query,type)){results.push({row,ang:ang.number,index:i,kind:'ang',source:'G'});if(results.length>=limit)return results}
+  let fast=null;
+  try{fast=await fastAngSearch(query,type,limit)}catch(e){console.warn('Fast-index error; scanning offline text instead',e)}
+  if(fast!==null){results.push(...fast);if(results.length>=limit)return results}
+  else{
+   const angs=await offlineAllAngs();
+   for(const ang of angs)for(let i=0;i<ang.page.length;i++){
+    const row=ang.page[i];
+    if(offlineMatch(row,query,type)){results.push({row,ang:ang.number,index:i,kind:'ang',source:'G'});if(results.length>=limit)return results}
+   }
   }
  }
  const corpora=await offlineSourceRecords();
@@ -955,6 +1006,7 @@ async function autoInstallDatabase(force=false){
    dbManagerStatus('Downloading & installing Gurbani database automatically · '+offlineCount+'/1430 Angs');
    await downloadOfflineLibrary();
   }
+  if(offlineCount===1430){try{await prepareAngFirstLetterIndex()}catch(e){console.warn('Index will build on next search',e)}}
   if(navigator.onLine===false)return;
   let manifest;
   try{manifest=await readGithubPackManifest()}catch(e){
@@ -985,6 +1037,7 @@ async function deleteOfflineDatabase(){
  if(offlineDownloading||automaticInstallRunning){dbManagerStatus('Download still stopping. Try Delete again.');return}
  try{
   await offlineStore('angs','readwrite',store=>store.clear());
+  await offlineStore('fastIndex','readwrite',store=>store.clear());offlineIndexPromise=null;
   await offlineStore('corpora','readwrite',store=>store.clear());
   await offlineStore('requests','readwrite',store=>store.clear());
   cachedOfflineAngs=null;cachedOfflineCorpora=null;
