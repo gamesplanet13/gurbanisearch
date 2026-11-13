@@ -270,7 +270,7 @@ function sendOneDeviceSettings(key,includeContent=false){
  const v=deviceSettings(key),rev=++deliveryCounter;
  send(c,{type:'display-mode',token:myToken,mode:preferredView(key)});
  const packet={type:'project',token:myToken,rev,settings:v.projection,bookSettings:v.book};
- if(includeContent&&lastContent)packet.content=lastContent;
+ if(includeContent&&lastContent&&projectionIsOn)packet.content=lastContent;
  if(send(c,packet)){pendingDelivery.set(c,{rev,time:Date.now()});status('Settings sent to '+(known[key]?.name||key))}
 }
 function editDeviceSettings(key){
@@ -424,7 +424,21 @@ setInterval(reconnectSaved,10000);
 window.addEventListener('online',reconnectSaved);function probeAfterResume(){reconnectSaved();const sentAt=Date.now();for(const [key,c] of connections){if(!c?.open)continue;send(c,{type:'ping',id:sentAt,token:myToken});setTimeout(()=>{if(connections.get(key)===c&&(health.get(c)||0)<sentAt){connections.delete(key);try{c.close()}catch(_){}reconnectSaved()}},5000)}}window.addEventListener('focus',probeAfterResume);window.addEventListener('pageshow',probeAfterResume);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)reconnectSaved()});
 $('changeControllerCode').onclick=()=>{const v=$('newControllerCode').value.trim();if(!/^\d{5}$/.test(v))return status('Enter a valid 5-digit controller code');if(v===myCode)return status('This is already your controller code');put('gb-controller-code',v);location.reload()};
-function publish(payload,projectionOnly=false){
+let projectionIsOn=stored('gb-projection-switch-on',true);
+function refreshProjectionSwitch(){
+ const b=$('projectionSwitch');b.classList.toggle('projection-enabled',projectionIsOn);b.classList.toggle('projection-disabled',!projectionIsOn);
+ b.textContent=projectionIsOn?'▣':'✕';b.title=projectionIsOn?'Projection ON — tap to switch OFF':'Projection OFF — tap to switch ON';
+ b.setAttribute('aria-label',projectionIsOn?'Projection ON':'Projection OFF');b.setAttribute('aria-pressed',String(projectionIsOn))
+}
+$('projectionSwitch').onclick=()=>{
+ projectionIsOn=!projectionIsOn;put('gb-projection-switch-on',projectionIsOn);refreshProjectionSwitch();
+ if(!projectionIsOn)publish({content:null},false,true);
+ else if(lastContent)publish({content:lastContent},false,true);
+ status(projectionIsOn?'Projection ON':'Projection OFF — local line selection still works')
+};
+refreshProjectionSwitch();
+function publish(payload,projectionOnly=false,force=false){
+ if(!projectionIsOn&&!force&&payload.content!==null)return 0;
  let sent=0;const rev=++deliveryCounter;
  for(const id of selected){
   if(projectionOnly&&['book','obs'].includes(known[id]?.kind))continue;
@@ -1101,7 +1115,57 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout
 $('offlineRefresh').addEventListener('click',refreshSourcesAvailability);
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(e=>console.warn('Offline app-shell cache unavailable',e))}
 $('query').onkeydown=e=>{if(e.key==='Enter')$('search').click()};
-$('keyboard').onchange=()=>{$('query').lang=$('keyboard').value;const m={en:'7',pa:'0',hi:'2'};$('searchType').value=m[$('keyboard').value];$('query').focus()};
+const KB_LAYOUT={
+ en:['qwertyuiop','asdfghjkl','zxcvbnm'],
+ pa:['ੌੈਾੀੂਬਹਗਦਜਡ਼ੋੇ੍ਿੁਪ','ਰਕਤਚਟੰਮਨਵਲਸਯ','ਸ਼ਖਗ਼ਜਜ਼ਫ਼ੜ'],
+ hi:['ौैाीूबहगदजड','ोे्िुपरकतचट','ंमनवलसयशषह'],
+};
+let keyboardOpen=false;
+function buildVirtualKeyboard(){
+ const target=$('keyboardKeys');target.replaceChildren();
+ const lang=$('keyboard').value;
+ for(const row of KB_LAYOUT[lang]){
+  for(const symbol of Array.from(row)){
+   const key=document.createElement('button');key.type='button';key.textContent=symbol;
+   key.setAttribute('aria-label','Insert '+symbol);
+   key.onpointerdown=e=>e.preventDefault();
+   key.onclick=()=>insertVirtualText(symbol);
+   target.append(key)
+  }
+ }
+ const extras=lang==='en'?['-','.','?']:lang==='pa'?['ੳ','ਅ','ੲ','ਂ','ੱ','ੑ']:['अ','आ','इ','ई','उ','ऊ'];
+ for(const symbol of extras){const key=document.createElement('button');key.type='button';key.textContent=symbol;key.onclick=()=>insertVirtualText(symbol);target.append(key)}
+ const space=document.createElement('button');space.type='button';space.className='kb-space';space.textContent='Space';space.onclick=()=>insertVirtualText(' ');
+ const back=document.createElement('button');back.type='button';back.className='kb-delete';back.textContent='⌫';back.title='Backspace';back.onclick=()=>backspaceVirtualText();
+ const search=document.createElement('button');search.type='button';search.className='kb-search';search.textContent='⌕';search.title='Search';search.onclick=()=>$('search').click();
+ target.append(space,back,search);
+ for(const button of document.querySelectorAll('#keyboardLanguages button[data-lang]'))button.classList.toggle('kb-active',button.dataset.lang===lang)
+}
+function insertVirtualText(text){
+ const field=$('query');let a=field.selectionStart??field.value.length,b=field.selectionEnd??a;
+ field.setRangeText(text,a,b,'end');field.dispatchEvent(new Event('input',{bubbles:true}));field.focus({preventScroll:true})
+}
+function backspaceVirtualText(){
+ const field=$('query');let a=field.selectionStart??field.value.length,b=field.selectionEnd??a;
+ if(a===b&&a>0)a--;
+ field.setRangeText('',a,b,'end');field.dispatchEvent(new Event('input',{bubbles:true}));field.focus({preventScroll:true})
+}
+function toggleVirtualKeyboard(open){
+ keyboardOpen=!!open;$('onscreenKeyboard').hidden=!keyboardOpen;
+ $('keyboardToggle').setAttribute('aria-expanded',String(keyboardOpen));
+ $('keyboardToggle').classList.toggle('primary',keyboardOpen);
+ $('query').setAttribute('inputmode',keyboardOpen?'none':'text');
+ if(keyboardOpen)buildVirtualKeyboard();
+}
+$('keyboardToggle').onclick=()=>toggleVirtualKeyboard(!keyboardOpen);
+$('keyboardHide').onclick=()=>toggleVirtualKeyboard(false);
+document.querySelectorAll('#keyboardLanguages button[data-lang]').forEach(b=>b.onclick=()=>{
+ $('keyboard').value=b.dataset.lang;
+ $('keyboard').dispatchEvent(new Event('change'));
+ buildVirtualKeyboard()
+});
+$('keyboard').onchange=()=>{$('query').lang=$('keyboard').value;const m={en:'7',pa:'0',hi:'2'};$('searchType').value=m[$('keyboard').value];$('query').placeholder={en:'Type first letters',pa:'ਪਹਿਲੇ ਅੱਖਰ ਲਿਖੋ',hi:'खोज के अक्षर लिखें'}[$('keyboard').value];if(keyboardOpen)buildVirtualKeyboard()};
+
 let readingAng=null,readingTitle='',shabadAng=null,sukhmaniSalokStarts=[],readingSourceInfo=null,shabadSourceInfo=null;
 function sourceLabelForLine(x,i,ang){
  if(readingAng)return {name:'Sri Guru Granth Sahib Ji',ang:String(readingAng)};
@@ -1216,6 +1280,68 @@ async function loadCanonicalBani(k){
  }catch(e){status('Could not load '+cfg.title+': '+e.message)}
 }
 $('aapeSangat').onclick=async()=>{status('Loading ਸ਼ਬਦ…');try{const d=await loadJson('https://api.banidb.com/v2/angs/551/G');const line=(d.page||[]).find(x=>verse(x).includes('ਆਪੇ ਸੰਗਤਿ ਸਦਿ ਬਹਾਲ'));if(!line||!sid(line))throw Error('Shabad not found on Ang 551');await openShabad(line)}catch(e){status('Could not load ਸ਼ਬਦ: '+e.message)}};
+
+const NITNEM_SOURCES=[
+ ['japji',2,'ਜਪੁਜੀ ਸਾਹਿਬ','G'],
+ ['jaap',4,'ਜਾਪ ਸਾਹਿਬ','D'],
+ ['tavPrasad',6,'ਤ੍ਵ ਪ੍ਰਸਾਦਿ ਸਵੱਯੇ','D'],
+ ['deenan',7,'ਸਵੱਯੇ ਦੀਨਨ ਕੀ ਪ੍ਰਤਿਪਾਲ','D'],
+ ['chaupai',9,'ਬੇਨਤੀ ਚੌਪਈ ਸਾਹਿਬ','D'],
+ ['anandFull',10,'ਅਨੰਦ ਸਾਹਿਬ','G'],
+ ['rehras',21,'ਰਹਿਰਾਸ ਸਾਹਿਬ','G'],
+ ['sohila',23,'ਸੋਹਿਲਾ ਸਾਹਿਬ','G'],
+ ['ardas',24,'ਅਰਦਾਸ','A'],
+ ['asaVar',90,'ਆਸਾ ਦੀ ਵਾਰ','G']
+];
+async function fetchNitnemReading(id,title,sourceCode){
+ const cfg=NITNEM_SOURCES.find(x=>x[1]===id);
+ const cacheKey='gb-bani-reading-v1-'+id;
+ let data=stored(cacheKey,null);
+ if(!Array.isArray(data)||!data.length){
+  const result=await loadJson('https://api.banidb.com/v2/banis/'+id);
+  const body=Array.isArray(result.verses)?result.verses:verses(result);
+  if(!Array.isArray(body)||body.length<5)throw Error('No complete verses returned from Gurbani source');
+  data=body.map(x=>{
+   const v=x.verse?.verse?.unicode??x.verse?.unicode??x.pn??verse(x);
+   const transliteration=x.verse?.transliteration??x.transliteration??{};
+   const hi=x.hi??transliteration.hindi??'';
+   const en=x.en??transliteration.english??'';
+   return {verse:{unicode:v},transliteration:{english:typeof en==='string'?en:'',hindi:typeof hi==='string'?hi:''},source:{sourceId:sourceCode,name:sourceCode==='G'?'Sri Guru Granth Sahib Ji':sourceCode==='D'?'Sri Dasam Granth':title},pageNo:x.verse?.pageNo??null}
+  }).filter(v=>verse(v));
+  if(data.length<5)throw Error('Gurbani source returned an incomplete Bani');
+  try{put(cacheKey,data)}catch(_){}
+ }
+ return data
+}
+async function openNitnemBani(id,title,src){
+ const nonce=++searchNonce;status('Opening '+title+'…');
+ try{
+  const data=await fetchNitnemReading(id,title,src);if(nonce!==searchNonce)return;
+  setReading(data,title,null);
+  shabadSourceInfo={name:src==='G'?'Sri Guru Granth Sahib Ji':src==='D'?'Sri Dasam Granth':title,ang:''};
+  status(title+' · '+data.length+' lines')
+ }catch(e){status(title+' unavailable: '+e.message)}
+}
+for(const [button,id,title,source] of NITNEM_SOURCES){
+ $(button).onclick=()=>openNitnemBani(id,title,source)
+}
+$('nitnem').onclick=async()=>{
+ const nonce=++searchNonce,combined=[];
+ status('Loading morning Nitnem…');
+ try{
+  for(const id of [2,4,6,9]){
+   const cfg=NITNEM_SOURCES.find(v=>v[1]===id);
+   const part=await fetchNitnemReading(cfg[1],cfg[2],cfg[3]);if(nonce!==searchNonce)return;
+   combined.push({verse:{unicode:'॥ '+cfg[2]+' ॥'},source:{name:cfg[2]}},...part)
+  }
+  const anand=await fetchCanonicalBani('anand');if(nonce!==searchNonce)return;
+  combined.push({verse:{unicode:'॥ ਅਨੰਦ ਸਾਹਿਬ · ੬ ਪਉੜੀਆਂ ॥'}},...anand);
+  try{const doc=await (await fetch('data/anand-ending-salok.json')).json();if(doc.verses?.length===7)combined.push(...doc.verses)}catch(_){}
+  setReading(combined,'ਨਿਤਨੇਮ · Morning',null);
+  status('Morning Nitnem loaded · '+combined.length+' lines')
+ }catch(e){status('Could not load Nitnem: '+e.message)}
+};
+
 $('anandSix').onclick=()=>loadCanonicalBani('anand');$('sukhmani').onclick=()=>loadCanonicalBani('sukhmani');$('sehaj').onclick=()=>loadAng(stored('gb-sehaj-ang',1));$('angSearch').onclick=()=>loadAng($('angInput').value);$('prevAng').onclick=()=>loadAng((readingAng||Number($('angInput').value)||1)-1);$('nextAng').onclick=()=>loadAng((readingAng||Number($('angInput').value)||1)+1);
 async function openShabad(x,fromHistory=false){
  const n=sid(x);if(!n)return status('No shabad ID available');
