@@ -106,7 +106,7 @@ function render(){
  }
  if(waheguru){bookMotion.center(null);displayedCurrent=null;return;}
  renderAlternateProjection();const source=content.sourceMeta||null;const credit=$('sourceCredit');credit.textContent=(source&&source.name)?('['+GurbaniLayout.sourceCode(source)+']'):'';credit.hidden=!credit.textContent;const angVal=(source&&source.ang)||content.ang||'';$('angIndicator').hidden=!angVal;$('angIndicator').textContent=angVal?'(Ang '+angVal+')':'';$('bookMetaTop').hidden=credit.hidden&&!angVal;
- requestAnimationFrame(()=>GurbaniLayout.protectMetadata($('bookMetaTop'),['#lines','#singleVerse','#singleHindiVerse','#singleEnglishVerse','#singleGurmukhiMeaning','#singleHindiMeaning','#singleEnglishMeaning']));
+ 
  if(displayMode==='projection'){bookMotion.center(null);displayedCurrent=null;return}
  const lines=Array.isArray(content.bookLines)&&content.bookLines.length?content.bookLines:(content.verse?[content.verse]:[]);
  if(!lines.length){bookMotion.center(null);box.textContent='';displayedLines=[];displayedCurrent=null;const empty=document.createElement('div');empty.className='empty';empty.textContent='ੴ ਵਾਹਿਗੁਰੂ — Waiting for Gurbani Shabad';box.append(empty);return}
@@ -133,8 +133,11 @@ function render(){
   displayedCurrent=line;
   if(line){line.classList.add('current');bookMotion.center(line)}
  }
-
+ requestAnimationFrame(()=>requestAnimationFrame(checkGurbaniMeta));
 }
+function checkGurbaniMeta(){GurbaniLayout.protectMetadata($('bookMetaTop'),['#lines','#singleVerse','#singleHindiVerse','#singleEnglishVerse','#singleGurmukhiMeaning','#singleHindiMeaning','#singleEnglishMeaning'])}
+window.addEventListener('resize',()=>requestAnimationFrame(checkGurbaniMeta));
+document.addEventListener('scroll',()=>requestAnimationFrame(checkGurbaniMeta),{passive:true,capture:true});
 let awaitSelection=read('gb-book-await-selection',!owner);
 function markAwaitSelection(v){awaitSelection=v;put('gb-book-await-selection',v);updateMainPairing()}
 function updateMainPairing(){ $('mainPairingCode').textContent=code; $('mainPairing').hidden=!!owner&&!awaitSelection;document.body.classList.toggle('pairing-active',!$('mainPairing').hidden); }
