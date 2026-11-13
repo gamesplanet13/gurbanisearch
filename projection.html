@@ -19,7 +19,22 @@ body.day-mode .verse-meta-bar,body.alt-book .verse-meta-bar{background:#eee4d5e8
 body.day-mode .verse-meta-bar .ang-indicator,body.alt-book .verse-meta-bar .ang-indicator{color:#6d4c18}
 .gp-credit{bottom:2px!important;z-index:7}
 
-</style><style>.developer-menu-foot{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:12px;padding:9px 7px;border-top:1px solid #ae8d4970;color:#f1d99c;font-size:11px}.developer-menu-foot a{color:#d1e7ff;text-decoration:none;font-size:11px}.developer-menu-foot strong{font-size:11px}</style></head><body><div id="stage"><div id="clock" hidden></div><div id="verse"></div><div id="hindiShabad" class="translation"></div><div id="englishShabad" class="translation"></div><div id="englishMeaning" class="translation"></div><div id="punjabiMeaning" class="translation"></div><div id="hindiMeaning" class="translation"></div><div id="hint" aria-hidden="true"></div><div id="rainbowScreen" aria-hidden="true"></div></div><div id="bookAlternate" hidden><div class="alt-book-heading">ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ</div><div id="alternateLines"></div></div><div id="photoStage" hidden><img id="photoImage" alt=""></div><div id="sahibzaadeStage" hidden role="img" aria-label="Sahibzaade family portrait"><img id="sahibzaadeImage" alt="Sahibzaade family portrait"></div><div id="verseMetaBar" class="verse-meta-bar" hidden><div id="sourceCredit" class="source-credit" hidden></div><div id="angIndicator" class="ang-indicator" hidden></div></div><footer class="gp-credit">Developed by Rajinder Singh · <a href="mailto:harjas.info@gmail.com">harjas.info@gmail.com</a> · 2026</footer><section id="mainPairing" hidden role="status" aria-live="polite"><div class="main-pair-title">Projection · Connection code</div><div id="mainPairingCode">•••••</div><div class="main-pair-help">इस कोड को Control ऐप में डालकर Connect करें</div></section><button id="menuButton" aria-label="Projection settings" aria-expanded="false">☰</button><div id="setup"><div class="row"><b class="grow">Projection Settings</b><button id="closeMenu">✕</button></div><div class="body"><span class="muted">Share this projection code with controller:</span><div id="code" class="code">•••••</div><p class="muted" id="status">Connecting…</p><div class="row"><input id="controllerCode" placeholder="Controller 5-digit code" inputmode="numeric" maxlength="5" class="grow"><button id="join">Connect</button></div><div class="row"><input id="name" class="grow" placeholder="Display name"><button id="saveName">Save</button></div><div class="row"><input id="newCode" class="grow" inputmode="numeric" maxlength="5" placeholder="New 5-digit code"><button id="changeCode">Change code</button></div><div class="developer-menu-foot"><strong>Developed by Rajinder Singh</strong><a href="mailto:harjas.info@gmail.com">✉ Email</a><a href="https://www.youtube.com/results?search_query=HarjasTV" target="_blank" rel="noopener noreferrer">▶ HarjasTV · YouTube</a></div><button id="resetPairing" class="action">Reset pairing</button> <button id="fullscreen">Fullscreen</button><div class="small-heading">Sahibzaade Picture</div><div class="row"><button id="showSahibzaade" class="action">Show Picture · Full Screen</button><button id="hideSahibzaade" class="action">Close Picture</button></div><div class="row"><button id="chooseSahibzaade" class="action">Use Original High-Quality Picture</button><input id="sahibzaadeFile" type="file" accept="image/*" hidden></div><p class="muted">The included portrait opens with one tap. Optionally select the original high-resolution image once on this device for a sharper fullscreen display.</p><div class="small-heading">Font size · live adjustments</div><label class="control-slider">Line spacing <span id="projectionSpacingValue">135</span>%<input type="range" id="projectionSpacing" min="90" max="220" step="5" value="135"></label><label class="control-slider">Gurbani <span id="vValue">64</span> px<input type="range" id="vSize" min="24" max="200" value="64"></label><label class="control-slider">Hindi Shabad <span id="hsvValue">64</span> px<input id="hsvSize" type="range" min="24" max="200" value="64"></label><label class="control-slider">English Shabad <span id="esvValue">64</span> px<input id="esvSize" type="range" min="24" max="200" value="64"></label><label class="control-slider">English meaning <span id="enValue">28</span> px<input type="range" id="enSize" min="16" max="90" value="28"></label><label class="control-slider">Punjabi meaning <span id="paValue">28</span> px<input type="range" id="paSize" min="16" max="90" value="28"></label><label class="control-slider">Hindi meaning <span id="hiValue">28</span> px<input type="range" id="hiSize" min="16" max="90" value="28"></label><label><input type="checkbox" id="projectionDay"> Day mode</label><br><label><input type="checkbox" id="projectionFit" checked> Auto-fit full screen</label><br><label><input type="checkbox" id="projectionLari"> ਲੜੀਵਾਰ</label><br><label><input type="checkbox" id="projectionFlow"> Continuous shabad lines</label><br><label><input type="checkbox" id="projectionPause"> Colour words before punctuation</label><p class="muted">Colour marks source punctuation, not verified ਵਿਸਰਾਮ.</p><p class="muted">Latest slide is stored locally, even if the controller disconnects. Keep this browser running for live updates.</p></div></div>
+</style><style>.developer-menu-foot{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:12px;padding:9px 7px;border-top:1px solid #ae8d4970;color:#f1d99c;font-size:11px}.developer-menu-foot a{color:#d1e7ff;text-decoration:none;font-size:11px}.developer-menu-foot strong{font-size:11px}
+/* Camera overlays use reserved flex/grid regions, never paint over Gurbani text. */
+#liveCameraStage{position:fixed;inset:0;z-index:5;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#liveCameraStage[hidden]{display:none!important}
+#liveCameraStage video{width:100%;height:100%;object-fit:contain;background:#000}
+body.camera-full #liveCameraStage{inset:0;z-index:10}
+body.camera-full #stage,body.camera-full #bookAlternate{visibility:hidden!important}
+body.camera-horizontal #liveCameraStage{inset:0 auto 0 0;width:var(--camera-portion,50vw)}
+body.camera-horizontal #stage,body.camera-horizontal #bookAlternate{position:fixed!important;inset:0 0 0 var(--camera-portion,50vw)!important;width:auto!important;height:100dvh!important;overflow:auto!important;box-sizing:border-box}
+body.camera-vertical #liveCameraStage{inset:0 0 auto 0;height:var(--camera-portion,50dvh)}
+body.camera-vertical #stage,body.camera-vertical #bookAlternate{position:fixed!important;inset:var(--camera-portion,50dvh) 0 0 0!important;width:100%!important;height:auto!important;overflow:auto!important;box-sizing:border-box}
+body.camera-horizontal #stage,body.camera-horizontal #bookAlternate,body.camera-vertical #stage,body.camera-vertical #bookAlternate{z-index:3;visibility:visible!important}
+body.camera-horizontal #verseMetaBar,body.camera-vertical #verseMetaBar{left:auto;right:8px;width:auto;max-width:calc(100% - var(--camera-portion,50%));bottom:18px}
+body.camera-full #verseMetaBar{visibility:hidden}
+body.camera-full #menuButton,body.camera-horizontal #menuButton,body.camera-vertical #menuButton{z-index:20}
+</style></head><body><div id="stage"><div id="clock" hidden></div><div id="verse"></div><div id="hindiShabad" class="translation"></div><div id="englishShabad" class="translation"></div><div id="englishMeaning" class="translation"></div><div id="punjabiMeaning" class="translation"></div><div id="hindiMeaning" class="translation"></div><div id="hint" aria-hidden="true"></div><div id="rainbowScreen" aria-hidden="true"></div></div><div id="bookAlternate" hidden><div class="alt-book-heading">ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ</div><div id="alternateLines"></div></div><div id="liveCameraStage" hidden><video id="liveCameraVideo" autoplay muted playsinline></video></div><div id="photoStage" hidden><img id="photoImage" alt=""></div><div id="sahibzaadeStage" hidden role="img" aria-label="Sahibzaade family portrait"><img id="sahibzaadeImage" alt="Sahibzaade family portrait"></div><div id="verseMetaBar" class="verse-meta-bar" hidden><div id="sourceCredit" class="source-credit" hidden></div><div id="angIndicator" class="ang-indicator" hidden></div></div><footer class="gp-credit">Developed by Rajinder Singh · <a href="mailto:harjas.info@gmail.com">harjas.info@gmail.com</a> · 2026</footer><section id="mainPairing" hidden role="status" aria-live="polite"><div class="main-pair-title">Projection · Connection code</div><div id="mainPairingCode">•••••</div><div class="main-pair-help">इस कोड को Control ऐप में डालकर Connect करें</div></section><button id="menuButton" aria-label="Projection settings" aria-expanded="false">☰</button><div id="setup"><div class="row"><b class="grow">Projection Settings</b><button id="closeMenu">✕</button></div><div class="body"><span class="muted">Share this projection code with controller:</span><div id="code" class="code">•••••</div><p class="muted" id="status">Connecting…</p><div class="row"><input id="controllerCode" placeholder="Controller 5-digit code" inputmode="numeric" maxlength="5" class="grow"><button id="join">Connect</button></div><div class="row"><input id="name" class="grow" placeholder="Display name"><button id="saveName">Save</button></div><div class="row"><input id="newCode" class="grow" inputmode="numeric" maxlength="5" placeholder="New 5-digit code"><button id="changeCode">Change code</button></div><div class="developer-menu-foot"><strong>Developed by Rajinder Singh</strong><a href="mailto:harjas.info@gmail.com">✉ Email</a><a href="https://www.youtube.com/results?search_query=HarjasTV" target="_blank" rel="noopener noreferrer">▶ HarjasTV · YouTube</a></div><button id="resetPairing" class="action">Reset pairing</button> <button id="fullscreen">Fullscreen</button><div class="small-heading">Sahibzaade Picture</div><div class="row"><button id="showSahibzaade" class="action">Show Picture · Full Screen</button><button id="hideSahibzaade" class="action">Close Picture</button></div><div class="row"><button id="chooseSahibzaade" class="action">Use Original High-Quality Picture</button><input id="sahibzaadeFile" type="file" accept="image/*" hidden></div><p class="muted">The included portrait opens with one tap. Optionally select the original high-resolution image once on this device for a sharper fullscreen display.</p><div class="small-heading">Font size · live adjustments</div><label class="control-slider">Line spacing <span id="projectionSpacingValue">135</span>%<input type="range" id="projectionSpacing" min="90" max="220" step="5" value="135"></label><label class="control-slider">Gurbani <span id="vValue">64</span> px<input type="range" id="vSize" min="24" max="200" value="64"></label><label class="control-slider">Hindi Shabad <span id="hsvValue">64</span> px<input id="hsvSize" type="range" min="24" max="200" value="64"></label><label class="control-slider">English Shabad <span id="esvValue">64</span> px<input id="esvSize" type="range" min="24" max="200" value="64"></label><label class="control-slider">English meaning <span id="enValue">28</span> px<input type="range" id="enSize" min="16" max="90" value="28"></label><label class="control-slider">Punjabi meaning <span id="paValue">28</span> px<input type="range" id="paSize" min="16" max="90" value="28"></label><label class="control-slider">Hindi meaning <span id="hiValue">28</span> px<input type="range" id="hiSize" min="16" max="90" value="28"></label><label><input type="checkbox" id="projectionDay"> Day mode</label><br><label><input type="checkbox" id="projectionFit" checked> Auto-fit full screen</label><br><label><input type="checkbox" id="projectionLari"> ਲੜੀਵਾਰ</label><br><label><input type="checkbox" id="projectionFlow"> Continuous shabad lines</label><br><label><input type="checkbox" id="projectionPause"> Colour words before punctuation</label><p class="muted">Colour marks source punctuation, not verified ਵਿਸਰਾਮ.</p><p class="muted">Latest slide is stored locally, even if the controller disconnects. Keep this browser running for live updates.</p></div></div>
 <script src="gurbani-layout.js?v=1"></script><script src="peerjs-1.5.5.min.js"></script><script src="gurbani-peer-manager.js?v=20261113-stablecode"></script><script>
 'use strict';
 const $=id=>document.getElementById(id);
@@ -198,9 +213,50 @@ function remotePhoto(m){
 function updateMainPairing(){ $('mainPairingCode').textContent=code; $('mainPairing').hidden=!!owner&&!awaitSelection; }
 function send(c,m){try{if(c.open)c.send(m)}catch{}}
 function hello(c){send(c,{type:'hello',deviceId:code,code:code,name:name,owner:owner})}
+
+let allowedCameraCode=null,cameraCall=null,cameraFeed=null,cameraLayout='full',cameraPortion=50;
+function clearCamera(){
+ cameraCall?.close();cameraCall=null;cameraFeed=null;
+ $('liveCameraVideo').pause();$('liveCameraVideo').srcObject=null;
+ $('liveCameraStage').hidden=true;document.body.classList.remove('camera-full','camera-horizontal','camera-vertical');
+}
+function applyCameraLayout(){
+ if(!cameraFeed)return;
+ document.body.classList.remove('camera-full','camera-horizontal','camera-vertical');
+ document.body.classList.add('camera-'+cameraLayout);
+ document.documentElement.style.setProperty('--camera-portion',cameraPortion+(cameraLayout==='horizontal'?'vw':'dvh'));
+ $('liveCameraStage').hidden=false;
+}
+function acceptCameraCall(call){
+ if(!call.peer?.startsWith('gurbani-camera-v1-')||!allowedCameraCode||call.peer!=='gurbani-camera-v1-'+allowedCameraCode||call.metadata?.cameraCode!==allowedCameraCode){call.close();return}
+ cameraCall?.close();cameraCall=call;
+ call.answer();
+ call.on('stream',stream=>{
+  if(cameraCall!==call)return;
+  cameraFeed=stream;$('liveCameraVideo').srcObject=stream;
+  $('liveCameraVideo').play().catch(()=>{});
+  applyCameraLayout()
+ });
+ call.on('close',()=>{if(cameraCall===call)clearCamera()});
+ call.on('error',()=>{if(cameraCall===call)clearCamera()})
+}
+
 function handle(c){connections.add(c);c.on('open',()=>{hello(c);$('status').textContent='Waiting for controller authorization'});
 c.on('data',m=>{if(!m||typeof m!=='object')return;if(m.type==='ping'){send(c,{type:'pong',id:m.id});return}
 if(m.type==='display-mode'&&owner&&m.token===owner){displayMode=m.mode==='book'?'book':'projection';localStorage.setItem('gb-projection-view-mode',displayMode);render();send(c,{type:'applied',rev:m.rev});return}
+if(m.type==='camera-allow'&&owner&&m.token===owner){
+ if(!/^\d{5}$/.test(String(m.cameraCode)))return;
+ allowedCameraCode=String(m.cameraCode);
+ cameraLayout=['full','horizontal','vertical'].includes(m.layout)?m.layout:'full';
+ cameraPortion=Math.max(15,Math.min(85,Number(m.portion)||50));
+ applyCameraLayout();return
+}
+if(m.type==='camera-layout'&&owner&&m.token===owner){
+ cameraLayout=['full','horizontal','vertical'].includes(m.layout)?m.layout:'full';
+ cameraPortion=Math.max(15,Math.min(85,Number(m.portion)||50));
+ applyCameraLayout();return
+}
+if(m.type==='camera-hide'&&owner&&m.token===owner){allowedCameraCode=null;clearCamera();return}
 if(m.type==='sahibzaade-show'&&owner&&m.token===owner){openSahibzaade();return}
 if(m.type==='sahibzaade-close'&&owner&&m.token===owner){closeSahibzaade();return}
 if(m.type?.startsWith('photo-')&&owner&&m.token===owner){remotePhoto(m);return}
@@ -215,7 +271,7 @@ function connectController(controllerCode){
 }
 function start(){
  if(typeof GurbaniPeer==='undefined'){$('status').textContent='Connection library unavailable';return}
- GurbaniPeer.start({id:()=>prefix+code,onPeer:p=>{peer=p},
+ GurbaniPeer.start({id:()=>prefix+code,onPeer:p=>{peer=p;p.on('call',acceptCameraCall)},
  onStatus:message=>{$('status').textContent=message},
  onOpen:()=>{$('status').textContent=owner?'Ready (paired)':'Ready — enter code on controller';if(pendingController){const target=pendingController;pendingController=null;connectController(target)}},
  onConnection:handle,
