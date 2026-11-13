@@ -119,7 +119,7 @@ main{width:100%;max-width:none;margin:3px auto;padding:0 4px;gap:4px;align-items
 .install-count{font-size:17px;font-variant-numeric:tabular-nums;font-weight:700}
 .install-actions{justify-content:center;margin:10px 0}
 .install-card button{min-height:30px;font-size:12px}
-#offlineToolsDetails{padding:3px 5px!important;margin:2px 0!important}#offlineToolsDetails>summary{cursor:pointer;font-size:10px;font-weight:650;color:#c9d9f5;padding:3px 0}#offlineToolsDetails:not([open]){max-height:24px;overflow:hidden} </style></head><body><div id="databaseInstall" class="database-install" role="dialog" aria-modal="true" aria-labelledby="databaseInstallTitle" hidden>
+#offlineToolsDetails{padding:3px 5px!important;margin:2px 0!important}#offlineToolsDetails>summary{cursor:pointer;font-size:10px;font-weight:650;color:#c9d9f5;padding:3px 0}#offlineToolsDetails:not([open]){max-height:24px;overflow:hidden} .menu-db-panel{border:1px solid #516889;border-radius:8px;padding:6px;margin:5px 0}.menu-db-panel summary{font-size:11px;font-weight:650;cursor:pointer}.menu-db-panel .offline-tools{margin:5px 0}.menu-db-panel .row{flex-wrap:wrap}.menu-db-panel #dbDelete{font-size:11px;padding:5px 7px}.menu-db-panel .small{font-size:9px} </style></head><body><div id="databaseInstall" class="database-install" role="dialog" aria-modal="true" aria-labelledby="databaseInstallTitle" hidden>
  <div class="install-card">
   <div class="install-symbol">ੴ</div>
   <h2 id="databaseInstallTitle">Download &amp; Install Gurbani Database</h2>
@@ -135,7 +135,7 @@ main{width:100%;max-width:none;margin:3px auto;padding:0 4px;gap:4px;align-items
 <section class="card" id="connectCard"><h2>Connected Projections</h2><div class="row"><div class="grow"><span class="muted">Your controller code</span><div id="code" class="code">•••••</div></div><span id="connStatus" class="muted">Connecting…</span></div><div class="row"><input id="newControllerCode" class="grow" inputmode="numeric" maxlength="5" placeholder="New 5-digit controller code"><button id="changeControllerCode">Change code</button></div><div class="row"><button id="searchWifi" class="primary">Search Wi-Fi Projections</button></div><p id="wifiStatus" class="small" aria-live="polite">Find Projection or Book View on the same Wi-Fi.</p><div id="wifiResults"></div><div class="row"><input id="pairCode" placeholder="Projection 5-digit code" inputmode="numeric" maxlength="5" class="grow"><button id="pair" class="primary">Connect</button></div><p class="small">You can also type your controller code into the Projection browser. Select displays below before projecting.</p><p id="pairStatus" class="small" aria-live="polite">Connecting…</p><div id="devices"></div></section>
 <section class="card" id="searchCard"><h2>Search Gurbani</h2><div class="row"><label for="corpusSource" class="small">Source</label><select id="corpusSource" class="grow"><option value="all">All Sources</option><option value="G">Sri Guru Granth Sahib Ji</option><option value="D">Sri Dasam Granth</option><option value="B">Bhai Gurdas Ji Vaaran</option><option value="N">Bhai Nand Lal Ji</option><option value="A">Amrit Keertan / Other</option></select></div><div class="row"><select id="keyboard"><option value="en">English keyboard</option><option value="pa">Gurmukhi keyboard</option><option value="hi">Hindi keyboard</option></select><select id="searchType"><option value="7">First letters (English)</option><option value="0">First letters (Gurmukhi)</option><option value="2">Full word (Gurmukhi)</option><option value="4">Romanized word</option></select></div><div class="row"><input id="query" class="grow" placeholder="Type first letters (e.g. ddss)"><button id="search" class="primary icon-btn" title="Search Gurbani" aria-label="Search Gurbani">⌕</button><button id="waheguru" style="background:linear-gradient(120deg,#ff9d59,#a75dff,#24c6ad);font-weight:750" aria-label="Project animated Waheguru">ਵਾਹਿਗੁਰੂ ✨</button></div><div class="quick-actions"><button id="aapeSangat" title="ਆਪੇ ਸੰਗਤਿ ਸਦਿ ਬਹਾਲੈ">ਆਪੇ ਸੰਗਤਿ…</button><button id="anandSix" title="ਅਨੰਦ ਸਾਹਿਬ — 6 ਪਉੜੀਆਂ">ਅਨੰਦ 6</button><button id="sukhmani" title="ਸੁਖਮਨੀ ਸਾਹਿਬ">ਸੁਖਮਨੀ</button><button id="sehaj" title="ਸਹਿਜ ਪਾਠ">ਸਹਿਜ ਪਾਠ</button></div><div id="results" class="list" hidden></div><details class="offline-tools" id="offlineToolsDetails"><summary>Offline Library · Download &amp; Storage</summary><div class="row"><strong class="grow">Offline Gurbani Library</strong><span id="offlineBadge" class="small">Checking storage…</span></div><div class="row"><button id="offlineDownload" class="primary" title="Download Sri Guru Granth Sahib Ji Angs from Open Granth for offline search">↓ SGGS 1430 Angs</button><button id="offlineSourceDownload" class="primary" title="Save the chosen GitHub source pack on this device">↓ Selected Source</button><button id="offlineStop" title="Pause offline downloading">Ⅱ</button><button id="offlineRefresh" title="Check offline downloaded pages">↻</button></div><progress id="offlineProgress" value="0" max="1430"></progress><div class="row"><label class="small grow" for="offlineImport">Import vetted source pack (JSON)</label><input id="offlineImport" type="file" accept=".json,application/json" aria-label="Import locally saved scripture source pack"></div><div id="sourceAvailability" class="small" aria-live="polite"></div><p id="offlineMessage" class="small" aria-live="polite">Public-domain Gurbani text from Open Granth (Shabad OS source). Download once online; then search and read offline. English meaning is available when included in source.</p></details><p class="small">Offline search uses saved text; additional online search is available when connected.</p></section></div>
 <div><section class="card" id="shabadCard"><div class="row" style="justify-content:space-between;align-items:center"><h2 style="margin:0">Shabad · Choose a Line</h2><button id="historyToggle" class="icon-btn" type="button" aria-expanded="false" title="Recent Shabads History" aria-label="Recent Shabads History">☷</button></div><section class="card" id="historyCard" hidden><div class="row" style="justify-content:space-between"><strong>Recent Shabads</strong><button id="historyClose" type="button">✕</button></div><div id="historyList"></div></section><div class="row"><button id="mainLine" class="primary icon-btn" title="Go to Main Line" aria-label="Go to Main Line">⌂</button><span id="mainLabel" class="small">Main: —</span></div><p class="small">Tap any line to project; use ☆ to set that line as Main.</p><div id="readingNavigator" hidden><div class="small" id="readingKindLabel"></div><div id="sukhmaniNavigation" hidden class="row"><button id="prevSalok" class="icon-btn" title="Previous Salok" aria-label="Previous Salok">◀</button><input id="salokNumber" type="number" min="1" max="24" inputmode="numeric" placeholder="Salok 1–24" style="width:120px"><button id="openSalok" class="icon-btn" title="Open selected Salok" aria-label="Open selected Salok">↵</button><button id="nextSalok" class="icon-btn" title="Next Salok" aria-label="Next Salok">▶</button><span id="salokPosition" class="small"></span></div><div id="sehajNavigation" hidden><div class="row"><input id="angInput" type="number" min="1" max="1430" inputmode="numeric" placeholder="Custom Ang 1–1430" class="grow"><button id="angSearch" class="icon-btn" title="Open selected Ang" aria-label="Open selected Ang">↵</button><button id="prevAng" class="icon-btn" title="Previous Ang" aria-label="Previous Ang">◀</button><button id="nextAng" class="icon-btn" title="Next Ang" aria-label="Next Ang">▶</button></div></div></div><div id="lines" class="list"></div><div class="row"><button id="previous" class="icon-btn" type="button" title="Previous line" aria-label="Previous line">◀</button><button id="next" class="icon-btn" type="button" title="Next line" aria-label="Next line">▶</button><button id="clear" class="icon-btn icon-danger" type="button" title="Clear projection" aria-label="Clear projection">⌫</button></div></section>
-<section class="card" id="fontCard"><h2>Default Settings (New Devices)</h2><p class="small">For connected screens, open ⚙ Settings beside each device. These presets do not overwrite other devices.</p><label class="field">Gurbani size <span id="vsLabel">64</span> px<input type="range" id="vs" min="24" max="200" value="64"></label><label class="field">Hindi shabad size <span id="hsvLabel">64</span> px<input type="range" id="hsv" min="24" max="200" value="64"></label><label class="field">English shabad size <span id="esvLabel">64</span> px<input type="range" id="esv" min="24" max="200" value="64"></label><label class="field">English meaning size <span id="enLabel">28</span> px<input type="range" id="enSize" min="16" max="90" value="28"></label><label class="field">Punjabi meaning size <span id="paLabel">28</span> px<input type="range" id="paSize" min="16" max="90" value="28"></label><label class="field">Hindi meaning size <span id="hiLabel">28</span> px<input type="range" id="hiSize" min="16" max="90" value="28"></label><label class="field">Projection line spacing <span id="projectionSpacingLabel">135</span>%<input type="range" id="projectionSpacing" min="90" max="220" step="5" value="135"></label><h2>Projection display</h2><label><input type="checkbox" id="projectionFit" checked> Auto-fit full screen</label><label><input type="checkbox" id="projectionLari"> ਲੜੀਵਾਰ (Larrivaar)</label><label><input type="checkbox" id="projectionFlow"> Continuous shabad lines</label><label><input type="checkbox" id="projectionPause"> Colour words before punctuation</label><h2>Book View Settings</h2><label><input type="checkbox" id="bookLari"> ਲੜੀਵਾਰ (Larrivaar)</label><label><input type="checkbox" id="bookFlow"> Continuous shabad lines</label><label><input type="checkbox" id="bookPause"> Colour words before punctuation</label><label class="field">Book font <span id="bookSizeLabel">30</span> px<input type="range" id="bookSize" min="14" max="85" value="30"></label><label class="field">Book line spacing <span id="bookSpacingLabel">160</span>%<input type="range" id="bookSpacing" min="90" max="220" step="5" value="160"></label><p class="small">Changes apply to selected Book View screens and are saved.</p><label><input id="clock" type="checkbox"> Show clock (top left)</label><p class="small">Font size changes live. No Apply needed.</p><p id="status" class="muted">Ready.</p><p class="small">Last projected line remains on the display when controller disconnects. Reconnection needs the Projection tab to remain open and online.</p></section></div></main><div id="controlAng" class="ang-indicator" hidden></div><footer class="gp-credit">Software by Games Planet · Developed 2026 by Rajinder Singh · Contact: 7983624797 · Version 2026.11.12.6</footer><aside id="functionsMenu" hidden><div class="row" style="justify-content:space-between"><strong>Functions</strong><button id="closeMenu">✕</button></div><div id="menuOptions"><h2>Pictures · Controller</h2><p class="small">Send photos to selected Projection screens; order and fade controlled here.</p><input id="picFiles" type="file" accept="image/*" multiple><div id="picList"></div><label><input id="picFade" type="checkbox" checked> Fade</label><label>Duration <span id="picSeconds">5</span>s<input id="picInterval" type="range" min="2" max="30" value="5"></label><div class="row"><button id="picSend">Send Slideshow</button><button id="picStop">Close Pictures</button></div><div class="row"><button id="sahibzaadeSend" class="primary">Show Sahibzaade Picture · Full Screen</button><button id="sahibzaadeClose">Close Sahibzaade Picture</button></div><p class="small">Sends the built-in picture to the selected online Projection devices, without uploading it again.</p><hr><h2>Day / Night</h2><label><input id="controlDay" type="checkbox"> Control · Day mode</label><label><input id="projectionDay" type="checkbox"> Projection · Day mode</label><label><input id="bookNight" type="checkbox"> Book View · Night mode</label><h2>Projection Lines</h2><p class="small">Gurbani Shabad</p><label><input type="checkbox" id="gurmukhiCheck" checked> Gurmukhi</label><label><input type="checkbox" id="hindiShabadCheck"> Hindi</label><label><input type="checkbox" id="englishShabadCheck"> English</label><p class="small">Gurbani Arth</p><label><input type="checkbox" id="paCheck" checked> Punjabi</label><label><input type="checkbox" id="hiCheck"> Hindi</label><label><input type="checkbox" id="enCheck"> English</label><hr><a href="projection.html" target="_blank">Open Projection Browser</a><p><a href="book.html" target="_blank">Open Book Reading Projection</a></p><hr><details><summary>OBS Live Text</summary><h2>OBS Live Text</h2><p class="small">Open this link as an OBS Browser Source, then press Connect OBS.</p><input id="obsUrl" readonly aria-label="OBS link"><div class="row"><button id="copyObs">Copy OBS link</button><button id="connectObs">Connect OBS</button></div><p class="small">Tick languages and use ↑ / ↓ to set order.</p><div id="obsOptions"></div></details><hr><details id="customTools"><summary>Custom Text & Scroll</summary><p class="small">Type or paste text. Online translation is optional and may contain errors; review before projecting.</p><textarea id="customText" rows="4" style="width:100%;font:inherit" placeholder="Gurmukhi, Hindi or English text"></textarea><label>Translate online to <select id="customTarget"><option value="pa">Punjabi (Gurmukhi)</option><option value="hi">Hindi</option><option value="en">English</option></select></label><button id="convertCustom">Translate text online</button><textarea id="customConverted" rows="3" style="width:100%;font:inherit" placeholder="Editable translated text"></textarea><button id="useConverted">Use translated text</button><label><input type="checkbox" id="customScroll"> Scroll text on Projection</label><div class="row"><button id="sendCustom">Project custom text</button></div><p class="small" id="customStatus" aria-live="polite">Online translation is sent to a third-party service; avoid private text.</p></details></div></aside>
+<section class="card" id="fontCard"><h2>Default Settings (New Devices)</h2><p class="small">For connected screens, open ⚙ Settings beside each device. These presets do not overwrite other devices.</p><label class="field">Gurbani size <span id="vsLabel">64</span> px<input type="range" id="vs" min="24" max="200" value="64"></label><label class="field">Hindi shabad size <span id="hsvLabel">64</span> px<input type="range" id="hsv" min="24" max="200" value="64"></label><label class="field">English shabad size <span id="esvLabel">64</span> px<input type="range" id="esv" min="24" max="200" value="64"></label><label class="field">English meaning size <span id="enLabel">28</span> px<input type="range" id="enSize" min="16" max="90" value="28"></label><label class="field">Punjabi meaning size <span id="paLabel">28</span> px<input type="range" id="paSize" min="16" max="90" value="28"></label><label class="field">Hindi meaning size <span id="hiLabel">28</span> px<input type="range" id="hiSize" min="16" max="90" value="28"></label><label class="field">Projection line spacing <span id="projectionSpacingLabel">135</span>%<input type="range" id="projectionSpacing" min="90" max="220" step="5" value="135"></label><h2>Projection display</h2><label><input type="checkbox" id="projectionFit" checked> Auto-fit full screen</label><label><input type="checkbox" id="projectionLari"> ਲੜੀਵਾਰ (Larrivaar)</label><label><input type="checkbox" id="projectionFlow"> Continuous shabad lines</label><label><input type="checkbox" id="projectionPause"> Colour words before punctuation</label><h2>Book View Settings</h2><label><input type="checkbox" id="bookLari"> ਲੜੀਵਾਰ (Larrivaar)</label><label><input type="checkbox" id="bookFlow"> Continuous shabad lines</label><label><input type="checkbox" id="bookPause"> Colour words before punctuation</label><label class="field">Book font <span id="bookSizeLabel">30</span> px<input type="range" id="bookSize" min="14" max="85" value="30"></label><label class="field">Book line spacing <span id="bookSpacingLabel">160</span>%<input type="range" id="bookSpacing" min="90" max="220" step="5" value="160"></label><p class="small">Changes apply to selected Book View screens and are saved.</p><label><input id="clock" type="checkbox"> Show clock (top left)</label><p class="small">Font size changes live. No Apply needed.</p><p id="status" class="muted">Ready.</p><p class="small">Last projected line remains on the display when controller disconnects. Reconnection needs the Projection tab to remain open and online.</p></section></div></main><div id="controlAng" class="ang-indicator" hidden></div><footer class="gp-credit">Software by Games Planet · Developed 2026 by Rajinder Singh · Contact: 7983624797 · Version 2026.11.12.6</footer><aside id="functionsMenu" hidden><div class="row" style="justify-content:space-between"><strong>Functions</strong><button id="closeMenu">✕</button></div><div id="menuOptions"><h2>Pictures · Controller</h2><p class="small">Send photos to selected Projection screens; order and fade controlled here.</p><input id="picFiles" type="file" accept="image/*" multiple><div id="picList"></div><label><input id="picFade" type="checkbox" checked> Fade</label><label>Duration <span id="picSeconds">5</span>s<input id="picInterval" type="range" min="2" max="30" value="5"></label><div class="row"><button id="picSend">Send Slideshow</button><button id="picStop">Close Pictures</button></div><div class="row"><button id="sahibzaadeSend" class="primary">Show Sahibzaade Picture · Full Screen</button><button id="sahibzaadeClose">Close Sahibzaade Picture</button></div><p class="small">Sends the built-in picture to the selected online Projection devices, without uploading it again.</p><hr><h2>Day / Night</h2><label><input id="controlDay" type="checkbox"> Control · Day mode</label><label><input id="projectionDay" type="checkbox"> Projection · Day mode</label><label><input id="bookNight" type="checkbox"> Book View · Night mode</label><h2>Projection Lines</h2><p class="small">Gurbani Shabad</p><label><input type="checkbox" id="gurmukhiCheck" checked> Gurmukhi</label><label><input type="checkbox" id="hindiShabadCheck"> Hindi</label><label><input type="checkbox" id="englishShabadCheck"> English</label><p class="small">Gurbani Arth</p><label><input type="checkbox" id="paCheck" checked> Punjabi</label><label><input type="checkbox" id="hiCheck"> Hindi</label><label><input type="checkbox" id="enCheck"> English</label><hr><a href="projection.html" target="_blank">Open Projection Browser</a><p><a href="book.html" target="_blank">Open Book Reading Projection</a></p><hr><details><summary>OBS Live Text</summary><h2>OBS Live Text</h2><p class="small">Open this link as an OBS Browser Source, then press Connect OBS.</p><input id="obsUrl" readonly aria-label="OBS link"><div class="row"><button id="copyObs">Copy OBS link</button><button id="connectObs">Connect OBS</button></div><p class="small">Tick languages and use ↑ / ↓ to set order.</p><div id="obsOptions"></div></details><hr><details id="customTools"><summary>Custom Text & Scroll</summary><p class="small">Type or paste text. Online translation is optional and may contain errors; review before projecting.</p><textarea id="customText" rows="4" style="width:100%;font:inherit" placeholder="Gurmukhi, Hindi or English text"></textarea><label>Translate online to <select id="customTarget"><option value="pa">Punjabi (Gurmukhi)</option><option value="hi">Hindi</option><option value="en">English</option></select></label><button id="convertCustom">Translate text online</button><textarea id="customConverted" rows="3" style="width:100%;font:inherit" placeholder="Editable translated text"></textarea><button id="useConverted">Use translated text</button><label><input type="checkbox" id="customScroll"> Scroll text on Projection</label><div class="row"><button id="sendCustom">Project custom text</button></div><p class="small" id="customStatus" aria-live="polite">Online translation is sent to a third-party service; avoid private text.</p></details><hr><details id="menuDatabasePanel" class="menu-db-panel"><summary>▸ Database · Download / Storage / Version</summary><div id="menuDatabaseHost"></div><div class="row"><button id="dbDelete" class="icon-danger" title="Delete offline scripture database from this device">🗑 Delete Database</button><button id="dbReload" title="Refresh storage status">↻ Status</button></div><div class="row"><label class="small">App Version</label><strong id="appVersionNumber">2026.11.13 · Offline Library v2</strong></div><p class="small">Download runs while this app remains open. If Android stops the app, it automatically resumes the next time you open it. Missing text still uses online search when internet is available.</p></details></div></aside>
 <script src="peerjs-1.5.5.min.js"></script><script src="gurbani-peer-manager.js?v=20261113-stablecode"></script><script>
 'use strict';
 const $=id=>document.getElementById(id);
@@ -885,10 +885,10 @@ $('search').onclick=async()=>{
  status('Searching Gurbani…');$('results').hidden=false;$('results').replaceChildren();
  const type=$('searchType').value;
  // Prefer instant local search after the initial database install, even with internet.
- if(offlineCount===1430){
+ if(offlineCount>0){
   try{
    const fast=await offlineSearch(q,type);
-   if(fast.length){renderSearchResults(fast,true);status(fast.length+' matches from offline database · '+offlineCount+' SGGS Angs saved');return}
+   if(fast.length){renderSearchResults(fast,true);status(fast.length+' matches from device database · '+offlineCount+'/1430 Angs; more results may be available online');return}
   }catch(error){console.warn('Local search fallback unavailable',error)}
  }
  // When completely offline, search the device database without contacting the internet.
@@ -908,96 +908,84 @@ $('search').onclick=async()=>{
 };
 refreshOfflineProgress();refreshSourcesAvailability();
 
-let firstRunActive=false;
-const firstRunMarker='gb-first-run-install-v2';
-const firstRunDone=()=>localStorage.getItem(firstRunMarker)==='complete';
-function firstRunMessage(phase,detail){
- $('installPhase').textContent=phase;
- $('installDetails').textContent=detail||'';
+// Non-blocking database manager: move the existing Offline Library panel into the bottom hamburger section.
+$('menuDatabaseHost').append($('offlineToolsDetails'));
+$('offlineToolsDetails').open=true;
+$('databaseInstall').hidden=true;
+let automaticInstallRunning=false,automaticInstallTimer=null,onlineCorpusManifest=null;
+const dbManagerStatus=(message)=>{if(message)$('offlineMessage').textContent=message;};
+async function knownSourcePacks(){
+ try{
+  const manifest=await readGithubPackManifest();
+  return ['D','B','N','A'].filter(k=>manifest.sources?.[k]?.parts?.length)
+ }catch(error){return []}
 }
-function firstRunDisplay(show){
- $('databaseInstall').hidden=!show;
- if(show){$('installProgress').value=offlineCount;$('installCount').textContent=offlineCount+' / 1430 Angs'}
-}
-async function getPackStatus(){
- let manifest;
- try{manifest=await readGithubPackManifest()}catch(e){return {available:[],missing:['D','B','N'],error:String(e)}}
- const available=[],missing=[];
- for(const key of ['D','B','N']){
-  if(Array.isArray(manifest.sources?.[key]?.parts)&&manifest.sources[key].parts.length)available.push(key);
-  else missing.push(key)
- }
- return{available,missing}
-}
-async function verifyInstalledSource(key){
- const manifest=await readGithubPackManifest(),parts=manifest.sources?.[key]?.parts||[];
+async function sourcePackInstalled(k,manifest){
+ const parts=manifest.sources?.[k]?.parts||[];
  if(!parts.length)return false;
- const saved=await offlineSourceRecords();
+ const entries=await offlineSourceRecords();
  return parts.every(part=>{
-  const id=part.path.split('/').at(-1).replace(/^chunk-/,'').replace(/\.json$/,'');
-  return saved.some(p=>p.key===key+':shabados-'+key+'-'+id&&p.lines?.length===part.lines)
+  const suffix=part.path.split('/').at(-1).replace(/^chunk-/,'').replace(/\.json$/,'');
+  return entries.some(entry=>entry.key===k+':shabados-'+k+'-'+suffix&&entry.lines?.length===part.lines)
  })
 }
-async function firstRunInstall(){
- if(firstRunActive)return;
- firstRunActive=true;
- firstRunDisplay(true);
- $('installRetry').hidden=true;$('installRefresh').disabled=true;
- const sourceSelect=$('corpusSource'),previousSource=sourceSelect.value;
+async function autoInstallDatabase(){
+ if(automaticInstallRunning||offlineDownloading||navigator.onLine===false)return;
+ automaticInstallRunning=true;
+ const selection=$('corpusSource'),originalSelection=selection.value;
  try{
-  offlineCount=await offlineCountAngs();showOfflineProgress();
+  offlineCount=await offlineCountAngs();
+  showOfflineProgress();
   if(offlineCount<1430){
-   if(navigator.onLine===false)throw Error('Internet is required to download the Gurbani Database for the first time.');
-   firstRunMessage('Download & Install Gurbani Database','Sri Guru Granth Sahib Ji · '+offlineCount+'/1430 Angs. Already saved Angs will be skipped.');
+   dbManagerStatus('Downloading & installing Gurbani database automatically · '+offlineCount+'/1430 Angs');
    await downloadOfflineLibrary();
-   offlineCount=await offlineCountAngs();showOfflineProgress();
-   if(offlineCount!==1430)throw Error('SGGS download incomplete: '+offlineCount+'/1430. Retry resumes without repeating completed Angs.');
   }
-  firstRunMessage('Checking Other Gurbani Sources','Installing all source packs currently published in the GitHub repository.');
-  const status=await getPackStatus();
-  $('installOtherSources').textContent='Other sources on GitHub: '+status.available.map(k=>SOURCE_META[k].label).join(', ')+(status.missing.length?' · Not yet published: '+status.missing.map(k=>SOURCE_META[k].label).join(', '):'');
-  for(const key of status.available){
-   if(await verifyInstalledSource(key))continue;
-   sourceSelect.value=key;
-   firstRunMessage('Installing '+SOURCE_META[key].label,'Downloading and saving published source packs on this device.');
+  if(navigator.onLine===false)return;
+  let manifest;
+  try{manifest=await readGithubPackManifest()}catch(e){
+   dbManagerStatus('SGGS '+offlineCount+'/1430 saved. Other GitHub data packs are not yet available.');
+   return
+  }
+  for(const key of ['D','B','N','A']){
+   if(!manifest.sources?.[key]?.parts?.length||navigator.onLine===false)continue;
+   if(await sourcePackInstalled(key,manifest))continue;
+   selection.value=key;
+   dbManagerStatus('Installing '+SOURCE_META[key].label+' from GitHub…');
    await installGithubOfflineSource();
-   if(!(await verifyInstalledSource(key)))throw Error(SOURCE_META[key].label+' pack installation incomplete. Tap Retry to continue.');
   }
-  if(status.missing.length){
-   // Do not claim the complete multi-source corpus is installed.
-   firstRunMessage('Sri Guru Granth Sahib Ji Ready · Other Sources Pending','The full 1430-Ang library is installed. The other listed sources have not yet been published as downloadable packs on GitHub.');
-   $('installRetry').hidden=false;$('installRetry').textContent='Recheck & Install Sources';
-   $('installRefresh').textContent='Use Available SGGS Library';
-   $('installRefresh').disabled=false;
-   $('installRefresh').onclick=()=>{localStorage.setItem(firstRunMarker,'sggs-ready');firstRunDisplay(false)};
-   return;
-  }
-  localStorage.setItem(firstRunMarker,'complete');
-  firstRunMessage('Gurbani Database Installed','All published source packs are saved on this device. Gurbani search is ready.');
   await refreshSourcesAvailability();
-  firstRunDisplay(false)
- }catch(e){
-  firstRunMessage('Database Setup Incomplete',e.message);
-  $('installRetry').hidden=false;$('installRetry').textContent='Retry / Resume';
-  $('installRefresh').disabled=false;$('installRefresh').textContent='Recheck Storage';
-  $('installRefresh').onclick=firstRunInstall
- }finally{
-  sourceSelect.value=previousSource;
-  $('installRefresh').disabled=false;
-  firstRunActive=false
- }
+  if(offlineCount===1430){
+   const pending=['D','B','N'].filter(key=>!manifest.sources?.[key]?.parts?.length);
+   dbManagerStatus(pending.length?'SGGS ready offline. Unpublished sources pending: '+pending.map(k=>SOURCE_META[k].label).join(', '):'Published Gurbani databases installed. Missing text can still be searched online.')
+  }
+ }catch(error){dbManagerStatus('Automatic download paused: '+error.message+'. Will resume on next opening or Retry.')}
+ finally{selection.value=originalSelection;automaticInstallRunning=false}
 }
-$('installRetry').onclick=firstRunInstall;
-$('installRefresh').onclick=firstRunInstall;
-(async()=>{
+async function deleteOfflineDatabase(){
+ if(!confirm('Delete ALL downloaded Gurbani texts and cached Shabads from this device? You will need internet to download them again.'))return;
+ offlineStopRequested=true;
+ // Avoid racing in-flight downloads with deletion.
+ for(let i=0;i<60&&(offlineDownloading||automaticInstallRunning);i++)await sleepOffline(150);
+ if(offlineDownloading||automaticInstallRunning){dbManagerStatus('Download still stopping. Try Delete again.');return}
  try{
-  offlineCount=await offlineCountAngs();showOfflineProgress();
-  if(firstRunDone()&&offlineCount===1430)return;
-  if(localStorage.getItem(firstRunMarker)==='sggs-ready'&&offlineCount===1430)return;
-  await firstRunInstall()
- }catch(e){firstRunDisplay(true);firstRunMessage('Offline storage unavailable',e.message);$('installRetry').hidden=false}
-})();
-
+  await offlineStore('angs','readwrite',store=>store.clear());
+  await offlineStore('corpora','readwrite',store=>store.clear());
+  await offlineStore('requests','readwrite',store=>store.clear());
+  cachedOfflineAngs=null;cachedOfflineCorpora=null;
+  offlineCount=0;
+  await refreshOfflineProgress();await refreshSourcesAvailability();
+  dbManagerStatus('Offline Gurbani database deleted from this device. Online search remains available. Use Download to restore.');
+ }catch(error){dbManagerStatus('Database delete failed: '+error.message)}
+}
+$('dbDelete').onclick=deleteOfflineDatabase;
+$('dbReload').onclick=async()=>{await refreshOfflineProgress();await refreshSourcesAvailability()};
+$('offlineDownload').onclick=()=>{autoInstallDatabase()};
+$('menuDatabasePanel').addEventListener('toggle',()=>{if($('menuDatabasePanel').open){refreshOfflineProgress();refreshSourcesAvailability()}});
+refreshOfflineProgress();refreshSourcesAvailability();
+// Do not freeze the Controller at startup; download only while the browser/app is running.
+setTimeout(autoInstallDatabase,350);
+window.addEventListener('online',()=>setTimeout(autoInstallDatabase,700));
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(autoInstallDatabase,400)});
 $('offlineRefresh').addEventListener('click',refreshSourcesAvailability);
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(e=>console.warn('Offline app-shell cache unavailable',e))}
 $('query').onkeydown=e=>{if(e.key==='Enter')$('search').click()};
