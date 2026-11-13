@@ -6,8 +6,8 @@ android {
         applicationId 'in.gurbanisearch'
         minSdk 23
         targetSdk 35
-        versionCode 20261116
-        versionName '2026.11.12.6'
+        versionCode 20261117
+        versionName '2026.11.13.7'
     }
     flavorDimensions += 'role'
     productFlavors {
@@ -24,6 +24,13 @@ android {
             resValue 'string', 'app_name', 'Gurbani Projection'
             buildConfigField 'String', 'START_PAGE', '"projection.html"'
             buildConfigField 'String', 'ROLE', '"projection"'
+        }
+        camera {
+            dimension 'role'
+            applicationIdSuffix '.camera'
+            resValue 'string', 'app_name', 'Gurbani Live Camera'
+            buildConfigField 'String', 'START_PAGE', '"camera.html"'
+            buildConfigField 'String', 'ROLE', '"camera"'
         }
         book {
             dimension 'role'
