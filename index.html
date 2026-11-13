@@ -444,7 +444,7 @@ function handleCameraConnection(c,code){
  c.on('error',e=>cameraStatus('Camera connection: '+(e.message||e.type)))
 }
 function connectCamera(code){
- if(!/^\\d{5}$/.test(code))return cameraStatus('Enter Camera Phone 5-digit pairing code');
+ if(!/^\d{5}$/.test(code))return cameraStatus('Enter Camera Phone 5-digit pairing code');
  if(!peer?.open)return cameraStatus('Controller offline. Try reconnecting.');
  let existing=cameraLinks.get(code);
  if(existing?.open)return cameraStatus('Camera '+code+' already connected');
