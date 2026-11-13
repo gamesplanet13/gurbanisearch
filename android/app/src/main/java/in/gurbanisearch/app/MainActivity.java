@@ -47,17 +47,17 @@ public class MainActivity extends Activity {
         settings.setCacheMode(WebSettings.LOAD_DEFAULT);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         android.app.UiModeManager uiMode = getSystemService(android.app.UiModeManager.class);
-        boolean tvProjection = "projection".equals(BuildConfig.ROLE) && uiMode != null
+        boolean tvProjection = ("projection".equals(BuildConfig.ROLE) || "book".equals(BuildConfig.ROLE)) && uiMode != null
                 && uiMode.getCurrentModeType() == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION;
         web.setWebViewClient(new WebViewClient() {
             @Override public android.webkit.WebResourceResponse shouldInterceptRequest(
                     WebView view, android.webkit.WebResourceRequest request) {
                 Uri uri = request.getUrl();
                 if (tvProjection && isTrustedOrigin(uri)
-                        && "/gurbanisearch/gurbani-tv-waheguru-glow.js".equals(uri.getPath())) {
+                        && "/gurbanisearch/gurbani-waheguru-wide.js".equals(uri.getPath())) {
                     try {
                         return new android.webkit.WebResourceResponse("application/javascript", "UTF-8",
-                                getAssets().open("gurbani-tv-waheguru-glow.js"));
+                                getAssets().open("gurbani-waheguru-wide.js"));
                     } catch (java.io.IOException ignored) { }
                 }
                 return super.shouldInterceptRequest(view, request);
