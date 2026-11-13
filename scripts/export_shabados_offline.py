@@ -86,12 +86,7 @@ def main() -> int:
                             raise ValueError(f"Invalid/non-Gurmukhi primary for {line_id}")
                         item={"verse":{"unicode":text},"source":{"sourceId":src,"name":SOURCES[src]},"shabadId":group_id,"verseId":line_id,"section":section_name}
                         if isinstance(primary.get("page"),int):item["pageNo"]=primary["page"]
-                        # Translation is separate editorial content: preserve source and language.
-                        for entry in content:
-                            if entry.get("type")=="translation" and entry.get("language") in ("en","pa","hi"):
-                                lang=entry["language"]
-                                if isinstance(entry.get("data"),str) and entry["data"].strip():
-                                    item.setdefault("translation",{})[lang]={"unicode":entry["data"],"source":",".join(entry.get("assets",[]))}
+                        # Preserve canonical primary scripture only; editorial translations have independent rights.
                         group_lines.append(item)
                     if len(batch)+len(group_lines)>MAX_LINES:flush()
                     batch.extend(group_lines);count+=len(group_lines)
