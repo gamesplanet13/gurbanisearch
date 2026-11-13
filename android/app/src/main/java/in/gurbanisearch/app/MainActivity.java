@@ -60,10 +60,9 @@ public class MainActivity extends Activity {
                 if (fileCallback != null) { fileCallback.onReceiveValue(null); fileCallback = null; }
                 fileCallback = callback;
                 try {
-                    Intent choose = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                    choose.addCategory(Intent.CATEGORY_OPENABLE);
-                    choose.setType("image/*");
-                    choose.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                    // Respect the web input's accepted MIME types and selection mode.
+                    // The controller can also import offline data, not just images.
+                    Intent choose = params.createIntent();
                     startActivityForResult(choose, FILE_PICKER_REQUEST);
                     return true;
                 } catch (Exception ex) {
@@ -74,7 +73,9 @@ public class MainActivity extends Activity {
             }
             @Override public void onPermissionRequest(PermissionRequest request){
                 runOnUiThread(() -> {
-                    if(!request.getOrigin().toString().startsWith(SITE) || !requestHasVideoOnly(request)){
+                    if(!"https://gamesplanet13.github.io".equals(request.getOrigin().toString())
+                            || web.getUrl() == null || !web.getUrl().startsWith(SITE)
+                            || !requestHasVideoOnly(request)){
                         request.deny(); return;
                     }
                     if(Build.VERSION.SDK_INT >= 23 && checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
