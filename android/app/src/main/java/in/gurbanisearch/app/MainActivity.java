@@ -11,6 +11,10 @@ import android.webkit.WebSettings;
 import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
 import android.content.ClipData;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.webkit.WebChromeClient.FileChooserParams;
 import android.graphics.Color;
 import android.content.Intent;
 import android.net.Uri;
@@ -18,6 +22,8 @@ import android.net.Uri;
 public class MainActivity extends Activity {
     private WebView web;
     private static final int FILE_PICKER_REQUEST=3804;
+    private static final int CAMERA_PERMISSION_REQUEST=3805;
+    private PermissionRequest pendingMediaPermission;
     private ValueCallback<Uri[]> fileCallback;
     private Updater updater;
     private WifiDiscovery wifiDiscovery;
@@ -67,7 +73,16 @@ public class MainActivity extends Activity {
                 }
             }
             @Override public void onPermissionRequest(PermissionRequest request){
-                request.deny();
+                runOnUiThread(() -> {
+                    if(!request.getOrigin().toString().startsWith(SITE) || !requestHasVideoOnly(request)){
+                        request.deny(); return;
+                    }
+                    if(Build.VERSION.SDK_INT >= 23 && checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+                        if(pendingMediaPermission != null)pendingMediaPermission.deny();
+                        pendingMediaPermission=request;
+                        requestPermissions(new String[]{Manifest.permission.CAMERA},CAMERA_PERMISSION_REQUEST);
+                    }else request.grant(new String[]{PermissionRequest.RESOURCE_VIDEO_CAPTURE});
+                });
             }
         });
         wifiDiscovery = new WifiDiscovery(this, web, BuildConfig.ROLE);
@@ -76,6 +91,25 @@ public class MainActivity extends Activity {
         web.loadUrl(SITE + BuildConfig.START_PAGE + "?app=20261116");
         updater = new Updater(this);
         updater.check();
+    }
+    private static boolean requestHasVideoOnly(PermissionRequest request){
+        boolean video=false;
+        for(String resource:request.getResources()){
+            if(PermissionRequest.RESOURCE_VIDEO_CAPTURE.equals(resource))video=true;
+            else return false;
+        }
+        return video;
+    }
+    @Override public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] results){
+        super.onRequestPermissionsResult(requestCode,permissions,results);
+        if(requestCode != CAMERA_PERMISSION_REQUEST)return;
+        PermissionRequest pending=pendingMediaPermission;
+        pendingMediaPermission=null;
+        if(pending!=null){
+            if(results.length>0 && results[0]==PackageManager.PERMISSION_GRANTED)
+                pending.grant(new String[]{PermissionRequest.RESOURCE_VIDEO_CAPTURE});
+            else pending.deny();
+        }
     }
     @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -107,6 +141,7 @@ public class MainActivity extends Activity {
         else finish();
     }
     @Override protected void onDestroy() {
+        if(pendingMediaPermission != null){pendingMediaPermission.deny();pendingMediaPermission=null;}
         if(fileCallback != null) { fileCallback.onReceiveValue(null); fileCallback = null; }
         if(updater!=null) updater.close();
         if(wifiDiscovery!=null) wifiDiscovery.close();
