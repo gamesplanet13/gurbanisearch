@@ -1,18 +1,18 @@
 {
   "controller": {
-    "versionCode": 20261122,
-    "apkUrl": "https://gamesplanet13.github.io/gurbanisearch/apk/Gurbani_controller_20261122.apk"
+    "versionCode": 20261123,
+    "apkUrl": "https://gamesplanet13.github.io/gurbanisearch/apk/Gurbani_controller_20261123.apk"
   },
   "projection": {
-    "versionCode": 20261122,
-    "apkUrl": "https://gamesplanet13.github.io/gurbanisearch/apk/Gurbani_projection_20261122.apk"
+    "versionCode": 20261123,
+    "apkUrl": "https://gamesplanet13.github.io/gurbanisearch/apk/Gurbani_projection_20261123.apk"
   },
   "book": {
-    "versionCode": 20261122,
-    "apkUrl": "https://gamesplanet13.github.io/gurbanisearch/apk/Gurbani_book_20261122.apk"
+    "versionCode": 20261123,
+    "apkUrl": "https://gamesplanet13.github.io/gurbanisearch/apk/Gurbani_book_20261123.apk"
   },
   "camera": {
-    "versionCode": 20261122,
-    "apkUrl": "https://gamesplanet13.github.io/gurbanisearch/apk/Gurbani_camera_20261122.apk"
+    "versionCode": 20261123,
+    "apkUrl": "https://gamesplanet13.github.io/gurbanisearch/apk/Gurbani_camera_20261123.apk"
   }
 }

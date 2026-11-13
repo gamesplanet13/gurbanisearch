@@ -49,7 +49,13 @@ public class MainActivity extends Activity {
         web.setWebViewClient(new WebViewClient() {
             @Override public boolean shouldOverrideUrlLoading(WebView view, android.webkit.WebResourceRequest request) {
                 Uri uri=request.getUrl();
-                if ("gamesplanet13.github.io".equals(uri.getHost()) && uri.getPath()!=null && uri.getPath().startsWith("/gurbanisearch/")) return false;
+                if (isTrustedOrigin(uri) && uri.getPath() != null && uri.getPath().startsWith("/gurbanisearch/")) {
+                    if (uri.getPath().startsWith("/gurbanisearch/apk/")) {
+                        if (updater != null && request.isForMainFrame()) updater.check(true);
+                        return true;
+                    }
+                    return false;
+                }
                 try { startActivity(new Intent(Intent.ACTION_VIEW,uri)); }catch(Exception ignored){}
                 return true;
             }
@@ -93,6 +99,12 @@ public class MainActivity extends Activity {
         setContentView(web);
         updater = new Updater(this);
         web.addJavascriptInterface(new UpdateBridge(), "GurbaniUpdates");
+        web.setDownloadListener((url, userAgent, contentDisposition, mimeType, contentLength) -> {
+            Uri uri = Uri.parse(url);
+            if (isTrustedOrigin(uri) && uri.getPath() != null && uri.getPath().startsWith("/gurbanisearch/apk/")) {
+                updater.check(true);
+            }
+        });
         web.loadUrl(SITE + BuildConfig.START_PAGE + "?app=" + BuildConfig.VERSION_CODE);
         updater.check(false);
     }

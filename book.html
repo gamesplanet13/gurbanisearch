@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gurbani Book Reading Projection</title><style>
-*{box-sizing:border-box}body{margin:0;background:#17130e;color:#30251a;font-family:system-ui,"Noto Sans Gurmukhi",serif}#book{background:linear-gradient(90deg,#f3e6c8,#fffaee 16%,#fff9e8 83%,#e9d8ae);min-height:100vh;min-height:100dvh;max-width:1160px;margin:auto;padding:clamp(20px,5vw,70px) clamp(15px,6vw,75px);box-shadow:0 0 35px #0009;border-left:9px solid #d9c594;border-right:9px solid #d9c594;overflow-wrap:anywhere;touch-action:pan-y}.line{padding:var(--book-line-pad,9px) 12px;border-radius:9px;line-height:var(--book-leading,1.6);margin:0;transition:background .2s,color .2s}.line.current{background:#f3c76c;color:#292017;box-shadow:inset 0 0 0 2px #b58d36,0 0 20px #a66b3460;font-weight:800}.line.current:before{content:"✦ ";color:#975c14}.heading{text-align:center;font-weight:bold;margin:0 0 28px;color:#7c521c}.empty{text-align:center;color:#775a32;font-size:24px;padding-top:18vh}#menuButton{position:fixed;right:10px;top:9px;font-size:22px;z-index:10;background:#25211ddd;color:white;border:1px solid #999;border-radius:8px;padding:6px 12px;cursor:pointer}#panel{position:fixed;right:10px;top:56px;z-index:9;background:#191e28;color:#fff;border:1px solid #596780;border-radius:16px;padding:18px;width:min(380px,95vw);max-height:85vh;overflow:auto;box-shadow:0 15px 45px #0008}#panel[hidden]{display:none}input,button{font:inherit}input[type=text]{background:#26354b;color:#fff;border:1px solid #60728d;border-radius:9px;padding:10px;width:100%}.pair{font-size:32px;letter-spacing:5px;color:#edce8e;font-weight:800}.row{display:flex;gap:6px;margin:10px 0;align-items:center}.row button,.action{background:#2d4669;color:white;border:1px solid #6d83a2;border-radius:8px;padding:9px;cursor:pointer}.sliders{display:block;margin:15px 0;font-size:13px}.sliders input{width:100%}.small{font-size:12px;color:#a8b7d0}.gp-credit{position:fixed;bottom:3px;left:50%;transform:translateX(-50%);font-size:8px;color:#857351;white-space:nowrap;text-align:center;pointer-events:none;max-width:94vw;overflow:hidden;text-overflow:ellipsis}@media(orientation:landscape){#book{padding-top:22px;padding-bottom:28px}}@media print{#menuButton,#panel,.gp-credit{display:none}#book{box-shadow:none}}
+*{box-sizing:border-box}body{margin:0;background:#17130e;color:#30251a;font-family:system-ui,"Noto Sans Gurmukhi",serif}#book{background:linear-gradient(90deg,#f3e6c8,#fffaee 16%,#fff9e8 83%,#e9d8ae);position:fixed;top:0;right:0;bottom:0;left:0;overflow:auto;text-align:center;padding:clamp(20px,5vw,70px) clamp(15px,6vw,75px);box-shadow:0 0 35px #0009;border-left:9px solid #d9c594;border-right:9px solid #d9c594;overflow-wrap:anywhere;touch-action:pan-y}.line{padding:var(--book-line-pad,9px) 12px;border-radius:9px;line-height:var(--book-leading,1.6);margin:0;transition:background .2s,color .2s}.line.current{background:#f3c76c;color:#292017;box-shadow:inset 0 0 0 2px #b58d36,0 0 20px #a66b3460;font-weight:800}.line.current:before{content:"✦ ";color:#975c14}.heading{text-align:center;font-weight:bold;margin:0 0 28px;color:#7c521c}.empty{text-align:center;color:#775a32;font-size:24px;padding-top:18vh}#menuButton{position:fixed;right:10px;top:9px;font-size:22px;z-index:10;background:#25211ddd;color:white;border:1px solid #999;border-radius:8px;padding:6px 12px;cursor:pointer}#panel{position:fixed;right:10px;top:56px;z-index:9;background:#191e28;color:#fff;border:1px solid #596780;border-radius:16px;padding:18px;width:min(380px,95vw);max-height:85vh;overflow:auto;box-shadow:0 15px 45px #0008}#panel[hidden]{display:none}input,button{font:inherit}input[type=text]{background:#26354b;color:#fff;border:1px solid #60728d;border-radius:9px;padding:10px;width:100%}.pair{font-size:32px;letter-spacing:5px;color:#edce8e;font-weight:800}.row{display:flex;gap:6px;margin:10px 0;align-items:center}.row button,.action{background:#2d4669;color:white;border:1px solid #6d83a2;border-radius:8px;padding:9px;cursor:pointer}.sliders{display:block;margin:15px 0;font-size:13px}.sliders input{width:100%}.small{font-size:12px;color:#a8b7d0}.gp-credit{position:fixed;bottom:3px;left:50%;transform:translateX(-50%);font-size:8px;color:#857351;white-space:nowrap;text-align:center;pointer-events:none;max-width:94vw;overflow:hidden;text-overflow:ellipsis}@media(orientation:landscape){#book{padding-top:22px;padding-bottom:28px}}@media print{#menuButton,#panel,.gp-credit{display:none}#book{box-shadow:none}}
 
 #bookWaheguru{position:fixed;top:0;right:0;bottom:0;left:0;z-index:8;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse,#241732,#030208 70%);color:#ffe2a1;font-size:12vw;font-weight:800;text-shadow:0 0 20px #a46de0}
 #bookWaheguru[hidden]{display:none}
@@ -12,13 +12,13 @@
 #mainPairing .main-pair-title{font-size:24px;font-size:clamp(18px,4vh,46px);font-weight:800;color:#f1d08c}
 #mainPairingCode{font-size:16vh;font-size:clamp(44px,min(17vw,23vh),190px);line-height:1;letter-spacing:.07em;font-weight:850;font-variant-numeric:tabular-nums;color:#fff}
 #mainPairing .main-pair-help{font-size:16px;font-size:clamp(14px,3vh,28px);color:#ddd;max-width:95%;line-height:1.4}
-.pause-word{color:#e35b17;font-weight:800}#lines.flow .line{display:inline;padding:0;box-shadow:none}#lines.flow .line.current:before{content:""}.ang-indicator{position:fixed;right:12px;bottom:18px;font-size:11px;color:#aaa;z-index:3;pointer-events:none}body.night-mode #book{background:#111;color:#f3e6c8;border-color:#524833}body.night-mode{background:#000;color:#eee}body.night-mode .heading{color:#e3c884}body.night-mode .line.current{background:#6c541e;color:#fff}body.alt-projection #book{display:none!important}#singleProjection[hidden]{display:none}#singleProjection{position:fixed;top:0;right:0;bottom:0;left:0;z-index:2;background:#000;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:3vh;padding:5vw;font-family:system-ui,"Noto Sans Gurmukhi",sans-serif;overflow-wrap:anywhere;overflow:auto}#singleProjection .singleLine{max-width:94vw;line-height:1.4;font-size:clamp(25px,6vw,100px)}#singleProjection .meaning{font-size:clamp(16px,3vw,40px);color:#eac986;max-width:94vw}body.alt-projection #menuButton{z-index:9} .source-credit{position:fixed;bottom:19px;left:4%;width:92%;z-index:8;text-align:center;color:#6a4a22;font-size:clamp(10px,1.4vw,14px);pointer-events:none;background:#fff8e8b8;padding:2px 8px;max-height:42px;overflow:hidden;text-overflow:ellipsis}.source-credit[hidden]{display:none}body.night-mode .source-credit{color:#e4ccac;background:#17120dbb}body.alt-projection .source-credit{color:#c6bdad;background:#0007}
+.pause-word{color:#e35b17;font-weight:800}#lines{max-width:1160px;margin:0 auto;text-align:center}#lines.flow .line{display:inline;padding:0;box-shadow:none}#lines.flow .line.current:before{content:""}.ang-indicator{position:fixed;right:12px;bottom:18px;font-size:11px;color:#aaa;z-index:3;pointer-events:none}body.night-mode #book{background:#111;color:#f3e6c8;border-color:#524833}body.night-mode{background:#000;color:#eee}body.night-mode .heading{color:#e3c884}body.night-mode .line.current{background:#6c541e;color:#fff}body.alt-projection #book{display:none!important}#singleProjection[hidden]{display:none}#singleProjection{position:fixed;top:0;right:0;bottom:0;left:0;z-index:2;background:#000;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:3vh;padding:5vw;font-family:system-ui,"Noto Sans Gurmukhi",sans-serif;overflow-wrap:anywhere;overflow:auto}#singleProjection .singleLine{max-width:94vw;line-height:1.4;font-size:clamp(25px,6vw,100px)}#singleProjection .meaning{font-size:clamp(16px,3vw,40px);color:#eac986;max-width:94vw}body.alt-projection #menuButton{z-index:9} .source-credit{position:fixed;bottom:19px;left:4%;width:92%;z-index:8;text-align:center;color:#6a4a22;font-size:clamp(10px,1.4vw,14px);pointer-events:none;background:#fff8e8b8;padding:2px 8px;max-height:42px;overflow:hidden;text-overflow:ellipsis}.source-credit[hidden]{display:none}body.night-mode .source-credit{color:#e4ccac;background:#17120dbb}body.alt-projection .source-credit{color:#c6bdad;background:#0007}
 /* Book View source and Ang live in a reserved top-right row below the menu icon. */
 .book-meta-top{position:fixed;right:10px;top:54px;z-index:8;display:flex;flex-direction:column;align-items:flex-end;gap:2px;max-width:min(66vw,480px);padding:4px 7px;border-radius:6px;background:#fff9e9ec;pointer-events:none;box-shadow:0 2px 10px #29201520}
 .book-meta-top[hidden],.book-meta-top .source-credit[hidden],.book-meta-top .ang-indicator[hidden]{display:none!important}
 .book-meta-top .source-credit,.book-meta-top .ang-indicator{position:static!important;top:auto!important;bottom:auto!important;left:auto!important;right:auto!important;transform:none!important;display:block;width:auto!important;max-width:100%;max-height:none!important;background:transparent!important;color:#664b25;font-size:clamp(10px,1.35vw,13px);padding:0!important;text-align:right;white-space:normal;overflow-wrap:anywhere;pointer-events:none;z-index:auto}
 .book-meta-top .ang-indicator{font-weight:750;white-space:nowrap;color:#835919}
-#book{padding-top:max(92px,10vh)!important;padding-bottom:max(30px,5vh)}
+#book{padding-top:54px!important;padding-top:clamp(54px,9vh,82px)!important;padding-bottom:max(30px,5vh)}
 body.night-mode .book-meta-top{background:#191712ed}
 body.night-mode .book-meta-top .source-credit,body.night-mode .book-meta-top .ang-indicator{color:#e6cf9e}
 body.alt-projection .book-meta-top{background:#090909d9}
@@ -55,17 +55,18 @@ function setMenu(on){$('panel').hidden=!on;$('menuButton').setAttribute('aria-ex
 $('menuButton').onclick=()=>setMenu($('panel').hidden);$('closeMenu').onclick=()=>setMenu(false);
 $('book').addEventListener('pointerdown',()=>setMenu(false));
 document.addEventListener('keydown',e=>{if(e.key==='Escape')setMenu(false)});
-let displayMode=(localStorage.getItem('gb-book-view-mode')==='projection'?'projection':'book'),remoteProjectionSettings={};
+let displayMode='book',remoteProjectionSettings={};
+const displaySession=Date.now()+'-'+Math.random();
 function renderAlternateProjection(){
  document.body.classList.toggle('alt-projection',displayMode==='projection');
  $('singleProjection').hidden=displayMode!=='projection';
  if(displayMode!=='projection')return;
  const c=saved.content||{},scripts=c.scripts||{};
  $('singleVerse').textContent=scripts.gurmukhi||c.verse||'';
- $('singleVerse').style.fontSize=Math.max(20,Math.min(200,Number(remoteProjectionSettings.verseSize)||64))+'px';
+ $('singleVerse').style.fontSize=Math.max(20,Math.min(360,Number(remoteProjectionSettings.verseSize)||64))+'px';
  const means=c.meanings||{};
  for(const [id,val,size] of [['singleGurmukhiMeaning',means.punjabi,'punjabiSize'],['singleHindiMeaning',means.hindi,'hindiSize'],['singleEnglishMeaning',means.english,'englishSize']]){
-  const el=$(id);el.textContent=val||'';el.hidden=!val;el.style.fontSize=Math.max(14,Math.min(100,Number(remoteProjectionSettings[size])||28))+'px'
+  const el=$(id);el.textContent=val||'';el.hidden=!val;el.style.fontSize=Math.max(14,Math.min(180,Number(remoteProjectionSettings[size])||28))+'px'
  }
 }
 let displayedLines=[],displayedStyle='',displayedCurrent=null;
@@ -75,6 +76,7 @@ function render(){
  $('bookWaheguru').hidden=!waheguru;
  if(waheguru)return;
  renderAlternateProjection();const source=content.sourceMeta||null;const credit=$('sourceCredit');credit.textContent=(source&&source.name)?('Source: '+source.name+(source.detail?' · '+source.detail:'')):'';credit.hidden=!credit.textContent;const angVal=(source&&source.ang)||content.ang||'';$('angIndicator').hidden=!angVal;$('angIndicator').textContent=angVal?'(Ang '+angVal+')':'';$('bookMetaTop').hidden=credit.hidden&&!angVal;
+ if(displayMode==='projection'){displayedCurrent=null;return}
  const lines=Array.isArray(content.bookLines)&&content.bookLines.length?content.bookLines:(content.verse?[content.verse]:[]);
  if(!lines.length){box.textContent='';displayedLines=[];displayedCurrent=null;const empty=document.createElement('div');empty.className='empty';empty.textContent='ੴ ਵਾਹਿਗੁਰੂ — Waiting for Gurbani Shabad';box.append(empty);return}
  const current=Number.isInteger(content.activeIndex)?content.activeIndex:0;box.classList.toggle('flow',!!bookLayout.flow);
@@ -102,18 +104,18 @@ let awaitSelection=read('gb-book-await-selection',!owner);
 function markAwaitSelection(v){awaitSelection=v;put('gb-book-await-selection',v);updateMainPairing()}
 function updateMainPairing(){ $('mainPairingCode').textContent=code; $('mainPairing').hidden=!!owner&&!awaitSelection;document.body.classList.toggle('pairing-active',!$('mainPairing').hidden); }
 function send(c,m){try{if(c.open)c.send(m)}catch(_){ }}
-function hello(c){send(c,{type:'hello',deviceId:code,code,name,owner,kind:'book',bookSettings:bookState()})}
+function hello(c){send(c,{type:'hello',deviceId:code,code,name,owner,kind:'book',displaySession,bookSettings:bookState()})}
 function connection(c){
  connections.add(c);
  c.on('open',()=>{hello(c);setPairingStatus('Waiting for pairing')});
  c.on('data',m=>{
   if(!m||typeof m!=='object')return;
   if(m.type==='ping'){send(c,{type:'pong',id:m.id});return}
-  if(m.type==='display-mode'&&owner&&m.token===owner){displayMode=m.mode==='projection'?'projection':'book';localStorage.setItem('gb-book-view-mode',displayMode);window.scrollTo(0,0);render();if(m.rev!==undefined)send(c,{type:'applied',rev:m.rev});return}
+  if(m.type==='display-mode'&&owner&&m.token===owner){const next=m.mode==='projection'?'projection':'book';if(next!==displayMode){displayMode=next;render()}if(m.rev!==undefined)send(c,{type:'applied',rev:m.rev});return}
   if(m.type==='remove-pairing'&&owner&&m.token===owner){$('resetPairing').onclick();return}
   if(m.type==='auth'&&typeof m.token==='string'){
    if(owner&&owner!==m.token){send(c,{type:'rejected'});setPairingStatus('Paired to another controller — use Reset pairing to change');return}
-   owner=m.token;put('gb-book-owner',owner);updateMainPairing();send(c,{type:'accepted',deviceId:code,code,name,kind:'book',bookSettings:bookState()});setPairingStatus('Paired');return
+   owner=m.token;put('gb-book-owner',owner);updateMainPairing();send(c,{type:'accepted',deviceId:code,code,name,kind:'book',displaySession,bookSettings:bookState()});setPairingStatus('Paired');return
   }
   if(m.type==='project'&&owner&&m.token===owner){
    if(m.bookSettings&&typeof m.bookSettings==='object'){applyBookSettings(m.bookSettings.fontSize,m.bookSettings.lineSpacing,false);setBookLayout(m.bookSettings,false,false)}
