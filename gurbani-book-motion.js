@@ -52,7 +52,7 @@ window.GurbaniBookMotion = function (surface, scroller, fontSize, previewSize, s
   if (!initialDistance) return;
   const a = event.touches[0], b = event.touches[1], y = (a.clientY + b.clientY) / 2;
   const hit = document.elementFromPoint((a.clientX + b.clientX) / 2, y);
-  const line = hit && hit.closest('.line, .alt-book-line');
+  const line = hit && hit.closest('.line, .alt-book-line, .searcher-line');
   const bounds = line && line.getBoundingClientRect();
   const size = fontSize();
   pinch = {distance:initialDistance, size, next:size, line, y,
