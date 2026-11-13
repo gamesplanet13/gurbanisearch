@@ -56,3 +56,15 @@ When the Controller opens on a device without the local SGGS Ang database, it no
 The source-pack generator scripts are `scripts/build_offline_sggs.py` and `scripts/export_shabados_offline.py`. The GitHub Action at `.github/workflows/build-offline-corpora.yml` generates the manifest and packs. **The existence of scripts or workflow is not proof that the packs have already been generated.** Check `data/offline-packs/manifest.json`: `status: not-built` means source packs are not yet ready on GitHub. Do not claim all sources are available until the manifest shows published files and the download/install has been tested.
 
 Shabad OS texts are imported as original primary Gurmukhi text only. Editorial Hindi/Punjabi/English translations have separate rights and are not assumed redistributable. The Nitnem quick buttons currently include bundled Anand Sahib and Sukhmani Sahib data; the full requested Nitnem collection is not yet independently compiled into one offline package.
+
+## Database section in Controller menu (current behavior)
+
+Open Controller **☰ → bottom → Database · Download / Storage / Version**. Tap the header to expand and tap again to close. It shows SGGS Ang download progress, counts of all saved source packs, database source import, App Version, and **Delete Database**.
+
+- The Controller starts or resumes unfinished local database downloads automatically **while the app/web page is running**, without a blocking full-screen setup; search and projection controls remain usable.
+- The source download prioritizes published GitHub packs. Until SGGS bundles have been published it uses Open Granth over the internet as a fallback. Other sources are saved only if their manifest packs exist; unpublished sources are never labeled as downloaded.
+- Already downloaded scriptures remain searchable locally. If the requested words are not found in downloaded Angs, online BaniDB search is attempted when internet is available.
+- Android/WebView and browsers generally **cannot reliably download while the app is suspended, force-closed or not running**. Downloads resume on next page opening/foregrounding or internet reconnection, not continuously when the process is dead.
+- Delete requires confirmation. It removes IndexedDB Angs, source packs, and cached online Shabads **from that device only**. It pauses auto-download until the user presses Download again.
+- Deletion of database data does not remove the app, stored device pairing settings, or the static application cache.
+- The main source pack manifest at `data/offline-packs/manifest.json` must be populated before a complete all-source offline database can be claimed.
