@@ -397,7 +397,7 @@ conn.on('data',m=>{if(!m||typeof m!=='object')return;health.set(conn,Date.now())
 }
 if(m.type==='pong'){return}if(m.type==='applied'){const p=pendingDelivery.get(conn);if(p&&m.rev===p.rev)pendingDelivery.delete(conn);return}
 if(m.type==='hello'){if(m.owner && m.owner!==myToken){status('Screen is paired to another controller. On that screen choose Reset pairing.');conn.close();return}if(m.code){const existing=connections.get(m.deviceId||key);if(m.deviceId&&m.deviceId!==key){connections.delete(key);key=m.deviceId}known[key]={code:m.code,name:m.name||'Projection',kind:m.kind||'projection'};put('gb-known-devices',known);connections.set(key,conn);selected.add(key);put('gb-selected-devices',[...selected]);announce(conn);renderDevices();status('Projection connected')}}
-if(m.type==='accepted'&&m.kind==='obs')send(conn,{type:'project',token:myToken,obsSettings:obsValues(),...(lastContent?{content:lastContent}:{})});
+if(m.type==='accepted'&&m.kind==='obs')send(conn,{type:'project',token:myToken,obsSettings:obsValues(),...(lastContent&&lastContent.mode!=='waheguru'?{content:lastContent}:{})});
 if(m.type==='accepted'&&m.kind!=='obs')setTimeout(()=>sendOneDeviceSettings(key,true),0);
 if(m.type==='accepted'){if(m.deviceId){if(m.deviceId!==key){connections.delete(key);key=m.deviceId}known[key]={code:m.code||codeValue,name:m.name||'Projection',kind:m.kind||known[key]?.kind||'projection'};put('gb-known-devices',known);selected.add(key);put('gb-selected-devices',[...selected]);connections.set(key,conn)}renderDevices();sendDeviceView(key);status('Paired successfully')}
 if((m.type==='hello'||m.type==='accepted')&&m.kind==='book'&&m.bookSettings&&!perDeviceSettings[key]){const saved=deviceSettings(key);saved.book={...saved.book,...m.bookSettings};persistDeviceSettings()}
@@ -680,10 +680,15 @@ function publish(payload,projectionOnly=false,force=false){
  let sent=0;const rev=++deliveryCounter;
  for(const id of selected){
   if(projectionOnly&&['book','obs'].includes(known[id]?.kind))continue;
+  if(payload.content?.mode==='waheguru'&&known[id]?.kind==='obs')continue;
   const c=connections.get(id);if(!c?.open)continue;
   const isObs=known[id]?.kind==='obs';
   const personal=isObs?null:deviceSettings(id);
   const packet={type:'project',token:myToken,rev,...payload};
+  if(!isObs&&preferredView(id)==='projection'&&!personal.projection.flow&&Array.isArray(packet.content?.bookLines)){
+   const {bookLines,...singleLine}=packet.content;
+   packet.content=singleLine;
+  }
   if(personal){packet.settings={...(payload.settings||{}),...personal.projection};packet.bookSettings={...(payload.bookSettings||{}),...personal.book};}
   if(send(c,packet)){sent++;pendingDelivery.set(c,{rev,time:Date.now()})}
  }
@@ -1682,7 +1687,7 @@ $('convertCustom').onclick=async()=>{
 $('useConverted').onclick=()=>{if(!$('customConverted').value.trim())return;$('customText').value=$('customConverted').value;$('customStatus').textContent='Edited translation copied to projection text'};
 
 $('sendCustom').onclick=()=>{const text=$('customText').value.trim();if(!text)return status('Paste text first');const content={mode:'custom',verse:text,scripts:{gurmukhi:text},meanings:{},scroll:!!$('customScroll').checked};publish({content,settings:settings()},true)};
-$('waheguru').onclick=()=>{const content={mode:'waheguru',verse:'ਵਾਹਿਗੁਰੂ',scripts:{gurmukhi:'ਵਾਹਿਗੁਰੂ',hindi:'वाहेगुरु',english:'Waheguru'},meanings:{}};if(publish({content,settings:settings()},true))status('Animated Waheguru sent to selected Projection screens')};
+$('waheguru').onclick=()=>{const content={mode:'waheguru',verse:'ਵਾਹਿਗੁਰੂ',scripts:{gurmukhi:'ਵਾਹਿਗੁਰੂ',hindi:'वाहेगुरु',english:'Waheguru'},meanings:{}};if(!projectionIsOn)return status('Turn Projection ON to show Waheguru');lastContent=content;put('gb-last-content',content);if(publish({content}))status('Waheguru sent to selected displays')};
 renderHistory();
 renderDevices();start();
 </script></body></html>

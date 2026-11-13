@@ -148,6 +148,14 @@ public class MainActivity extends Activity {
         if(web != null && web.canGoBack()) web.goBack();
         else finish();
     }
+    @Override protected void onResume() {
+        super.onResume();
+        if (updater != null) updater.resume();
+    }
+    @Override protected void onPause() {
+        if (updater != null) updater.pause();
+        super.onPause();
+    }
     @Override protected void onDestroy() {
         if(pendingMediaPermission != null){pendingMediaPermission.deny();pendingMediaPermission=null;}
         if(fileCallback != null) { fileCallback.onReceiveValue(null); fileCallback = null; }
