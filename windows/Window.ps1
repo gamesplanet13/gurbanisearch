@@ -11,8 +11,13 @@ public static class GurbaniWindow {
     [DllImport("user32.dll")] public static extern short GetAsyncKeyState(int key);
     [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr hwnd, out uint pid);
     [DllImport("user32.dll")] public static extern bool PostMessage(IntPtr hwnd, uint msg, IntPtr w, IntPtr l);
+    [DllImport("kernel32.dll", SetLastError=true)] public static extern uint SetThreadExecutionState(uint esFlags);
 }
 '@
+    # Keep Windows awake while this Gurbani app window is running.
+    # ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED prevents idle sleep/display-off;
+    # never changes the user's Windows power plan or monitors' permanent brightness.
+    [void][GurbaniWindow]::SetThreadExecutionState([uint32]0x80000003)
     $edgeArguments = '--user-data-dir="' + $Profile + '" --no-first-run --start-fullscreen --new-window "' + $Url + '"'
     $process = Start-Process -FilePath $Edge -ArgumentList $edgeArguments -PassThru
     for ($i=0; $i -lt 80 -and !$process.HasExited -and $process.MainWindowHandle -eq 0; $i++) {
@@ -71,6 +76,7 @@ public static class GurbaniWindow {
         Start-Sleep -Milliseconds 35
     }
 } finally {
+    try { [void][GurbaniWindow]::SetThreadExecutionState([uint32]0x80000000) } catch {}
     if ($shortcutUpdate) { Remove-Job -Job $shortcutUpdate -Force -ErrorAction SilentlyContinue }
     $mutex.ReleaseMutex()
     $mutex.Dispose()
