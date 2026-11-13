@@ -454,6 +454,7 @@ $('clear').onclick=()=>{lastContent=null;put('gb-last-content',null);publish({co
 /* Offline-first BaniDB cache. Caches only source data returned by BaniDB;
    user must explicitly download 1430 Angs online to enable complete SGGS Ang search. */
 const OFFLINE_DB_NAME='gamesplanet-gurbani-offline-v1';
+if(navigator.storage?.persist)navigator.storage.persist().catch(()=>{});
 const OFFLINE_DB_VERSION=2;
 let offlineDbPromise=null,offlineStopRequested=false,offlineDownloading=false,offlineCount=0;
 function offlineDb(){
@@ -499,9 +500,11 @@ async function offlineCountAngs(){
   req.onerror=()=>reject(req.error)
  })
 }
+let cachedOfflineAngs=null;
 async function offlineAllAngs(){
+ if(cachedOfflineAngs)return cachedOfflineAngs;
  const db=await offlineDb();
- return new Promise((resolve,reject)=>{
+ cachedOfflineAngs=new Promise((resolve,reject)=>{
   const arr=[],tx=db.transaction('angs','readonly'),req=tx.objectStore('angs').openCursor();
   req.onsuccess=()=>{
    const cur=req.result;if(!cur)return;
@@ -509,7 +512,8 @@ async function offlineAllAngs(){
   };
   tx.oncomplete=()=>resolve(arr);
   tx.onerror=()=>reject(tx.error)
- })
+ }).catch(e=>{cachedOfflineAngs=null;throw e});
+ return cachedOfflineAngs
 }
 const OPEN_GRANTH_CORPUS='https://raw.githubusercontent.com/opengranth/open-granth/main/corpus/';
 function parseOpenGranthAng(markdown,n){
@@ -540,6 +544,7 @@ async function offlineStoreAng(n,data){
  const angLines=Array.isArray(data?.page)?data.page:verses(data);
  if(!Array.isArray(angLines)||!angLines.some(x=>verse(x)))throw Error('Ang '+n+' returned empty/invalid lines');
  await offlineStore('angs','readwrite',store=>store.put({number:n,page:angLines,updatedAt:Date.now()}));
+ cachedOfflineAngs=null;
 }
 async function offlineLoadJson(url){
  if(navigator.onLine===false){
@@ -579,16 +584,22 @@ function normalizeOfflineText(value){
 function firstLetters(value){
  return normalizeOfflineText(value).split(' ').filter(Boolean).map(w=>Array.from(w)[0]).join('')
 }
-function offlineMatch(row,query,type){
+const offlineIndexedRows=new WeakMap();
+function indexedOfflineRow(row){
+ let entry=offlineIndexedRows.get(row);if(entry)return entry;
  const line=verse(row),roman=getScript(row,'english');
- if(!line)return false;
- const needle=normalizeOfflineText(query);
+ entry={line:normalizeOfflineText(line),roman:normalizeOfflineText(roman),first:firstLetters(line),romanFirst:firstLetters(roman)};
+ offlineIndexedRows.set(row,entry);
+ return entry
+}
+function offlineMatch(row,query,type){
+ const x=indexedOfflineRow(row),needle=normalizeOfflineText(query);
  if(!needle)return false;
- if(type==='7')return firstLetters(roman).replace(/\s/g,'').includes(needle.replace(/\s/g,''));
- if(type==='0')return firstLetters(line).includes(needle.replace(/\s/g,''));
- if(type==='2')return normalizeOfflineText(line).includes(needle);
- if(type==='4')return normalizeOfflineText(roman).includes(needle);
- return normalizeOfflineText(line).includes(needle)||normalizeOfflineText(roman).includes(needle)
+ if(type==='7')return x.romanFirst.includes(needle.replace(/\s/g,''));
+ if(type==='0')return x.first.includes(needle.replace(/\s/g,''));
+ if(type==='2')return x.line.includes(needle);
+ if(type==='4')return x.roman.includes(needle);
+ return x.line.includes(needle)||x.roman.includes(needle)
 }
 
 const SOURCE_META={
@@ -599,13 +610,16 @@ const SOURCE_META={
  A:{label:'Other Panthic Sources',pages:null}
 };
 const corpusSource=()=>document.getElementById('corpusSource').value;
+let cachedOfflineCorpora=null;
 async function offlineSourceRecords(){
+ if(cachedOfflineCorpora)return cachedOfflineCorpora;
  const db=await offlineDb();
- return new Promise((resolve,reject)=>{
+ cachedOfflineCorpora=new Promise((resolve,reject)=>{
   const arr=[],tx=db.transaction('corpora','readonly'),req=tx.objectStore('corpora').openCursor();
   req.onsuccess=()=>{const c=req.result;if(c){arr.push(c.value);c.continue()}};
   tx.oncomplete=()=>resolve(arr);tx.onerror=()=>reject(tx.error)
- })
+ }).catch(e=>{cachedOfflineCorpora=null;throw e});
+ return cachedOfflineCorpora
 }
 async function offlineSearch(query,type,limit=40){
  const source=corpusSource(),results=[];
@@ -681,6 +695,7 @@ async function installGithubOfflineSource(){
    if(part.lines&&part.lines!==lines.length)throw Error('Manifest verse count mismatch: '+part.path);
    if(!pack.citation)throw Error('Missing original source citation');
    await offlineStore('corpora','readwrite',store=>store.put({key:src+':'+pack.id,source:src,title:pack.title,citation:pack.citation,lines,updatedAt:Date.now()}));
+   cachedOfflineCorpora=null;
    done++;
    $('offlineMessage').textContent=SOURCE_META[src].label+' · '+done+'/'+item.parts.length+' packs saved on this device';
    await sleepOffline(90);
@@ -715,6 +730,7 @@ $('offlineImport').onchange=async e=>{
   if(!citation)throw Error('Pack must include a source citation/reference for authenticity');
   const key=source+':'+String(json.id||file.name).slice(0,160);
   await offlineStore('corpora','readwrite',store=>store.put({key,source,title,citation,lines:normalized,updatedAt:Date.now()}));
+  cachedOfflineCorpora=null;
   status('Offline source pack saved: '+title+' · '+normalized.length+' lines');
   await refreshSourcesAvailability()
  }catch(error){status('Source pack not installed: '+error.message)}
