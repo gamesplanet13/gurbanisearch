@@ -790,32 +790,70 @@ async function refreshOfflineProgress(){
 const sleepOffline=ms=>new Promise(r=>setTimeout(r,ms));
 async function downloadOfflineLibrary(){
  if(offlineDownloading)return;
- if(navigator.onLine===false)return status('Connect to internet once to download the Gurbani Library');
+ if(navigator.onLine===false)return status('Connect to internet once to install Gurbani Database');
  offlineDownloading=true;offlineStopRequested=false;$('offlineDownload').disabled=true;
  try{
-  for(let n=1;n<=1430;n++){
-   if(offlineStopRequested)break;
-   if(await offlineGet('angs',n).catch(()=>null))continue;
-   let ok=false;
-   for(let retry=0;retry<3&&!ok&&!offlineStopRequested;retry++){
-    try{
-     const file='ang-'+String(n).padStart(4,'0')+'.md';
-     const resp=await fetch(OPEN_GRANTH_CORPUS+file,{cache:'no-store'});
-     if(!resp.ok)throw Error('Open Granth HTTP '+resp.status);
-     const data=parseOpenGranthAng(await resp.text(),n);
-     await offlineStoreAng(n,data);ok=true;offlineCount++;
-     if(n%5===0||n===1430)showOfflineProgress('Downloading Ang '+n+' / 1430 · saved '+offlineCount+'. You can pause and resume.')
-    }catch(e){
-     if(retry===2){showOfflineProgress('Stopped on Ang '+n+': '+e.message+'. Tap Save to resume.');offlineStopRequested=true}
-     else await sleepOffline(800*(retry+1))
+  offlineCount=await offlineCountAngs();
+  let manifest=null;
+  try{manifest=await readGithubPackManifest()}catch(e){console.info('Using direct Open Granth fallback; GitHub SGGS bundles not published yet',e)}
+  const published=manifest?.sources?.G?.parts;
+  if(Array.isArray(published)&&published.length){
+   // Fast first run: 20 verified Angs per GitHub bundle, resume skips already saved pages.
+   for(const part of published){
+    if(offlineStopRequested)break;
+    if(!/^G\/chunk-\d{4}\.json$/.test(part.path))throw Error('Invalid SGGS pack path');
+    let complete=true;
+    for(let n=part.start;n<=part.end;n++){
+     if(!(await offlineGet('angs',n))){complete=false;break}
+    }
+    if(complete)continue;
+    const response=await fetch('data/offline-packs/'+part.path,{cache:'no-store'});
+    if(!response.ok)throw Error('GitHub Gurbani pack unavailable: '+part.path+' HTTP '+response.status);
+    const pack=await response.json();
+    if(pack.format!=='gamesplanet-gurbani-angs-v1'||pack.source!=='G'||!Array.isArray(pack.pages)||pack.pages.length!==part.count)throw Error('Invalid SGGS pack: '+part.path);
+    for(const ang of pack.pages){
+     if(!Number.isInteger(ang.number)||ang.number<part.start||ang.number>part.end||!Array.isArray(ang.page)||ang.page.length<5)throw Error('Unverified Ang in '+part.path);
+     if(!(await offlineGet('angs',ang.number))){await offlineStoreAng(ang.number,ang);offlineCount++}
+    }
+    showOfflineProgress('Installing GitHub Gurbani pack '+part.path+' · '+offlineCount+'/1430 Angs');
+   }
+  }else{
+   // Reliable source fallback when the prebuilt Github pack has not been published.
+   // Bounded parallel downloads, resumable IndexedDB storage, no paid server.
+   $('offlineMessage').textContent='GitHub pack pending; downloading verified Open Granth Angs directly.';
+   const missing=[];
+   for(let n=1;n<=1430;n++)if(!(await offlineGet('angs',n)))missing.push(n);
+   let cursor=0,failure=null;
+   async function worker(){
+    while(!offlineStopRequested){
+     const i=cursor++;
+     if(i>=missing.length)return;
+     const n=missing[i];
+     let saved=false;
+     for(let retry=0;retry<3&&!saved&&!offlineStopRequested;retry++){
+      try{
+       const file='ang-'+String(n).padStart(4,'0')+'.md';
+       const response=await fetch(OPEN_GRANTH_CORPUS+file,{cache:'no-store'});
+       if(!response.ok)throw Error('HTTP '+response.status);
+       const obj=parseOpenGranthAng(await response.text(),n);
+       await offlineStoreAng(n,obj);saved=true;offlineCount++;
+       if(offlineCount%5===0||offlineCount===1430)showOfflineProgress('Installing Gurbani · '+offlineCount+' / 1430 Angs')
+      }catch(e){
+       if(retry>=2){failure=Error('Ang '+n+': '+e.message);offlineStopRequested=true;break}
+       await sleepOffline(500*(retry+1))
+      }
+     }
+     await sleepOffline(140)
     }
    }
-   if(!offlineStopRequested)await sleepOffline(320);
+   await Promise.all(Array.from({length:4},worker));
+   if(failure)throw failure
   }
-  await refreshOfflineProgress();
-  if(offlineStopRequested)status('Offline download paused. You can resume without losing saved Angs.');
-  else status('Gurbani Ang library downloaded for offline search and reading.')
- }catch(e){status('Offline save failed: '+e.message)}
+  offlineCount=await offlineCountAngs();
+  showOfflineProgress(offlineCount===1430?'Sri Guru Granth Sahib Ji complete — 1430 Angs saved on this device.':'Downloaded '+offlineCount+'/1430 Angs. Resume to finish.');
+  if(offlineCount!==1430)throw Error('Database incomplete: '+offlineCount+'/1430 Angs. Resume required.');
+  status('Sri Guru Granth Sahib Ji offline database installed')
+ }catch(e){status('Gurbani Database download incomplete: '+e.message);$('offlineMessage').textContent=e.message}
  finally{offlineDownloading=false;$('offlineDownload').disabled=false;offlineStopRequested=false}
 }
 $('offlineDownload').onclick=downloadOfflineLibrary;
