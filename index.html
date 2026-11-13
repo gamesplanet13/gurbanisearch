@@ -780,7 +780,8 @@ async function openOfflineSearchResult(item){
 function showOfflineProgress(message){
  $('offlineProgress').value=offlineCount;
  $('offlineBadge').textContent=offlineCount+'/1430 Angs';
- if(message)$('offlineMessage').textContent=message
+ if(message)$('offlineMessage').textContent=message;
+ if(!$('databaseInstall').hidden&&message)$('installDetails').textContent=message
 }
 async function refreshOfflineProgress(){
  try{offlineCount=await offlineCountAngs();showOfflineProgress(offlineCount===1430?'Full Sri Guru Granth Sahib Ji offline Ang library ready.':'Downloaded Angs are searchable offline. The remainder requires internet.')}
@@ -840,6 +841,97 @@ $('search').onclick=async()=>{
  }
 };
 refreshOfflineProgress();refreshSourcesAvailability();
+
+let firstRunActive=false;
+const firstRunMarker='gb-first-run-install-v2';
+const firstRunDone=()=>localStorage.getItem(firstRunMarker)==='complete';
+function firstRunMessage(phase,detail){
+ $('installPhase').textContent=phase;
+ $('installDetails').textContent=detail||'';
+}
+function firstRunDisplay(show){
+ $('databaseInstall').hidden=!show;
+ if(show){$('installProgress').value=offlineCount;$('installCount').textContent=offlineCount+' / 1430 Angs'}
+}
+async function getPackStatus(){
+ let manifest;
+ try{manifest=await readGithubPackManifest()}catch(e){return {available:[],missing:['D','B','N'],error:String(e)}}
+ const available=[],missing=[];
+ for(const key of ['D','B','N']){
+  if(Array.isArray(manifest.sources?.[key]?.parts)&&manifest.sources[key].parts.length)available.push(key);
+  else missing.push(key)
+ }
+ return{available,missing}
+}
+async function verifyInstalledSource(key){
+ const manifest=await readGithubPackManifest(),parts=manifest.sources?.[key]?.parts||[];
+ if(!parts.length)return false;
+ const saved=await offlineSourceRecords();
+ return parts.every(part=>{
+  const id=part.path.split('/').at(-1).replace(/^chunk-/,'').replace(/\.json$/,'');
+  return saved.some(p=>p.key===key+':shabados-'+key+'-'+id&&p.lines?.length===part.lines)
+ })
+}
+async function firstRunInstall(){
+ if(firstRunActive)return;
+ firstRunActive=true;
+ firstRunDisplay(true);
+ $('installRetry').hidden=true;$('installRefresh').disabled=true;
+ const sourceSelect=$('corpusSource'),previousSource=sourceSelect.value;
+ try{
+  offlineCount=await offlineCountAngs();showOfflineProgress();
+  if(offlineCount<1430){
+   if(navigator.onLine===false)throw Error('Internet is required to download the Gurbani Database for the first time.');
+   firstRunMessage('Download & Install Gurbani Database','Sri Guru Granth Sahib Ji · '+offlineCount+'/1430 Angs. Already saved Angs will be skipped.');
+   await downloadOfflineLibrary();
+   offlineCount=await offlineCountAngs();showOfflineProgress();
+   if(offlineCount!==1430)throw Error('SGGS download incomplete: '+offlineCount+'/1430. Retry resumes without repeating completed Angs.');
+  }
+  firstRunMessage('Checking Other Gurbani Sources','Installing all source packs currently published in the GitHub repository.');
+  const status=await getPackStatus();
+  $('installOtherSources').textContent='Other sources on GitHub: '+status.available.map(k=>SOURCE_META[k].label).join(', ')+(status.missing.length?' · Not yet published: '+status.missing.map(k=>SOURCE_META[k].label).join(', '):'');
+  for(const key of status.available){
+   if(await verifyInstalledSource(key))continue;
+   sourceSelect.value=key;
+   firstRunMessage('Installing '+SOURCE_META[key].label,'Downloading and saving published source packs on this device.');
+   await installGithubOfflineSource();
+   if(!(await verifyInstalledSource(key)))throw Error(SOURCE_META[key].label+' pack installation incomplete. Tap Retry to continue.');
+  }
+  if(status.missing.length){
+   // Do not claim the complete multi-source corpus is installed.
+   firstRunMessage('Sri Guru Granth Sahib Ji Ready · Other Sources Pending','The full 1430-Ang library is installed. The other listed sources have not yet been published as downloadable packs on GitHub.');
+   $('installRetry').hidden=false;$('installRetry').textContent='Recheck & Install Sources';
+   $('installRefresh').textContent='Use Available SGGS Library';
+   $('installRefresh').disabled=false;
+   $('installRefresh').onclick=()=>{localStorage.setItem(firstRunMarker,'sggs-ready');firstRunDisplay(false)};
+   return;
+  }
+  localStorage.setItem(firstRunMarker,'complete');
+  firstRunMessage('Gurbani Database Installed','All published source packs are saved on this device. Gurbani search is ready.');
+  await refreshSourcesAvailability();
+  firstRunDisplay(false)
+ }catch(e){
+  firstRunMessage('Database Setup Incomplete',e.message);
+  $('installRetry').hidden=false;$('installRetry').textContent='Retry / Resume';
+  $('installRefresh').disabled=false;$('installRefresh').textContent='Recheck Storage';
+  $('installRefresh').onclick=firstRunInstall
+ }finally{
+  sourceSelect.value=previousSource;
+  $('installRefresh').disabled=false;
+  firstRunActive=false
+ }
+}
+$('installRetry').onclick=firstRunInstall;
+$('installRefresh').onclick=firstRunInstall;
+(async()=>{
+ try{
+  offlineCount=await offlineCountAngs();showOfflineProgress();
+  if(firstRunDone()&&offlineCount===1430)return;
+  if(localStorage.getItem(firstRunMarker)==='sggs-ready'&&offlineCount===1430)return;
+  await firstRunInstall()
+ }catch(e){firstRunDisplay(true);firstRunMessage('Offline storage unavailable',e.message);$('installRetry').hidden=false}
+})();
+
 $('offlineRefresh').addEventListener('click',refreshSourcesAvailability);
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(e=>console.warn('Offline app-shell cache unavailable',e))}
 $('query').onkeydown=e=>{if(e.key==='Enter')$('search').click()};
