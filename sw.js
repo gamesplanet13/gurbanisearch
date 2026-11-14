@@ -1,11 +1,11 @@
 /* Games Planet Gurbani — offline app shell. Search corpus stored in IndexedDB by Controller. */
-const VERSION='gurbani-shell-2026-11-13-searcher-reference-v10';
+const VERSION='gurbani-shell-2026-11-13-searcher-brand-v11';
 const CORE=[
  './','./index.html','./searcher.html','./gurbani-searcher.css','./gurbani-searcher-sync.js','./projection.html','./book.html','./obs.html','./camera.html',
  './gurbani-desktop-preview.js','./gurbani-desktop-fullscreen.js','./gurbani-screen-preview.js','./gurbani-waheguru-wide.js','./gurbani-updates.js','./gurbani-camera.js','./gurbani-layout.js','./gurbani-book-motion.js','./gurbani-peer-manager.js','./peerjs-1.5.5.min.js',
  './data/banis/anand-six.json','./data/banis/sukhmani-sahib.json',
  './data/anand-ending-salok.json','./assets/sahibzaade-family.webp',
- './assets/searcher/ang.png','./assets/searcher/favorites.png','./assets/searcher/history.png','./assets/searcher/initials.png','./assets/searcher/logo.png','./assets/searcher/next-off.png','./assets/searcher/next.png','./assets/searcher/previous.png','./assets/searcher/search-mode.png','./assets/searcher/search.png','./assets/searcher/settings.png','./assets/searcher/waheguru.png','./assets/searcher/word.png',
+ './assets/searcher/ang.png','./assets/searcher/favorites.png','./assets/searcher/history.png','./assets/searcher/initials.png','./assets/searcher/brand.svg','./assets/searcher/next-off.png','./assets/searcher/next.png','./assets/searcher/previous.png','./assets/searcher/search-mode.png','./assets/searcher/search.png','./assets/searcher/settings.png','./assets/searcher/waheguru.png','./assets/searcher/word.png',
  './assets/splash-portrait.svg','./assets/splash-landscape.svg'
 ];
 self.addEventListener('install',event=>{

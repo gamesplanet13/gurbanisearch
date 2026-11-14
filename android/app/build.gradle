@@ -20,8 +20,8 @@ android {
         }
         searcher {
             dimension 'role'
-            versionCode 20261129
-            versionName '2026.11.14.2'
+            versionCode 20261130
+            versionName '2026.11.14.3'
             applicationIdSuffix '.searcher'
             resValue 'string', 'app_name', 'Gurbani Searcher'
             buildConfigField 'String', 'START_PAGE', '"searcher.html"'

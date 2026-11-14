@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gurbani Searching Control</title><link rel="stylesheet" href="gurbani-searcher.css?v=5"><script>if(new URLSearchParams(location.search).get("view")==="searcher"){document.documentElement.classList.add("searcher");document.title="Gurbani Searcher"}</script><style>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gurbani Searching Control</title><link rel="stylesheet" href="gurbani-searcher.css?v=6"><script>if(new URLSearchParams(location.search).get("view")==="searcher"){document.documentElement.classList.add("searcher");document.title="Gurbani Searcher"}</script><style>
 *{box-sizing:border-box}body{margin:0;background:#0b101a;color:#eef5ff;font:15px system-ui,sans-serif}header{padding:16px;background:#182438;display:flex;justify-content:space-between;align-items:center;gap:10px}h1{font-size:21px;margin:0}main{max-width:1150px;margin:20px auto;padding:0 12px;display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{border:1px solid #36455e;background:#172232;padding:18px;border-radius:15px;margin-bottom:14px}h2{margin:0 0 12px;font-size:18px}input,select,button{font:inherit;color:#fff;background:#101b2d;border:1px solid #53627c;border-radius:9px;padding:11px}button{cursor:pointer;background:#28486b}button.primary{background:#1669ae}.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0}.grow{flex:1;min-width:110px}.muted{color:#b0bfd3;font-size:13px}.code{font-size:31px;letter-spacing:5px;color:#f7d48a;font-weight:bold}.list{max-height:50vh;overflow:auto}.item{display:block;text-align:left;width:100%;line-height:1.55;margin:7px 0;white-space:normal}.item.active{background:#575025;border-color:#e0bd68}.device{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:#253347;border-radius:8px;margin:7px 0;padding:10px}.device label{flex:1}.devstatus{font-size:12px;color:#89d5af}.verse{font-size:20px}.small{font-size:12px;color:#aebed4}a{color:#a7d2ff}label.field{display:block;margin:8px 0}input[type=range]{width:100%}input[type=checkbox]{accent-color:#dab66b}@media(max-width:850px){main{grid-template-columns:1fr}}#searchColumn{display:flex;flex-direction:column}#searchCard{order:0}#connectCard{order:1}#historyCard{order:2}#results[hidden]{display:none}#shabadCard label{font-size:12px}
 header{position:sticky;top:0;z-index:8}#menuButton{min-width:45px;font-size:23px;padding:7px 12px}#functionsMenu{position:fixed;right:12px;top:63px;z-index:20;max-width:min(94vw,400px);max-height:80vh;overflow-y:auto;background:#18263b;border:1px solid #6d7a96;border-radius:16px;padding:16px;box-shadow:0 15px 70px #000b}#functionsMenu[hidden]{display:none}#functionsMenu label{display:block;padding:6px 0}#menuOptions h2{font-size:16px;margin:9px 0}#connectCard,#fontCard{display:none}#functionsMenu #connectCard,#functionsMenu #fontCard{display:block;padding:10px;margin:8px 0}#functionsMenu .card{box-shadow:none}.historyItem{display:block;width:100%;text-align:left;margin:6px 0;background:#273750}.markMain{float:right;padding:4px 8px;margin-left:6px;background:#344864}.mainNote{color:#f3cc75;font-size:12px}#lines .item{overflow:auto} .gp-credit{font-size:9px;color:#7d8da4;text-align:center;padding:9px 4px 16px;opacity:.7} body.day-mode{background:#f5efe1;color:#25221c}body.day-mode header,body.day-mode #functionsMenu{background:#eee1c8;color:#25221c}body.day-mode .card{background:#fffaf0;border-color:#bcae94}body.day-mode input,body.day-mode select,body.day-mode button{background:#e7dcc6;color:#211d18;border-color:#9c896a}body.day-mode .small,body.day-mode .muted{color:#574e41}.ang-indicator{position:fixed;right:12px;bottom:18px;font-size:11px;color:#ab9a78;z-index:2;pointer-events:none}.quick-actions{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
 @media (orientation:landscape) and (min-width:650px){main{grid-template-columns:minmax(250px,42%) minmax(0,58%);align-items:start}main>div{min-width:0}#searchColumn{position:sticky;top:72px;max-height:calc(100dvh - 78px);overflow:auto}#shabadCard,#historyCard{width:100%}#lines{max-height:59dvh}#historyList{max-height:28dvh;overflow:auto}} @media (orientation:portrait),(max-width:649px){#searchColumn{position:static;max-height:none}#lines{max-height:45dvh}} #connectCard .device{flex-wrap:wrap} #connectCard .device select{max-width:150px} #customTools textarea{border-radius:9px;border:1px solid #52617a;background:#101b2d;color:#fff;padding:10px;margin:7px 0}#customTools summary{cursor:pointer;font-weight:700;padding:7px 0} #shabadCard{position:relative}#historyCard{position:absolute;top:54px;right:12px;z-index:12;width:min(360px,calc(100% - 24px));max-height:60vh;overflow:auto;box-shadow:0 16px 45px #000b;background:#202c41}#historyCard[hidden],#readingNavigator[hidden],#sukhmaniNavigation[hidden],#sehajNavigation[hidden],#asaNavigation[hidden]{display:none!important}#sukhmaniNavigation,#sehajNavigation{margin:12px 0;padding:10px;background:#223149;border-radius:12px}#readingNavigator input{min-width:90px}#historyToggle{font-size:13px;padding:8px 11px}@media(orientation:landscape) and (min-width:650px){main{grid-template-columns:minmax(260px,40%) minmax(0,60%)}#historyCard{max-height:75vh}} #devices .device{flex-wrap:wrap}#devices .device label{flex:1;min-width:135px}#devices .device select{max-width:145px}#devices .device-settings-editor{border:1px solid #7b8eab;background:#22324a;border-radius:12px;padding:12px;margin:8px 0 14px}#devices .device-settings-editor>select{width:100%;margin:5px 0}#devices .device-setting-field{display:block;margin:12px 0}#devices .device-setting-field input{display:block;width:100%;accent-color:#edc97d}#devices .device-setting-checkbox{display:block;padding:5px 0;font-size:14px}
@@ -150,7 +150,8 @@ main{width:100%;max-width:none;margin:3px auto;padding:0 4px;gap:4px;align-items
 </div><header><h1>ੴ Gurbani Searching Control</h1><button id="desktopPreviewToggle" aria-controls="desktopPreview" aria-expanded="false" hidden>Live Preview</button><button id="menuButton" class="icon-btn" title="Functions and connected devices" aria-label="Open functions" aria-expanded="false">☰</button></header>
 <nav id="searcherToolbar" class="searcher-toolbar" aria-label="Gurbani Searcher" hidden>
  <div id="searcherActions">
-  <div id="searcherHeading"><img src="assets/searcher/logo.png" alt=""><div><strong>Gurbani Searcher</strong><small id="searcherMode"></small></div></div>
+  <button id="searcherScreenShortcut" type="button" aria-label="ਸਕ੍ਰੀਨ ਜੋੜੋ · Connect screens" title="ਸਕ੍ਰੀਨ ਜੋੜੋ · Connect screens">▣</button>
+  <div id="searcherHeading"><img src="assets/searcher/brand.svg" alt=""><div><strong>Gurbani Searcher</strong><small id="searcherMode"></small></div></div>
   <button id="searcherPreferences" type="button" aria-label="ਸੈਟਿੰਗਾਂ · Settings"></button>
   <button id="searcherFavorites" type="button" title="ਮਨਪਸੰਦ · Favorites" aria-label="ਮਨਪਸੰਦ · Favorites">★</button>
   <button id="searcherSearch" type="button" aria-label="ਖੋਜ · Search" title="ਖੋਜ · Search">⌕</button>
@@ -159,7 +160,8 @@ main{width:100%;max-width:none;margin:3px auto;padding:0 4px;gap:4px;align-items
    <div class="searcher-settings-panel">
     <button id="searcherHistoryMenu" type="button">ਖੋਜ ਇਤਿਹਾਸ · Search History</button>
     <button id="searcherBaniMenu" type="button">ਬਾਣੀ · Reading shortcuts</button>
-    <button id="searcherDevices" type="button">ਜੁੜੀਆਂ ਸਕ੍ਰੀਨਾਂ · Screens</button>
+    <button id="searcherDevices" type="button">ਸਕ੍ਰੀਨ ਜੋੜੋ · Connect screens</button>
+    <button id="searcherWaheguruMenu" type="button">ਵਾਹਿਗੁਰੂ · Show Waheguru</button>
     <button id="searcherLinkMenu" type="button">ਕੰਟਰੋਲ ਨਾਲ ਜੋੜੋ · Link Control</button>
     <button id="searcherReaderSettings" type="button">ਪੜ੍ਹਨ ਦੀਆਂ ਸੈਟਿੰਗਾਂ · Reading settings</button>
     <div id="searcherReaderOptions" hidden>
@@ -171,7 +173,12 @@ main{width:100%;max-width:none;margin:3px auto;padding:0 4px;gap:4px;align-items
    </div>
   </details>
  </div>
-</nav><main><div id="searchColumn">
+</nav>
+<section id="searcherWaheguru" hidden aria-label="ਵਾਹਿਗੁਰੂ">
+ <div id="searcherWaheguruArt" aria-hidden="true"></div>
+ <button id="searcherWaheguruClose" type="button">ਬੰਦ ਕਰੋ · Close</button>
+</section>
+<main><div id="searchColumn">
 <section class="card" id="searcherLinkPanel" hidden>
  <label for="searcherControlCode">ਕੰਟਰੋਲ ਦਾ ਪੰਜ ਅੰਕਾਂ ਵਾਲਾ ਕੋਡ · Control code</label>
  <div class="row"><input id="searcherControlCode" class="grow" inputmode="numeric" maxlength="5">
@@ -208,7 +215,7 @@ main{width:100%;max-width:none;margin:3px auto;padding:0 4px;gap:4px;align-items
  <video id="desktopPreviewVideo" aria-label="Camera preview" autoplay muted playsinline hidden></video>
  <p id="desktopPreviewStatus" class="small" role="status"></p>
 </aside>
-<script src="gurbani-layout.js?v=2"></script><script src="gurbani-book-motion.js?v=3"></script><script src="gurbani-searcher-sync.js?v=1"></script><script src="gurbani-desktop-preview.js?v=1"></script>
+<script src="gurbani-layout.js?v=2"></script><script src="gurbani-book-motion.js?v=3"></script><script src="gurbani-searcher-sync.js?v=1"></script><script src="gurbani-waheguru-wide.js"></script><script src="gurbani-desktop-preview.js?v=1"></script>
 <script src="gurbani-updates.js?v=20261121" defer></script><script src="peerjs-1.5.5.min.js?v=20261118"></script><script src="gurbani-peer-manager.js?v=20261119"></script><script src="gurbani-camera.js?v=20261119"></script><script>
 'use strict';
 const $=id=>document.getElementById(id);
@@ -783,7 +790,7 @@ function renderWifiDevices(){
 }
 window.gbWifiFound=(code,name,kind)=>{if(!/^\d{5}$/.test(code)||typeof name!=='string'||!['projection','book'].includes(kind))return;wifiDevices.set(kind+':'+code,{code,name:name.slice(0,80),kind});renderWifiDevices();$('wifiStatus').textContent='ਜੋੜਨ ਲਈ ਸਕ੍ਰੀਨ ਚੁਣੋ। · Select a screen to connect.'};
 window.gbWifiFinished=(error)=>{if(error){$('wifiStatus').textContent=error;return}$('wifiStatus').textContent=wifiDevices.size?'ਜੋੜਨ ਲਈ ਸਕ੍ਰੀਨ ਚੁਣੋ। · Select a screen to connect.':'ਕੋਈ ਸਕ੍ਰੀਨ ਨਹੀਂ ਮਿਲੀ। ਪ੍ਰੋਜੈਕਸ਼ਨ ਜਾਂ ਗ੍ਰੰਥ ਵਿਊ ਇੱਕੋ ਵਾਈ-ਫਾਈ ’ਤੇ ਖੁੱਲ੍ਹਾ ਰੱਖੋ। · No screens found. Keep the updated Projection or Granth View app open on the same Wi-Fi.'};
-$('searchWifi').onclick=()=>{wifiDevices.clear();renderWifiDevices();if(!window.GurbaniWifi||typeof window.GurbaniWifi.search!=='function'){$('wifiStatus').textContent='Install the updated Gurbani Controller Android app for Wi-Fi search. You can still enter a code.';return}$('wifiStatus').textContent='ਵਾਈ-ਫਾਈ ’ਤੇ ਲੱਭ ਰਹੇ ਹਾਂ… · Searching the same Wi-Fi…';try{window.GurbaniWifi.search()}catch(e){$('wifiStatus').textContent='Wi-Fi search unavailable. Use the code.'}};
+$('searchWifi').onclick=()=>{wifiDevices.clear();renderWifiDevices();if(!window.GurbaniWifi||typeof window.GurbaniWifi.search!=='function'){$('wifiStatus').textContent='Wi-Fi search is available in the Gurbani Android app. You can still enter a code.';return}$('wifiStatus').textContent='ਵਾਈ-ਫਾਈ ’ਤੇ ਲੱਭ ਰਹੇ ਹਾਂ… · Searching the same Wi-Fi…';try{window.GurbaniWifi.search()}catch(e){$('wifiStatus').textContent='Wi-Fi search unavailable. Use the code.'}};
 $('pair').onclick=()=>{const c=$('pairCode').value.trim();if(!/^\d{5}$/.test(c))return status('ਪੰਜ ਅੰਕ ਪਾਓ। · Enter five digits.');connectProjection(c,c)};
 function reconnectSaved(){searcherSync.connect();if(peer&&peer.open&&!peer.disconnected){for(const [key,d] of Object.entries(known))if(autoReconnect[key]!==false&&!connections.has(key))connectProjection(key,d.code)}}
 setInterval(()=>{for(const [key,c] of connections){if(!c?.open)continue;const last=health.get(c)||Date.now();if(Date.now()-last>60000){connections.delete(key);try{c.close()}catch(_){}status('Reconnecting unresponsive display '+key);continue}send(c,{type:'ping',id:Date.now(),token:myToken})}renderDevices()},12000);
@@ -806,7 +813,7 @@ $('projectionSwitch').onclick=()=>{
 refreshProjectionSwitch();
 function publish(payload,projectionOnly=false,force=false,fromSync=false){
  if(!projectionIsOn&&!force&&payload.content!==null)return 0;
- const synced=!fromSync&&Object.hasOwn(payload,'content')&&(!payload.content||Array.isArray(payload.content.bookLines))&&searcherSync.send(payload.content);
+ const synced=!fromSync&&Object.hasOwn(payload,'content')&&(!payload.content||payload.content.mode==='waheguru'||Array.isArray(payload.content.bookLines))&&searcherSync.send(payload.content);
  let sent=0;const rev=++deliveryCounter;
  for(const id of (isSearcher?connections.keys():selected)){
   if(projectionOnly&&['book','obs'].includes(known[id]?.kind))continue;
@@ -821,7 +828,7 @@ function publish(payload,projectionOnly=false,force=false,fromSync=false){
    packet.content=singleLine;
   }
   if(personal){delete packet.settings;delete packet.bookSettings;}
-  const update=known[id]?.localWaheguru&&packet.content?.mode==='waheguru'?{type:'waheguru-show',token:myToken,rev}:packet;
+  const update=known[id]?.kind==='projection'&&known[id]?.localWaheguru&&packet.content?.mode==='waheguru'?{type:'waheguru-show',token:myToken,rev}:packet;
   if(send(c,update)){sent++;pendingDelivery.set(c,{rev,time:Date.now()})}
  }
  if(isSearcher)$('searcherMessage').textContent=sent?sent+' ਸਕ੍ਰੀਨਾਂ · Screens updated':synced?'ਕੰਟਰੋਲ ਨੂੰ ਭੇਜਿਆ · Sent to Control':'ਸਕ੍ਰੀਨ ਜੋੜੋ · Connect a display';
@@ -1958,13 +1965,38 @@ $('convertCustom').onclick=async()=>{
 $('useConverted').onclick=()=>{if(!$('customConverted').value.trim())return;$('customText').value=$('customConverted').value;$('customStatus').textContent='Edited translation copied to projection text'};
 
 $('sendCustom').onclick=()=>{const text=$('customText').value.trim();if(!text)return status('Paste text first');const content={mode:'custom',verse:text,scripts:{gurmukhi:text},meanings:{},scroll:!!$('customScroll').checked};publish({content,settings:settings()},true)};
-$('waheguru').onclick=()=>{const content={mode:'waheguru',verse:'ਵਾਹਿਗੁਰੂ',scripts:{gurmukhi:'ਵਾਹਿਗੁਰੂ',hindi:'वाहेगुरु',english:'Waheguru'},meanings:{}};if(!projectionIsOn)return status('Turn Projection ON to show Waheguru');lastContent=content;put('gb-last-content',content);if(publish({content}))status('Waheguru sent to selected displays')};
+let beforeSearcherWaheguru=null;
+function renderSearcherWaheguru(enabled){
+ if(!isSearcher)return;
+ $('searcherWaheguru').hidden=!enabled;
+ GurbaniTvWaheguru($('searcherWaheguruArt'),enabled);
+ if(enabled)$('searcherWaheguruClose').focus();
+}
+function closeSearcherWaheguru(){
+ renderSearcherWaheguru(false);
+ lastContent=beforeSearcherWaheguru;
+ beforeSearcherWaheguru=null;
+ put('gb-last-content',lastContent);
+ if(projectionIsOn)publish({content:lastContent});
+}
+$('waheguru').onclick=()=>{
+ const content={mode:'waheguru',verse:'ਵਾਹਿਗੁਰੂ',scripts:{gurmukhi:'ਵਾਹਿਗੁਰੂ',hindi:'वाहेगुरु',english:'Waheguru'},meanings:{}};
+ if(isSearcher){
+  if(!$('searcherWaheguru').hidden)return;
+  beforeSearcherWaheguru=lastContent?.mode==='waheguru'?null:lastContent;
+  toggleVirtualKeyboard(false);
+  renderSearcherWaheguru(true);
+ }else if(!projectionIsOn)return status('Turn Projection ON to show Waheguru');
+ lastContent=content;
+ put('gb-last-content',content);
+ if(projectionIsOn&&publish({content})&&!isSearcher)status('Waheguru sent to selected displays');
+};
 const searcherIdentity=isSearcher?(stored('gb-searcher-link-id','')||randomId()):'';
 if(isSearcher)put('gb-searcher-link-id',searcherIdentity);
 const searcherSync=GurbaniSearcherSync({
  isSearcher,peer:()=>peer,savedCode:stored('gb-searcher-control-link',''),identity:searcherIdentity,
  saveCode:value=>put('gb-searcher-control-link',value),
- current:()=>projectionIsOn&&active>=0&&Array.isArray(lastContent?.bookLines)?lastContent:null,
+ current:()=>projectionIsOn&&(lastContent?.mode==='waheguru'||(active>=0&&Array.isArray(lastContent?.bookLines)))?lastContent:null,
  approve:(code,identity)=>{
   const approved=stored('gb-approved-searchers',[]);
   if(approved.includes(identity))return true;
@@ -1974,6 +2006,8 @@ const searcherSync=GurbaniSearcherSync({
  },
  status:message=>{if(isSearcher)$('searcherLinkStatus').textContent=message;status(message)},
  receive:content=>{
+  if(isSearcher&&content?.mode==='waheguru'&&$('searcherWaheguru').hidden)beforeSearcherWaheguru=lastContent?.mode==='waheguru'?null:lastContent;
+  renderSearcherWaheguru(content?.mode==='waheguru');
   lastContent=content;put('gb-last-content',content);
   if(isSearcher&&content){
    const lineIndex=lines.findIndex(line=>getText(line)===(content.obsData?.sg||content.verse)&&(!content.ang||getAng(line)===content.ang));
@@ -2114,7 +2148,10 @@ if(isSearcher){
  queryRow.prepend(searchOptions);
  searchOptions.append(searchOptionsLabel,searchModes,sourceRow,modeRow);
  modeRow.prepend($('keyboardToggle'));
+ $('searcherWaheguruClose').onclick=closeSearcherWaheguru;
+ $('searcherWaheguruMenu').onclick=()=>{$('searcherSettings').open=false;$('waheguru').click();};
  window.gbSearcherBack=()=>{
+  if(!$('searcherWaheguru').hidden){closeSearcherWaheguru();return true;}
   if(keyboardOpen){toggleVirtualKeyboard(false);$('query').blur();return true;}
   if($('searcherSettings').open){$('searcherSettings').open=false;return true;}
   if(searchOptions.open){searchOptions.open=false;return true;}
@@ -2192,7 +2229,12 @@ if(isSearcher){
   toggleVirtualKeyboard(false);
   if(!$('historyCard').hidden)$('historyCard').scrollIntoView({block:'start'});
  });
+ $('searcherScreenShortcut').onclick=()=>$('searcherDevices').click();
+ $('connectCard').querySelector('h2').insertAdjacentHTML('afterend','<p class="small">Projection ਜਾਂ Granth View ਖੋਲ੍ਹੋ। ਸਕ੍ਰੀਨ ’ਤੇ ਦਿੱਤਾ 5 ਅੰਕਾਂ ਦਾ ਕੋਡ ਇੱਥੇ ਪਾਓ ਅਤੇ ਜੋੜੋ ਦਬਾਓ। ਹਰ ਸਕ੍ਰੀਨ ਲਈ ਇਹੀ ਕਰੋ।<br><span lang="en">Open Projection or Granth View, enter its 5-digit code below, then tap Connect. Repeat for each screen.</span></p>');
+ $('pairCode').addEventListener('keydown',event=>{if(event.key==='Enter')$('pair').click();});
  $('searcherDevices').onclick=()=>{
+  toggleVirtualKeyboard(false);
+  toggleHistory(false);
   $('searcherSettings').open=false;
   $('connectCard').classList.toggle('searcher-devices');
   if($('connectCard').classList.contains('searcher-devices'))window.scrollTo(0,0);
