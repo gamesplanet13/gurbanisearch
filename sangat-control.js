@@ -19,7 +19,7 @@ window.setupSangatPublisher = function (menu, currentContent) {
   function status(text) { message.textContent=text; }
   function showEnabled() {
     enable.hidden=true;
-    status('ਲਾਈਵ · Sangat View follows Projection automatically.');
+    status('Controller authorized. Public Sangat uses an internet live feed.');
   }
   function hex(bytes) { return Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join(''); }
   let approval, claiming=false, claimTimer;
@@ -86,6 +86,7 @@ window.setupSangatPublisher = function (menu, currentContent) {
       }
       if (!response.ok) throw new Error('Broadcast unavailable');
       showEnabled();
+      status('● Sangat live shabad published');
     } catch (_) {
       if (pending === undefined) pending = packet;
       delay = 3500;
