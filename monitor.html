@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="pa">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gurbani Multi View Monitor</title>
+<style>
+:root{color-scheme:dark;font:15px system-ui,"Noto Sans Gurmukhi",sans-serif}
+*{box-sizing:border-box}body{background:#10131a;color:#f8f6ef;margin:0}
+header{background:#1b2231;padding:14px 18px;position:sticky;top:0;z-index:2;border-bottom:1px solid #46506b}
+h1{font-size:21px;margin:0 0 6px}p{margin:6px 0}small{color:#afbacb}
+#state{font-size:13px;color:#ddb86c}main{padding:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:14px;align-items:start}
+.card{border:1px solid #46536a;background:#19202e;border-radius:12px;overflow:hidden;min-height:220px}
+.card .head{padding:11px 14px;display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #46536a}
+.card .name{font-weight:750;overflow-wrap:anywhere}.card .state{font-size:12px;color:#aebad0}
+.card img{display:block;max-width:100%;width:100%;object-fit:contain;background:#08090c;min-height:160px;max-height:65vh}
+.card iframe{width:100%;height:min(65vh,520px);border:0;background:#090909}
+.empty{padding:28px 12px;text-align:center;color:#b7bfd1}
+.card .foot{padding:8px 12px;font-size:12px;color:#9fa9be}
+a{color:#ddc17f}
+</style></head>
+<body>
+<header><h1>Multi View Monitor · ਸਾਰੀਆਂ ਸਕ੍ਰੀਨਾਂ</h1><p id="state">Control ਨਾਲ live connection ਦੀ ਉਡੀਕ…</p><small>Projection ਅਤੇ Granth View ਦੇ ਅਸਲ display snapshots; Sangat View public live ਹੈ। Preview ਹਰ ਕੁਝ ਸਕਿੰਟਾਂ ਬਾਅਦ ਬਦਲਦੀ ਹੈ।</small></header>
+<main id="grid"></main>
+<script>
+'use strict';
+const grid=document.getElementById('grid'),state=document.getElementById('state');
+const channel=typeof BroadcastChannel==='function'?new BroadcastChannel('gurbani-multiview-v1'):null;
+let latest=0,lastDevices=[],lastFrame=new Map();
+const cards=new Map();
+function element(type,cls,value){const x=document.createElement(type);if(cls)x.className=cls;if(value!==undefined)x.textContent=value;return x}
+function card(id,title,kind){
+ const root=element('section','card');root.dataset.id=id;
+ const head=element('div','head'),label=element('div','name',title),status=element('div','state');
+ head.append(label,status);root.append(head);
+ const media=id==='sangat'?document.createElement('iframe'):document.createElement('img');
+ if(id==='sangat'){media.title='Public Sangat View';media.src='sangat.html';media.loading='eager'}
+ else{media.alt='Live screen preview';media.hidden=true}
+ root.append(media);
+ const footer=element('div','foot',kind);root.append(footer);
+ grid.append(root);cards.set(id,{root,label,status,media,footer});return cards.get(id);
+}
+function repaint(devices){
+ const ids=new Set(['sangat']);
+ const publicCard=cards.get('sangat')||card('sangat','Public Sangat View','Live public Gurbani, viewer-controlled theme/language');
+ publicCard.status.textContent='Public · No pairing';
+ devices.forEach(d=>{
+  if(!d||typeof d.id!=='string')return;
+  ids.add(d.id);
+  const c=cards.get(d.id)||card(d.id,d.name||'Display','');
+  c.label.textContent=(d.name||'Display')+' · '+(d.code||'');
+  c.status.textContent=d.online?'● Online':'○ Offline';
+  c.footer.textContent=(d.mode==='book'?'Granth View':'Projection')+(d.online?' · Live display frame':' · Retaining last preview');
+  if(!d.online&&!c.media.src){c.media.hidden=true}
+ });
+ for(const [id,c] of cards)if(!ids.has(id)){c.root.remove();cards.delete(id)}
+}
+function receive(msg){
+ if(!msg||typeof msg!=='object')return;
+ if(msg.type==='devices'&&Array.isArray(msg.devices)){
+  latest=Date.now();lastDevices=msg.devices.slice(0,20);repaint(lastDevices);
+  state.textContent='● Control connected · '+lastDevices.filter(d=>d.online).length+' online displays';
+ }
+ if(msg.type==='frame'&&typeof msg.id==='string'&&typeof msg.frame==='string'&&
+   msg.frame.length<160000&&/^data:image\/jpeg;base64,[A-Za-z0-9+/]+=*$/.test(msg.frame)){
+  let cardRef=cards.get(msg.id);if(!cardRef)return;
+  cardRef.media.src=msg.frame;cardRef.media.hidden=false;
+  cardRef.status.textContent='● Live frame · '+new Date().toLocaleTimeString();
+  lastFrame.set(msg.id,Date.now());
+ }
+ if(msg.type==='error'&&cards.has(msg.id))cards.get(msg.id).status.textContent='Preview unavailable';
+}
+card('sangat','Public Sangat View','Public Internet live feed · Read only');repaint([]);
+if(channel){
+ channel.onmessage=event=>receive(event.data);
+ channel.postMessage({type:'monitor-ready'});
+ setInterval(()=>{
+  channel.postMessage({type:'monitor-ready'});
+  if(latest&&Date.now()-latest>12000)state.textContent='Control tab is not responding. Keep Control App open for live previews.';
+  for(const [id,when] of lastFrame)if(Date.now()-when>16000&&cards.has(id))cards.get(id).status.textContent='Frame reconnecting…';
+ },5000);
+ window.addEventListener('pagehide',()=>{channel.postMessage({type:'monitor-stop'});channel.close()});
+}else state.textContent='This browser does not support multi-view sync. Open the page in Chrome or a recent Android WebView.';
+</script></body></html>
