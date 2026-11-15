@@ -35,7 +35,7 @@ window.setupSangatPublisher = function (menu, currentContent) {
     enable.href=base+'/owner?device='+hex(new Uint8Array(hash));
     enable.hidden=false;
     enable.onclick=()=>{localStorage.setItem(grantStorage+'-pending','1');claim()};
-    status('Approve this Control once. Sangat View will then follow your selections.');
+    status('Sangat public broadcast is automatic. Optional hosted approval is available.');
     if (localStorage.getItem(grantStorage+'-pending')==='1') claim();
   }
   async function claim() {
@@ -55,7 +55,7 @@ window.setupSangatPublisher = function (menu, currentContent) {
       showEnabled();
       send(currentContent());
     } catch (_) {
-      status('Waiting for Control approval. Keep this screen open to retry.');
+      status(livePeer?.open?'● Sangat public Internet broadcast ready':'Hosted approval unavailable; public Internet connection reconnecting…');
     } finally {
       claiming=false;
       if (!legacyKey&&!document.hidden) claimTimer=setTimeout(claim,1800);
@@ -166,5 +166,5 @@ window.setupSangatPublisher = function (menu, currentContent) {
   window.addEventListener('online',()=>{claim();if(legacyKey)browserPublish()});
   for(const name of ['pageshow','focus'])window.addEventListener(name,claim);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)claim()});
-  return {send, active:()=>!!legacyKey};
+  return {send, active:()=>!!legacyKey||!!livePeer?.open};
 };
