@@ -80,6 +80,7 @@ public static class GurbaniWindow {
             }
         } catch { }
     }
+    $hadWindow = !$process.HasExited -and $process.MainWindowHandle -ne 0
     while (!$process.HasExited) {
         $process.Refresh()
         $window = $process.MainWindowHandle
@@ -87,6 +88,7 @@ public static class GurbaniWindow {
         $owner = [uint32]0
         [void][GurbaniWindow]::GetWindowThreadProcessId($foreground,[ref]$owner)
         if ($process.MainWindowTitle -like 'Gurbani Windows Close*' -and $window -ne 0) {
+            $confirmedExit = $true
             [void][GurbaniWindow]::PostMessage($window,0x10,[IntPtr]::Zero,[IntPtr]::Zero)
         } elseif ($process.MainWindowTitle -match '^Gurbani Windows Install ([0-9]+)' -and $window -ne 0) {
             $wanted = [int]$Matches[1]
@@ -131,6 +133,7 @@ public static class GurbaniWindow {
     $mutex.Dispose()
 }
 
-if ($relaunch) {
+if ($relaunch -or ($hadWindow -and !$confirmedExit)) {
+    Start-Sleep -Milliseconds 300
     Start-Process wscript.exe -ArgumentList ('"' + (Join-Path $PSScriptRoot 'Launch.vbs') + '" ' + $Role)
 }

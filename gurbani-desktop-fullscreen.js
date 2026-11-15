@@ -18,7 +18,6 @@
     if (dialog.open) return;
     prompt('Exit', 'Close this Gurbani window?', 'Exit', () => {
       document.title = 'Gurbani Windows Close';
-      window.close();
     });
   });
   const fullscreen = button('Full Screen', () => document.documentElement.requestFullscreen().catch(() => {}));
