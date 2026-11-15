@@ -23,42 +23,75 @@ const motion = GurbaniBookMotion(reader, document.scrollingElement || document.d
   previewSize, () => { try { localStorage.setItem(zoomKey, String(size)); } catch (_) {} }
 );
 
+const settingKey='gb-sangat-viewer-settings-v2';
+const defaults={sg:true,sh:false,se:false,mp:false,mh:false,me:false,lari:false,day:false};
+let viewerSettings={...defaults};
+try{const saved=JSON.parse(localStorage.getItem(settingKey)||'null');if(saved&&typeof saved==='object')for(const key of Object.keys(defaults))if(typeof saved[key]==='boolean')viewerSettings[key]=saved[key]}catch(_){}
+const fields=['sg','sh','se','mp','mh','me'];
+const menuButton=document.getElementById('sangatMenuButton');
+const menu=document.getElementById('sangatSettings');
+function refreshAppearance(){
+ document.documentElement.classList.toggle('sangat-day',viewerSettings.day);
+ document.documentElement.classList.toggle('sangat-larivaar',viewerSettings.lari);
+ for(const checkbox of menu.querySelectorAll('[data-field]'))checkbox.checked=!!viewerSettings[checkbox.dataset.field];
+ document.getElementById('sangatDay').checked=viewerSettings.day;
+ document.getElementById('sangatLari').checked=viewerSettings.lari;
+}
+function updateViewerSettings(key,value){
+ viewerSettings[key]=value;
+ try{localStorage.setItem(settingKey,JSON.stringify(viewerSettings))}catch(_){}
+ refreshAppearance();render(content);
+}
+menuButton.onclick=()=>{menu.hidden=!menu.hidden;menuButton.setAttribute('aria-expanded',String(!menu.hidden))};
+document.getElementById('sangatClose').onclick=()=>{menu.hidden=true;menuButton.setAttribute('aria-expanded','false')};
+for(const checkbox of menu.querySelectorAll('[data-field]'))checkbox.onchange=()=>updateViewerSettings(checkbox.dataset.field,checkbox.checked);
+document.getElementById('sangatDay').onchange=e=>updateViewerSettings('day',e.target.checked);
+document.getElementById('sangatLari').onchange=e=>updateViewerSettings('lari',e.target.checked);
+refreshAppearance();
+function applyLadisaar(input){return viewerSettings.lari?String(input||'').replace(/\\s+/gu,''):String(input||'')}
+function textRow(fragment,kind,text){
+ if(!text)return;
+ const node=document.createElement('span');
+ node.className=kind;
+ node.textContent=kind==='searcher-verse'?applyLadisaar(text):String(text);
+ fragment.append(node);
+}
 let displayed = [];
 let highlighted = null;
 function render(content) {
-  const blessing = content?.mode === 'waheguru';
-  const verses = !blessing && content ? content.bookLines?.length ? content.bookLines
-    : content.verse ? [content.verse] : [] : [];
-  waiting.hidden = !!(blessing || verses.length);
-  waheguru.hidden = !blessing;
-  details.textContent = [content?.shabadTitle, content?.ang ? 'ਅੰਗ ' + content.ang : '']
-    .filter(Boolean).join(' · ');
-  details.hidden = !details.textContent;
-  if (verses.length !== displayed.length || verses.some((line, i) => line !== displayed[i])) {
-    const fragment = document.createDocumentFragment();
-    for (const text of verses) {
-      const paragraph = document.createElement('div');
-      paragraph.className = 'searcher-line';
-      const verse = document.createElement('span');
-      verse.className = 'searcher-verse';
-      verse.textContent = text;
-      paragraph.append(verse);
-      fragment.append(paragraph);
-    }
-    lines.replaceChildren(fragment);
-    displayed = verses;
-    highlighted = null;
-  }
-  const active = lines.children[Math.max(0, Math.min(verses.length - 1, content?.activeIndex || 0))];
-  if (active === highlighted) return;
-  highlighted?.classList.remove('active');
-  highlighted?.removeAttribute('aria-current');
-  highlighted = active;
-  active?.classList.add('active');
-  active?.setAttribute('aria-current', 'true');
-  motion.center(active);
+ const blessing=content?.mode==='waheguru';
+ const rows=(!blessing&&content)?(Array.isArray(content.bookLines)&&content.bookLines.length?content.bookLines:(content.verse?[content.verse]:[])):[];
+ const detailsByLine=Array.isArray(content?.lineData)?content.lineData:[];
+ waiting.hidden=!!(blessing||rows.length);
+ waheguru.hidden=!blessing;
+ details.textContent=[content?.shabadTitle,content?.ang?'ਅੰਗ '+content.ang:''].filter(Boolean).join(' · ');
+ details.hidden=!details.textContent;
+ // Viewer controls only presentation; no event sends a message to Control.
+ const selected=Math.max(0,Math.min(rows.length-1,Number(content?.activeIndex)||0));
+ const fragment=document.createDocumentFragment();
+ rows.forEach((row,i)=>{
+  const card=document.createElement('div');
+  card.className='searcher-line';
+  const data=detailsByLine[i]||{};
+  const languages=data.scripts||{};
+  const meanings=data.meanings||{};
+  const fallback=String(row||'');
+  if(viewerSettings.sg)textRow(card,'searcher-verse',languages.gurmukhi||fallback);
+  if(viewerSettings.sh)textRow(card,'sangat-translation',languages.hindi||(i===selected?content?.scripts?.hindi:''));
+  if(viewerSettings.se)textRow(card,'sangat-translation',languages.english||(i===selected?content?.scripts?.english:''));
+  if(viewerSettings.mp)textRow(card,'sangat-meaning',meanings.punjabi||(i===selected?content?.meanings?.punjabi:''));
+  if(viewerSettings.mh)textRow(card,'sangat-meaning',meanings.hindi||(i===selected?content?.meanings?.hindi:''));
+  if(viewerSettings.me)textRow(card,'sangat-meaning',meanings.english||(i===selected?content?.meanings?.english:''));
+  if(!card.childNodes.length)textRow(card,'searcher-verse',fallback);
+  fragment.append(card);
+ });
+ lines.replaceChildren(fragment);
+ displayed=rows;
+ highlighted=lines.children[selected]||null;
+ highlighted?.classList.add('active');
+ highlighted?.setAttribute('aria-current','true');
+ if(highlighted)motion.center(highlighted);
 }
-
 let etag, revision, content = null, timer, loading = false;
 const snapshotKey='gb-sangat-last-live-v1';
 // Public viewers retain the last received Gurbani during temporary internet outages.
