@@ -70,9 +70,55 @@ try {
     render(content);
   }
 } catch (_) {}
+// Internet-based public viewing with no login, pairing or editing controls.
+// PeerJS is an independent fallback for an unavailable hosted live service.
+const broadcasterId='gurbani-sangat-public-v1';
+let viewerPeer=null,liveChannel=null,lastPeerAt=0;
+function acceptLive(packet){
+  if(!packet||packet.type!=='sangat-live'||!Number.isFinite(packet.revision))return;
+  const next=packet.content;
+  if(next!==null&&(typeof next!=='object'||!Array.isArray(next.bookLines)||
+      next.bookLines.length>400||next.bookLines.some(v=>typeof v!=='string'||v.length>500)))return;
+  lastPeerAt=Date.now();
+  revision='peer-'+String(packet.revision);
+  content=next;
+  render(content);
+  try{localStorage.setItem(snapshotKey,JSON.stringify({revision,content}))}catch(_){}
+  setLive(true);
+}
+function connectPublic(){
+  if(!viewerPeer?.open||viewerPeer.disconnected||liveChannel&&!liveChannel.destroyed)return;
+  try{
+    const c=viewerPeer.connect(broadcasterId,{reliable:true,metadata:{type:'sangat-view-read-only'}});
+    liveChannel=c;
+    c.on('open',()=>{if(c===liveChannel)c.send({type:'sangat-join'})});
+    c.on('data',acceptLive);
+    const drop=()=>{if(liveChannel===c){liveChannel=null;setLive(false)}};
+    c.on('close',drop);
+    c.on('error',()=>{drop();c.close()});
+    setTimeout(()=>{if(liveChannel===c&&!c.open){drop();c.close()}},12000);
+  }catch(_){}
+}
+if(window.GurbaniPeer&&typeof window.Peer==='function'){
+  window.GurbaniPeer.start({
+    id:()=>{
+      const bytes=crypto.getRandomValues(new Uint8Array(12));
+      return 'gurbani-sangat-view-'+Array.from(bytes,n=>n.toString(16).padStart(2,'0')).join('');
+    },
+    onPeer:p=>{viewerPeer=p},
+    onOpen:connectPublic,
+    onConnection:c=>c.close(),
+    onCollision:()=>{},
+    onTargetUnavailable:()=>{},
+    onStatus:()=>{}
+  });
+  setInterval(()=>{if(!document.hidden)connectPublic()},5000);
+}
 function setLive(online) {
-  status.dataset.live = String(online && !!content);
-  status.textContent = online ? content ? '● ਲਾਈਵ' : 'ਉਡੀਕ ਜਾਰੀ ਹੈ' : 'ਦੁਬਾਰਾ ਜੁੜ ਰਹੇ ਹਾਂ…';
+  const activePeer=liveChannel?.open&&Date.now()-lastPeerAt<45000;
+  const live=online||activePeer;
+  status.dataset.live=String(live&&!!content);
+  status.textContent=live?(content?'● ਲਾਈਵ':'ਉਡੀਕ ਜਾਰੀ ਹੈ'):'ਦੁਬਾਰਾ ਜੁੜ ਰਹੇ ਹਾਂ…';
 }
 async function sync() {
   clearTimeout(timer);
@@ -86,9 +132,10 @@ async function sync() {
       if (!response.ok) throw new Error('Live feed unavailable');
       const packet = await response.json();
       etag = response.headers.get('etag');
-      if (revision !== packet.revision) {
-        revision = packet.revision;
-        content = packet.content;
+      // Prefer active Internet live updates over an older hosted snapshot.
+      if(Date.now()-lastPeerAt>45000&&revision!==packet.revision){
+        revision=packet.revision;
+        content=packet.content;
         render(content);
         try{localStorage.setItem(snapshotKey,JSON.stringify({revision,content}))}catch(_){}
       }
