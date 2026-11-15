@@ -14,7 +14,7 @@
 #mainPairing .main-pair-help{font-size:16px;font-size:clamp(14px,3vh,28px);color:#ddd;max-width:95%;line-height:1.4}
 .pause-word{color:#e35b17;font-weight:800}#book{overflow-anchor:none}#lines{text-align:center;font-size:var(--book-font,30px)}#lines.flow .line{display:inline;padding:0;box-shadow:none}#lines.flow .line.current:before{content:""}.ang-indicator{position:fixed;right:12px;bottom:18px;font-size:11px;color:#aaa;z-index:3;pointer-events:none}body.night-mode #book{background:#111;color:#f3e6c8;border-color:#524833}body.night-mode{background:#000;color:#eee}body.night-mode .heading{color:#e3c884}body.night-mode .line.current{background:#6c541e;color:#fff}body.alt-projection #book{display:none!important}#singleProjection[hidden]{display:none}#singleProjection{position:fixed;top:0;right:0;bottom:0;left:0;z-index:2;background:#000;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:3vh;padding:5vw;font-family:system-ui,"Noto Sans Gurmukhi",sans-serif;overflow-wrap:anywhere}#singleProjection .singleLine{max-width:94vw;line-height:1.4;font-size:clamp(25px,6vw,100px)}#singleProjection .meaning{font-size:clamp(16px,3vw,40px);color:#eac986;max-width:94vw}body.alt-projection #menuButton{z-index:9} .source-credit{position:fixed;bottom:19px;left:4%;width:92%;z-index:8;text-align:center;color:#6a4a22;font-size:clamp(10px,1.4vw,14px);pointer-events:none;background:#fff8e8b8;padding:2px 8px;max-height:42px;overflow:hidden;text-overflow:ellipsis}.source-credit[hidden]{display:none}body.night-mode .source-credit{color:#e4ccac;background:#17120dbb}body.alt-projection .source-credit{color:#c6bdad;background:#0007}
 /* Granth View source and Ang live in a reserved top-right row below the menu icon. */
-.book-meta-top{position:fixed;right:10px;top:54px;z-index:1;display:flex;flex-direction:column;align-items:flex-end;gap:2px;max-width:min(66vw,480px);padding:4px 7px;border-radius:6px;background:#fff9e9ec;pointer-events:none;box-shadow:0 2px 10px #29201520}
+.book-meta-top{position:fixed;right:10px;top:54px;z-index:8;display:flex;flex-direction:column;align-items:flex-end;gap:2px;max-width:min(66vw,480px);padding:4px 7px;border-radius:6px;background:#fff9e9ec;pointer-events:none;box-shadow:0 2px 10px #29201520}
 .book-meta-top[hidden],.book-meta-top .source-credit[hidden],.book-meta-top .ang-indicator[hidden]{display:none!important}
 .book-meta-top .source-credit,.book-meta-top .ang-indicator{position:static!important;top:auto!important;bottom:auto!important;left:auto!important;right:auto!important;transform:none!important;display:block;width:auto!important;max-width:100%;max-height:none!important;background:transparent!important;color:#664b25;font-size:clamp(10px,1.35vw,13px);padding:0!important;text-align:right;white-space:normal;overflow-wrap:anywhere;pointer-events:none;z-index:auto}
 .book-meta-top .ang-indicator{font-weight:750;white-space:nowrap;color:#835919}
@@ -29,13 +29,7 @@ body.alt-projection #singleProjection{padding-top:max(105px,12vh)!important;padd
 #singleProjection[data-alignment="top"]{justify-content:flex-start}
 .book-meta-top .ang-indicator{font-size:clamp(13px,1.65vw,25px)!important}
 .book-line-extra{font-size:.66em;line-height:1.35}
-/* Gurbani text takes precedence over the fixed Ang/Source indicator when scrolling.
-   Opaque paper-coloured line backgrounds fully conceal metadata underneath. */
-#lines{position:relative;z-index:2}
-#lines .line{background:#fff9e8}
-#lines .line.current{background:#f3c76c}
-body.night-mode #lines .line{background:#111}
-body.night-mode #lines .line.current{background:#6c541e}
+
 </style><style>.developer-menu-foot{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:12px;padding:9px 7px;border-top:1px solid #ae8d4970;color:#f1d99c;font-size:11px}.developer-menu-foot a{color:#d1e7ff;text-decoration:none;font-size:11px}.developer-menu-foot strong{font-size:11px}</style><style>
 /* Compact trilingual connection instructions; pairing digits remain visually dominant. */
 #mainPairing{gap:clamp(4px,1vh,10px)!important;padding:12px!important}
