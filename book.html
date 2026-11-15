@@ -176,7 +176,7 @@ function connection(c){
   setTimeout(()=>{
    reversePairFallbacks.delete(callerCode);
    if(authorization.has(c)||!peer?.open||peer.disconnected)return;
-   if([...authorization].some(([link])=>link.open))return;
+   if([...authorization].some(([link])=>link.open&&link.peer==='gurbani-control-v1-'+callerCode))return;
    connectController(callerCode);
   },5500);
  }
