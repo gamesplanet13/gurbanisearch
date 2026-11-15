@@ -216,7 +216,7 @@ main{width:100%;max-width:none;margin:3px auto;padding:0 4px;gap:4px;align-items
  <p id="desktopPreviewStatus" class="small" role="status"></p>
 </aside>
 <script src="gurbani-layout.js?v=2"></script><script src="gurbani-book-motion.js?v=3"></script><script src="gurbani-searcher-sync.js?v=1"></script><script src="gurbani-waheguru-wide.js"></script><script src="gurbani-desktop-preview.js?v=1"></script>
-<script src="gurbani-updates.js?v=20261121" defer></script><script src="peerjs-1.5.5.min.js?v=20261118"></script><script src="gurbani-peer-manager.js?v=20261119"></script><script src="gurbani-camera.js?v=20261119"></script><script>
+<script src="sangat-control.js"></script><script src="gurbani-updates.js?v=20261121" defer></script><script src="peerjs-1.5.5.min.js?v=20261118"></script><script src="gurbani-peer-manager.js?v=20261119"></script><script src="gurbani-camera.js?v=20261119"></script><script>
 'use strict';
 const $=id=>document.getElementById(id);
 const isSearcher=document.documentElement.classList.contains('searcher');
@@ -834,8 +834,11 @@ $('projectionSwitch').onclick=()=>{
  status(projectionIsOn?'Projection ON':'Projection OFF — local line selection still works')
 };
 refreshProjectionSwitch();
+const sangatPublisher=!isSearcher&&window.setupSangatPublisher?.($('menuOptions'),
+ ()=>projectionIsOn ? lastContent : null);
 function publish(payload,projectionOnly=false,force=false,fromSync=false){
  if(!projectionIsOn&&!force&&payload.content!==null)return 0;
+ if(sangatPublisher&&Object.hasOwn(payload,'content'))sangatPublisher.send(payload.content);
  const synced=!fromSync&&Object.hasOwn(payload,'content')&&(!payload.content||payload.content.mode==='waheguru'||Array.isArray(payload.content.bookLines))&&searcherSync.send(payload.content);
  let sent=0;const rev=++deliveryCounter;
  for(const id of (isSearcher?connections.keys():selected)){
@@ -856,7 +859,7 @@ function publish(payload,projectionOnly=false,force=false,fromSync=false){
  }
  if(isSearcher)$('searcherMessage').textContent=sent?sent+' ਸਕ੍ਰੀਨਾਂ · Screens updated':synced?'ਕੰਟਰੋਲ ਨੂੰ ਭੇਜਿਆ · Sent to Control':'ਸਕ੍ਰੀਨ ਜੋੜੋ · Connect a display';
  else status(sent+' projection screen(s) updated');
- if(sent===0&&!isSearcher)status('No selected online projection. Reconnect or select a screen first.');
+ if(sent===0&&!isSearcher)status(sangatPublisher?.active() ? 'Sangat View live' : 'No selected online projection. Reconnect or select a screen first.');
  return sent
 }
 function settings(){return{alignment:'center',lineSpacing:Number($('projectionSpacing').value)||135,verseSize:+$('vs').value,hindiVerseSize:+$('hsv').value,englishVerseSize:+$('esv').value,meaningSize:+$('enSize').value,englishSize:+$('enSize').value,punjabiSize:+$('paSize').value,hindiSize:+$('hiSize').value,clock:$('clock').checked,autoFit:$('projectionFit').checked,larrivaar:$('projectionLari').checked,flow:$('projectionFlow').checked,pause:$('projectionPause').checked}}

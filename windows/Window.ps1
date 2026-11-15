@@ -97,7 +97,7 @@ public static class GurbaniWindow {
                 try {
                     $base = 'https://gamesplanet13.github.io/gurbanisearch/windows/'
                     $manifest = Invoke-RestMethod -Uri ($base + 'update.json') -TimeoutSec 10
-                    if ($manifest.version -eq $wanted -and $wanted -gt 10400 -and
+                    if ($manifest.version -eq $wanted -and $wanted -gt 10500 -and
                         $manifest.sha256 -match '^[a-fA-F0-9]{64}$') {
                         $installer = Join-Path $env:TEMP ("Gurbani-Windows-$wanted.exe")
                         Invoke-WebRequest -UseBasicParsing -Uri ($base + 'Gurbani-Windows-Setup.exe') -OutFile $installer -TimeoutSec 45

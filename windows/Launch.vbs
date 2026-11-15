@@ -1,5 +1,5 @@
 Option Explicit
-Const NativeVersion = "10400"
+Const NativeVersion = "10500"
 Dim shell, files, edge, candidate, role, page, profile, url, appData, timestamp, nowTime
 Set shell = CreateObject("WScript.Shell")
 Set files = CreateObject("Scripting.FileSystemObject")

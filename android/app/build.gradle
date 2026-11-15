@@ -27,6 +27,15 @@ android {
             buildConfigField 'String', 'START_PAGE', '"searcher.html"'
             buildConfigField 'String', 'ROLE', '"searcher"'
         }
+        sangat {
+            dimension 'role'
+            versionCode 20261132
+            versionName '2026.11.15.1'
+            applicationIdSuffix '.sangat'
+            resValue 'string', 'app_name', 'Sangat View'
+            buildConfigField 'String', 'START_PAGE', '"sangat.html"'
+            buildConfigField 'String', 'ROLE', '"sangat"'
+        }
         projection {
             dimension 'role'
             versionCode 20261131

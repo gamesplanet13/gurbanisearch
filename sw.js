@@ -1,7 +1,7 @@
 /* Games Planet Gurbani — offline app shell. Search corpus stored in IndexedDB by Controller. */
-const VERSION='gurbani-shell-2026-11-15-remote-unpair-v13';
+const VERSION='gurbani-shell-2026-11-15-sangat-v14';
 const CORE=[
- './','./index.html','./searcher.html','./gurbani-searcher.css','./gurbani-searcher-sync.js','./projection.html','./book.html','./obs.html','./camera.html',
+ './','./index.html','./searcher.html','./sangat.html','./sangat.js','./sangat-control.js','./gurbani-searcher.css','./gurbani-searcher-sync.js','./projection.html','./book.html','./obs.html','./camera.html',
  './gurbani-desktop-preview.js','./gurbani-desktop-fullscreen.js','./gurbani-screen-preview.js','./gurbani-waheguru-wide.js','./gurbani-updates.js','./gurbani-camera.js','./gurbani-layout.js','./gurbani-book-motion.js','./gurbani-peer-manager.js','./peerjs-1.5.5.min.js',
  './data/banis/anand-six.json','./data/banis/sukhmani-sahib.json',
  './data/anand-ending-salok.json','./assets/sahibzaade-family.webp',
