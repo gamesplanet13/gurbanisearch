@@ -166,7 +166,20 @@ function markAwaitSelection(v){awaitSelection=v;put('gb-book-await-selection',v)
 function updateMainPairing(){ $('mainPairingCode').textContent=code; $('mainPairing').hidden=!!controllers.size&&!awaitSelection;document.body.classList.toggle('pairing-active',!$('mainPairing').hidden); }
 function send(c,m){try{if(c.open)c.send(m)}catch(_){ }}
 function hello(c){send(c,{type:'hello',deviceId:code,code,name,multiController:true,kind:'book',displaySession,bookSettings:bookState()})}
+const reversePairFallbacks=new Set();
 function connection(c){
+ // A Controller-initiated Internet offer includes its code. If that WebRTC
+ // direction fails to authorize, try the reverse path automatically.
+ const callerCode=String(c.metadata?.controller||'');
+ if(callerCode&&/^\\d{5}$/.test(callerCode)&&!reversePairFallbacks.has(callerCode)){
+  reversePairFallbacks.add(callerCode);
+  setTimeout(()=>{
+   reversePairFallbacks.delete(callerCode);
+   if(authorization.has(c)||!peer?.open||peer.disconnected)return;
+   if([...authorization].some(([link])=>link.open))return;
+   connectController(callerCode);
+  },5500);
+ }
  c.on('open',()=>hello(c));
  const authTimeout=setTimeout(()=>{if(!authorization.has(c))c.close()},30000);
  c.on('data',m=>{
