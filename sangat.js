@@ -48,7 +48,7 @@ for(const checkbox of menu.querySelectorAll('[data-field]'))checkbox.onchange=()
 document.getElementById('sangatDay').onchange=e=>updateViewerSettings('day',e.target.checked);
 document.getElementById('sangatLari').onchange=e=>updateViewerSettings('lari',e.target.checked);
 refreshAppearance();
-function applyLadisaar(input){return viewerSettings.lari?String(input||'').replace(/\\s+/gu,''):String(input||'')}
+function applyLadisaar(input){return viewerSettings.lari?String(input||'').replace(/\s+/gu,''):String(input||'')}
 function textRow(fragment,kind,text){
  if(!text)return;
  const node=document.createElement('span');
