@@ -62,6 +62,48 @@ window.setupSangatPublisher = function (menu, currentContent) {
     }
   }
 
+  // Internet-only public read-only broadcast. This is a peer-to-peer fallback
+  // when the hosted /live service is unavailable; no viewer login or code.
+  const publicPeerId='gurbani-sangat-public-v1';
+  const audience=new Set();
+  let livePeer=null,latestSelection=null;
+  function publicPacket() {
+    return {type:'sangat-live',revision:Date.now(),content:latestSelection};
+  }
+  function broadcastPublic() {
+    const packet=publicPacket();
+    for(const channel of audience) {
+      try {if(channel.open)channel.send(packet)}
+      catch (_) {audience.delete(channel);try{channel.close()}catch (_) {}}
+    }
+  }
+  if(window.GurbaniPeer&&typeof window.Peer==='function'){
+    window.GurbaniPeer.start({
+      id:()=>publicPeerId,
+      onPeer:p=>{livePeer=p},
+      onOpen:()=>{
+        status('● Sangat public Internet broadcast ready');
+        broadcastPublic();
+      },
+      onConnection:channel=>{
+        // Viewers may only request the current public snapshot.
+        if(audience.size>=100){channel.close();return}
+        audience.add(channel);
+        const drop=()=>audience.delete(channel);
+        const snapshot=()=>{try{if(channel.open)channel.send(publicPacket())}catch (_) {drop()}};
+        channel.on('open',snapshot);
+        channel.on('data',message=>{if(message?.type==='sangat-join')snapshot()});
+        channel.on('close',drop);
+        channel.on('error',()=>{drop();channel.close()});
+      },
+      onCollision:()=>status('Another Control is already publishing Sangat View'),
+      onTargetUnavailable:()=>{},
+      onStatus:()=>{}
+    });
+  } else {
+    status('Sangat Internet connection library unavailable');
+  }
+
   let pending, publishing = false, timer;
   async function browserPublish() {
     if (publishing || pending === undefined) return;
@@ -98,7 +140,6 @@ window.setupSangatPublisher = function (menu, currentContent) {
   }
 
   function send(content) {
-    if (!legacyKey) return;
     let selection = null;
     if (content) {
       const rows = Array.isArray(content.bookLines) ? content.bookLines : [];
@@ -111,12 +152,17 @@ window.setupSangatPublisher = function (menu, currentContent) {
         shabadTitle:String(content.shabadTitle || '').slice(0,180),
       };
     }
-    const packet = JSON.stringify({content:selection});
-    pending=packet;browserPublish();
+    latestSelection=selection;
+    broadcastPublic();
+    if(legacyKey){
+      const packet = JSON.stringify({content:selection});
+      pending=packet;browserPublish();
+    }
   }
 
-  if (legacyKey) {showEnabled();send(currentContent())}
-  else prepareApproval().catch(()=>status('Control approval is unavailable.'));
+  send(currentContent());
+  if(legacyKey)showEnabled();
+  else prepareApproval().catch(()=>status('Hosted Sangat approval unavailable; Internet fallback remains enabled.'));
   window.addEventListener('online',()=>{claim();if(legacyKey)browserPublish()});
   for(const name of ['pageshow','focus'])window.addEventListener(name,claim);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)claim()});
