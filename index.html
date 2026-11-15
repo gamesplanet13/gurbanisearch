@@ -538,11 +538,17 @@ const health=new WeakMap(),pendingDelivery=new WeakMap(),authorizedDisplays=new 
 function setupConn(conn,key,codeValue){
  const open=()=>{health.set(conn,Date.now());announce(conn);$('connStatus').textContent='Online';renderDevices()};
  if(conn.open)open();else conn.on('open',open);
+ // Remote Internet WebRTC/TURN negotiation can exceed ten seconds.
+ // Retry authentication on an open channel before declaring pairing failed.
+ setTimeout(()=>{
+  if(authorizedDisplays.has(conn)||!conn.open)return;
+  announce(conn);
+ },10000);
  setTimeout(()=>{
   if(authorizedDisplays.has(conn))return;
   if(connections.get(key)===conn)connections.delete(key);
   conn.close();renderDevices();
- },10000);
+ },30000);
 conn.on('data',m=>{if(!m||typeof m!=='object')return;health.set(conn,Date.now());if(m.type==='camera-display-ready'){
  const route=activeCameraRoutes.get(String(m.code||''));
  if(route&&route.deviceId===key&&route.camera===String(m.cameraCode||'')){
