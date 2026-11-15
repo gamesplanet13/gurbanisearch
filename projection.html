@@ -71,7 +71,20 @@ const prefix='gurbani-projection-v1-',ctrlPrefix='gurbani-control-v1-';
 const desktopCode=new URLSearchParams(location.search).get('desktop')==='windows'
  ? new URLSearchParams(location.hash.slice(1)).get('lanCode') : null;
 const hasDesktopCode=/^[0-9]{5}$/.test(desktopCode||'');
-let pendingController=null, code=(hasDesktopCode?desktopCode:null)||read('gb-projection-code',null)||code5(),owner=read('gb-projection-owner',null),name=read('gb-projection-name',((navigator.userAgent.match(/Android[^;)]*;\s*([^;)]+?)(?:\s+Build\/|\))/i)||[])[1]||'Projection Screen').trim()),slide=read('gb-projection-slide',{content:null,settings:{verseSize:64,meaningSize:28,clock:false}}),peer,connections=new Set();
+let pendingController=null, code=(hasDesktopCode?desktopCode:null)||((v)=>/^\d{5}$/.test(v||'')?v:code5())(read('gb-projection-code',null)),name=read('gb-projection-name',((navigator.userAgent.match(/Android[^;)]*;\s*([^;)]+?)(?:\s+Build\/|\))/i)||[])[1]||'Projection Screen').trim()),slide=read('gb-projection-slide',{content:null,settings:{verseSize:64,meaningSize:28,clock:false}}),peer,connections=new Set();
+const legacyController=read('gb-projection-owner',null);
+const controllers=new Set(read('gb-projection-controllers',legacyController?[legacyController]:[]));
+const authorization=new Map();
+function saveControllers(){
+ store('gb-projection-controllers',[...controllers]);
+ store('gb-projection-owner',null);
+}
+function disconnectController(c){
+ const token=authorization.get(c);
+ authorization.delete(c);
+ connections.delete(c);
+ if(token)setPairingStatus(authorization.size?'Connected controls: '+authorization.size:'Ready for controls — display retained');
+}
 if(hasDesktopCode){$('changeCodeRow').style.display='none'}
 else store('gb-projection-code',code);$('code').textContent=code;$('name').value=name;
 const tvWaheguru=typeof window.GurbaniTvWaheguru==='function'&&(/[?&]display=tv(?:&|$)/.test(location.search)||(/[?&]desktop=windows(?:&|$)/.test(location.search)||/Windows NT|Macintosh|X11; Linux x86_64/i.test(navigator.userAgent)&&!/Android|iPad/i.test(navigator.userAgent))||/Android TV|Google TV|SMART-TV|BRAVIA|\bAFT[A-Z]+\b/i.test(navigator.userAgent));
@@ -225,7 +238,7 @@ $('stage').addEventListener('touchmove',e=>{if(!projectionPinch||e.touches.lengt
 $('stage').addEventListener('touchend',e=>{if(e.touches.length<2)projectionPinch=null});
 $('stage').addEventListener('touchcancel',()=>{projectionPinch=null});
 
-let awaitSelection=read('gb-projection-await-selection',!owner);
+let awaitSelection=read('gb-projection-await-selection',!controllers.size);
 function markAwaitSelection(v){awaitSelection=v;store('gb-projection-await-selection',v);updateMainPairing()}
 let photoBatch=null,photoTimer=null,photoIndex=0,photos=[];
 const SAHIBZAADE_DB='gurbani-sahibzaade-picture-v1';
@@ -316,9 +329,9 @@ function remotePhoto(m){
  if(m.type==='photo-add'&&Number.isInteger(m.index)&&m.index>=0&&m.index<photoBatch.total&&typeof (m.photo&&m.photo.src)==='string'&&/^data:image\/jpeg;base64,/.test(m.photo.src)&&m.photo.src.length<180000){photos[m.index]={name:String(m.photo.name||'Picture'),src:m.photo.src};return}
  if(m.type==='photo-play'){photos=photos.filter(Boolean);startPhotos()}
 }
-function updateMainPairing(){ $('mainPairingCode').textContent=code; $('mainPairing').hidden=!!owner&&!awaitSelection;document.body.classList.toggle('pairing-active',!$('mainPairing').hidden); }
+function updateMainPairing(){ $('mainPairingCode').textContent=code; $('mainPairing').hidden=!!controllers.size&&!awaitSelection;document.body.classList.toggle('pairing-active',!$('mainPairing').hidden); }
 function send(c,m){try{if(c.open)c.send(m)}catch(_){ }}
-function hello(c){send(c,{type:'hello',deviceId:code,code:code,name:name,owner:owner,kind:'projection',displaySession,localWaheguru:tvWaheguru,projectionSettings:slide.settings})}
+function hello(c){send(c,{type:'hello',deviceId:code,code:code,name:name,multiController:true,kind:'projection',displaySession,localWaheguru:tvWaheguru,projectionSettings:slide.settings})}
 
 let allowedCameraCode=null,allowedCameraController=null,cameraCall=null,cameraFeed=null,cameraLayout='full',cameraPortion=50;
 let cameraFrame={};
@@ -351,11 +364,16 @@ function acceptCameraCall(call){
  call.on('error',e=>{if(cameraCall===call){$('status').textContent='Camera video failed: '+(e.message||e.type||'WebRTC unavailable');clearCamera()}})
 }
 
-function handle(c){connections.add(c);c.on('open',()=>{hello(c);setPairingStatus('Waiting for controller authorization')});
-c.on('data',m=>{if(!m||typeof m!=='object')return;if(m.type==='screen-preview'&&owner&&m.token===owner&&window.GurbaniScreenPreview){GurbaniScreenPreview.request(c,m.enabled===true);return}
+function handle(c){
+ c.on('open',()=>hello(c));
+ const authTimeout=setTimeout(()=>{if(!authorization.has(c))c.close()},30000);
+ c.on('data',m=>{
+ if(!m||typeof m!=='object')return;
+ const authorized=authorization.has(c)&&authorization.get(c)===m.token;
+ if(m.type==='screen-preview'&&authorized&&window.GurbaniScreenPreview){GurbaniScreenPreview.request(c,m.enabled===true);return}
   if(m.type==='ping'){send(c,{type:'pong',id:m.id});return}
-if(m.type==='display-mode'&&owner&&m.token===owner){const next=m.mode==='book'?'book':'projection';if(next!==displayMode){displayMode=next;window.scrollTo(0,0);render()}send(c,{type:'applied',rev:m.rev});return}
-if(m.type==='camera-allow'&&owner&&m.token===owner){
+if(m.type==='display-mode'&&authorized){const next=m.mode==='book'?'book':'projection';if(next!==displayMode){displayMode=next;window.scrollTo(0,0);render()}send(c,{type:'applied',rev:m.rev});return}
+if(m.type==='camera-allow'&&authorized){
  if(m.cameraCode!=='local'&&!/^\d{5}$/.test(String(m.cameraCode)))return;
  allowedCameraCode=String(m.cameraCode);allowedCameraController=c.peer;
  cameraLayout=['full','horizontal','vertical'].includes(m.layout)?m.layout:'full';
@@ -363,27 +381,41 @@ if(m.type==='camera-allow'&&owner&&m.token===owner){
  cameraFrame=m;
  applyCameraLayout();send(c,{type:'camera-display-ready',code,cameraCode:allowedCameraCode});return
 }
-if(m.type==='camera-layout'&&owner&&m.token===owner){
+if(m.type==='camera-layout'&&authorized){
  cameraLayout=['full','horizontal','vertical'].includes(m.layout)?m.layout:'full';
  cameraPortion=Math.max(15,Math.min(85,Number(m.portion)||50));
  cameraFrame=m;
  applyCameraLayout();return
 }
-if(m.type==='camera-hide'&&owner&&m.token===owner){allowedCameraCode=null;allowedCameraController=null;clearCamera();return}
-if(m.type==='sahibzaade-show'&&owner&&m.token===owner){openSahibzaade();return}
-if(m.type==='sahibzaade-close'&&owner&&m.token===owner){closeSahibzaade();return}
-if((typeof m.type==='string'&&m.type.startsWith('photo-'))&&owner&&m.token===owner){remotePhoto(m);return}
-if(m.type==='remove-pairing'&&owner&&m.token===owner){$('resetPairing').onclick();return}
-  if(m.type==='auth'&&typeof m.token==='string'){if(owner&&owner!==m.token){send(c,{type:'rejected'});setPairingStatus('Paired to another controller — use Reset pairing to change');return}owner=m.token;store('gb-projection-owner',owner);updateMainPairing();send(c,{type:'accepted',deviceId:code,code:code,name:name,kind:'projection',displaySession});setPairingStatus('Connected to Controller')}
-if(m.type==='waheguru-show'&&owner&&m.token===owner){
+if(m.type==='camera-hide'&&authorized){allowedCameraCode=null;allowedCameraController=null;clearCamera();return}
+if(m.type==='sahibzaade-show'&&authorized){openSahibzaade();return}
+if(m.type==='sahibzaade-close'&&authorized){closeSahibzaade();return}
+if((typeof m.type==='string'&&m.type.startsWith('photo-'))&&authorized){remotePhoto(m);return}
+if(m.type==='remove-pairing'&&authorized){
+  controllers.delete(m.token);saveControllers();updateMainPairing();
+  send(c,{type:'unpaired'});disconnectController(c);setTimeout(()=>c.close(),200);return;
+ }
+ if(m.type==='auth'&&typeof m.token==='string'&&m.token.length>0&&m.token.length<=128&&(!authorization.has(c)||authorized)){
+  clearTimeout(authTimeout);
+  authorization.set(c,m.token);connections.add(c);controllers.add(m.token);
+  for(const [old,token] of authorization)if(old!==c&&token===m.token){disconnectController(old);old.close()}
+  saveControllers();updateMainPairing();
+  send(c,{type:'accepted',deviceId:code,code,name,kind:'projection',displaySession,multiController:true});
+  setPairingStatus('Connected controls: '+authorization.size);
+  return;
+ }
+if(m.type==='waheguru-show'&&authorized){
  slide.content={mode:'waheguru',verse:'ਵਾਹਿਗੁਰੂ'};
  markAwaitSelection(false);store('gb-projection-slide',slide);render();
  if(m.rev!==undefined)send(c,{type:'applied',rev:m.rev});
  return;
 }
-if(m.type==='project'&&owner&&m.token===owner){if(Object.prototype.hasOwnProperty.call(m,'content')){slide.content=m.content;if(m.content&&m.content.verse)markAwaitSelection(false)}if(m.bookSettings&&typeof m.bookSettings==='object'){const size=altBookSettings.fontSize;altBookSettings={...altBookSettings,...m.bookSettings};if(alternateMotion.pinching())altBookSettings.fontSize=size;store('gb-projection-alternate-book-settings',altBookSettings)}
+if(m.type==='project'&&authorized){if(Object.prototype.hasOwnProperty.call(m,'content')){slide.content=m.content;if(m.content&&m.content.verse)markAwaitSelection(false)}if(m.bookSettings&&typeof m.bookSettings==='object'){const size=altBookSettings.fontSize;altBookSettings={...altBookSettings,...m.bookSettings};if(alternateMotion.pinching())altBookSettings.fontSize=size;store('gb-projection-alternate-book-settings',altBookSettings)}
 if(m.settings)slide.settings={alignment:m.settings.alignment==='top'?'top':'center',verseSize:Math.max(24,Math.min(360,Number(m.settings.verseSize)||64)),hindiVerseSize:Math.max(24,Math.min(360,Number(m.settings.hindiVerseSize)||64)),englishVerseSize:Math.max(24,Math.min(360,Number(m.settings.englishVerseSize)||64)),meaningSize:Math.max(16,Math.min(180,Number(m.settings.meaningSize)||28)),englishSize:Math.max(16,Math.min(180,Number(m.settings.englishSize)||Number(m.settings.meaningSize)||28)),punjabiSize:Math.max(16,Math.min(180,Number(m.settings.punjabiSize)||28)),hindiSize:Math.max(16,Math.min(180,Number(m.settings.hindiSize)||28)),clock:!!m.settings.clock,lineSpacing:Math.max(90,Math.min(220,Number(m.settings.lineSpacing)||135)),dayMode:typeof m.settings.dayMode==='boolean'?m.settings.dayMode:!!(slide.settings||{}).dayMode,autoFit:m.settings.autoFit!==false,larrivaar:!!m.settings.larrivaar,flow:!!m.settings.flow,pause:!!m.settings.pause};if(m.projectionTheme&&typeof m.projectionTheme.dayMode==='boolean'){slide.settings=slide.settings||{};slide.settings.dayMode=m.projectionTheme.dayMode}store('gb-projection-slide',slide);render();if(m.rev!==undefined)send(c,{type:'applied',rev:m.rev})}
-});c.on('close',()=>{connections.delete(c);setPairingStatus(owner?'Disconnected — last slide remains':'Pairing cleared — ready for a controller')});c.on('error',e=>$('status').textContent=e.message)}
+});
+ c.on('close',()=>{clearTimeout(authTimeout);disconnectController(c)});
+ c.on('error',()=>{clearTimeout(authTimeout);disconnectController(c);c.close()});
+}
 function connectController(controllerCode){
  if(!peer||peer.destroyed||peer.disconnected||!peer.open){pendingController=controllerCode;setPairingStatus('Offline — reconnecting; pairing will retry');return}
  setPairingStatus('Connecting to controller '+controllerCode+'…');const c=peer.connect(ctrlPrefix+controllerCode,{reliable:true,metadata:{code:code}});let finished=false;c.on('open',()=>{finished=true});c.on('close',()=>{finished=true});c.on('error',()=>{finished=true});setTimeout(()=>{if(!finished&&!c.open){finished=true;try{c.close()}catch(_){}setPairingStatus('Could not connect. Connection timed out. Keep both apps online, check the code and try again.')}},20000);handle(c)
@@ -393,7 +425,7 @@ function start(){
  if(typeof GurbaniPeer==='undefined'){setPairingStatus('Pairing library failed to load. Reopen the app online.');return}
  GurbaniPeer.start({id:()=>prefix+code,onPeer:p=>{peer=p;p.on('call',acceptCameraCall)},
  onStatus:message=>{setPairingStatus(message)},
- onOpen:()=>{setPairingStatus(owner?'Ready (paired)':'Online — enter this code on Controller');if(pendingController){const target=pendingController;pendingController=null;connectController(target)}},
+ onOpen:()=>{setPairingStatus('Online — enter this code on Controller');if(pendingController){const target=pendingController;pendingController=null;connectController(target)}},
  onConnection:handle,
  onCollision:()=>{setPairingStatus('This code is busy. Retrying automatically.')},
  onTargetUnavailable:()=>{setPairingStatus('Controller not found. Open Controller and check its code.')}});
@@ -402,7 +434,7 @@ $('join').onclick=()=>{const c=$('controllerCode').value.trim();if(!/^\d{5}$/.te
 function advertiseWifi(){if(window.GurbaniWifi&&typeof window.GurbaniWifi.advertise==='function'){try{window.GurbaniWifi.advertise(code,name)}catch(e){}}}
 $('saveName').onclick=()=>{name=$('name').value.trim().slice(0,50)||'Projection Screen';store('gb-projection-name',name);advertiseWifi();for(const c of connections){send(c,{type:'identify',code:code,name:name})}$('status').textContent='Display name saved'};
 $('changeCode').onclick=()=>{const v=$('newCode').value.trim();if(!/^\d{5}$/.test(v))return $('status').textContent='Enter a valid 5-digit code';if(v===code)return $('status').textContent='This is already the current code';for(const c of connections)send(c,{type:'code-change',code:v});store('gb-projection-code',v);markAwaitSelection(true);setTimeout(()=>location.reload(),300)};
-$('resetPairing').onclick=()=>{owner=null;markAwaitSelection(true);store('gb-projection-owner',null);updateMainPairing();for(const c of [...connections]){send(c,{type:'unpaired'});setTimeout(()=>{try{c.close()}catch(_){}},250)}connections.clear();setPairingStatus('Pairing cleared — ready for a controller')};
+$('resetPairing').onclick=()=>{controllers.clear();saveControllers();markAwaitSelection(true);updateMainPairing();for(const c of [...connections]){send(c,{type:'unpaired'});setTimeout(()=>{try{c.close()}catch(_){}},250)}connections.clear();authorization.clear();setPairingStatus('Pairing cleared — ready for controls')};
 $('fullscreen').onclick=()=>document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
 function menu(show){
  document.body.classList.toggle('menu-open',show);
