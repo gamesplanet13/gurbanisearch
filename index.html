@@ -450,6 +450,10 @@ function renderDeviceSettingsPanel(key){
   const b=v.book;
   makeDeviceSlider(area,key,b,'Granth Gurbani font','fontSize',14,85,1,'px');
   makeDeviceSlider(area,key,b,'Granth line spacing','lineSpacing',90,220,5,'%');
+  for(const [field,label,max,initial] of [['marginLeft','Left space',160,16],['marginRight','Right space',160,16],['marginTop','Top space',200,92],['marginBottom','Bottom space',200,30]]){
+    if(!Number.isFinite(Number(b[field])))b[field]=initial;
+    makeDeviceSlider(area,key,b,label,field,0,max,1,'px');
+  }
   makeDeviceToggle(area,key,b,'Night mode','nightMode');
   makeDeviceToggle(area,key,b,'Larrivaar (ਲੜੀਵਾਰ)','larrivaar');
   makeDeviceToggle(area,key,b,'Continuous Gurbani lines','flow');
@@ -560,7 +564,7 @@ conn.on('data',m=>{if(!m||typeof m!=='object')return;health.set(conn,Date.now())
 if(m.type==='screen-preview-frame'||m.type==='screen-preview-error'){desktopPreview?.receive(conn,m);return}
 if(m.type==='book-line-selected'){
  // Only a paired Granth View may change the Controller reading.
- if(!authorizedDisplays.has(conn)||m.token!==myToken||known[key]?.kind!=='book'||!projectionIsOn)return;
+ if(!authorizedDisplays.has(conn)||m.token!==myToken||known[key]?.kind!=='book')return;
  const rows=lastContent?.bookLines;
  const index=m.index;
  if(!Array.isArray(rows)||!Number.isInteger(index)||index<0||index>=rows.length||typeof m.verse!=='string'||rows[index]!==m.verse)return;
@@ -568,10 +572,13 @@ if(m.type==='book-line-selected'){
  for(let i=0;i<lines.length;i++)if(getText(lines[i])===m.verse)candidates.push(i);
  if(!candidates.length)return;
  const previous=active;
- // Prefer the matching occurrence nearest the current Controller line.
- const pick=candidates.reduce((best,i)=>Math.abs(i-previous)<Math.abs(best-previous)?i:best,candidates[0]);
+ // Map the tapped row to its original position first, important for repeated verses.
+ const absoluteIndex=previous-(Number(lastContent.activeIndex)||0)+index;
+ const pick=candidates.includes(absoluteIndex)?absoluteIndex:
+  candidates.reduce((best,i)=>Math.abs(i-absoluteIndex)<Math.abs(best-absoluteIndex)?i:best,candidates[0]);
  if(pick!==active)show(pick);
- else status('Granth View line selected');
+ else {renderLines();status('Granth View line selected')}
+
  return;
 }
 if(m.type==='pong'){return}if(m.type==='applied'){const p=pendingDelivery.get(conn);if(p&&m.rev===p.rev)pendingDelivery.delete(conn);return}
@@ -594,7 +601,7 @@ if(m.type==='accepted'&&m.kind!=='obs'){
 if(m.type==='accepted'){if(m.deviceId){if(m.deviceId!==key){connections.delete(key);key=m.deviceId}known[key]={code:m.code||codeValue,name:m.name||'Projection',kind:m.kind||known[key]?.kind||'projection',localWaheguru:known[key]?.localWaheguru===true};put('gb-known-devices',known);selected.add(key);put('gb-selected-devices',[...selected]);connections.set(key,conn)}renderDevices();if(!m.multiController)sendDeviceView(key);status('Paired successfully')}
 if((m.type==='hello'||m.type==='accepted')&&m.kind==='book'&&m.bookSettings&&!perDeviceSettings[key]){const saved=deviceSettings(key);saved.book={...saved.book,...m.bookSettings};persistDeviceSettings()}
 if(m.type==='projection-settings'&&m.settings&&connections.get(key)===conn){adoptProjectionSettings(key,m.settings);if(openDeviceSettingsKey===key)renderDevices();return}
-if(m.type==='book-settings'){const saved=deviceSettings(key);saved.book={...saved.book,...Object.fromEntries(['fontSize','lineSpacing','nightMode','larrivaar','flow','pause','alignment'].filter(k=>m[k]!==undefined).map(k=>[k,m[k]]))};persistDeviceSettings();if(openDeviceSettingsKey===key)renderDevices()}
+if(m.type==='book-settings'){const saved=deviceSettings(key);saved.book={...saved.book,...Object.fromEntries(['fontSize','lineSpacing','nightMode','larrivaar','flow','pause','alignment','marginLeft','marginRight','marginTop','marginBottom'].filter(k=>m[k]!==undefined).map(k=>[k,m[k]]))};persistDeviceSettings();if(openDeviceSettingsKey===key)renderDevices()}
 if(m.type==='rejected'){status('Screen is paired to another controller. On that screen choose Reset pairing.');conn.close()}
 if(m.type==='unpaired'){delete autoReconnect[key];put('gb-auto-reconnect',autoReconnect);delete known[key];selected.delete(key);put('gb-known-devices',known);put('gb-selected-devices',[...selected]);if(connections.get(key)===conn)connections.delete(key);renderDevices();status('Screen pairing removed');conn.close()}
 if(m.type==='code-change'&&/^\d{5}$/.test(m.code)&&known[key]){
