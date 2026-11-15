@@ -38,7 +38,14 @@ final class Updater {
     private boolean waitingForPermission;
     private AlertDialog dialog;
     private boolean checking;
-    private boolean startupChecked;
+    private long lastCheck;
+    private final Runnable autoCheck = new Runnable() {
+        public void run() {
+            if (!active || closed) return;
+            if (System.currentTimeMillis() - lastCheck >= 300000) check(false);
+            handler.postDelayed(this, 60000);
+        }
+    };
 
     Updater(Activity activity) {
         this.activity = activity;
@@ -53,6 +60,7 @@ final class Updater {
         }
         if (checking) return;
         checking = true;
+        lastCheck = System.currentTimeMillis();
         new Thread(() -> {
             try {
                 JSONObject update = readManifest().getJSONObject(BuildConfig.ROLE);
@@ -66,7 +74,7 @@ final class Updater {
                 handler.post(() -> {
                     checking = false;
                     if (closed) return;
-                    if (!active) { if (!manual) startupChecked = false; return; }
+                    if (!active) { lastCheck = 0; return; }
                     if (version <= BuildConfig.VERSION_CODE) {
                         if (manual) showError("Latest on GitHub: " + filename + "\nThis app is up to date.");
                     } else if (state.getLong("version", 0) == version && state.getLong("download", -1) >= 0) {
@@ -142,7 +150,8 @@ final class Updater {
     void resume() {
         active = true;
         if (downloads == null) return;
-        if (!startupChecked) { startupChecked = true; check(false); }
+        handler.removeCallbacks(autoCheck);
+        autoCheck.run();
         if (state.getLong("version", 0) <= BuildConfig.VERSION_CODE) forgetDownload();
         if (waitingForPermission) {
             waitingForPermission = false;
@@ -158,6 +167,7 @@ final class Updater {
 
     void pause() {
         active = false;
+        handler.removeCallbacks(autoCheck);
         handler.removeCallbacks(pollDownload);
     }
 

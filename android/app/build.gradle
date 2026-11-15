@@ -6,7 +6,7 @@ android {
         applicationId 'in.gurbanisearch'
         minSdk 23
         targetSdk 35
-        versionCode 20261128
+        versionCode 20261131
         versionName '2026.11.13.17'
     }
     flavorDimensions += 'role'
@@ -20,7 +20,7 @@ android {
         }
         searcher {
             dimension 'role'
-            versionCode 20261130
+            versionCode 20261131
             versionName '2026.11.14.3'
             applicationIdSuffix '.searcher'
             resValue 'string', 'app_name', 'Gurbani Searcher'
@@ -29,7 +29,7 @@ android {
         }
         projection {
             dimension 'role'
-            versionCode 20261129
+            versionCode 20261131
             versionName '2026.11.14.1'
             applicationIdSuffix '.projection'
             resValue 'string', 'app_name', 'Gurbani Searching Projection'

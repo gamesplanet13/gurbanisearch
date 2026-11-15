@@ -18,7 +18,7 @@ import android.graphics.Color;
 import android.content.Intent;
 import android.net.Uri;
 
-public class MainActivity extends Activity {
+public class MainActivity extends SessionActivity {
     private WebView web;
     private static final int FILE_PICKER_REQUEST=3804;
     private static final int CAMERA_PERMISSION_REQUEST=3805;
@@ -189,29 +189,6 @@ public class MainActivity extends Activity {
             View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
             View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
             View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-    }
-    @Override public void onBackPressed() {
-        // Projection on Android TV: back must never quit without confirmation.
-        if("projection".equals(BuildConfig.ROLE)) {
-            new android.app.AlertDialog.Builder(this)
-                .setTitle("Exit Projection?")
-                .setMessage("Do you want to close Gurbani Projection?")
-                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
-                .setPositiveButton("Exit", (dialog, which) -> finish())
-                .show();
-            return;
-        }
-        if ("searcher".equals(BuildConfig.ROLE) && web != null) {
-            web.evaluateJavascript("Boolean(window.gbSearcherBack && window.gbSearcherBack())", handled -> {
-                if (!"true".equals(handled) && !isFinishing()) goBackOrFinish();
-            });
-            return;
-        }
-        goBackOrFinish();
-    }
-    private void goBackOrFinish() {
-        if (web != null && web.canGoBack()) web.goBack();
-        else finish();
     }
     @Override protected void onResume() {
         super.onResume();

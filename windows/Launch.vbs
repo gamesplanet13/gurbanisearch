@@ -1,4 +1,5 @@
 Option Explicit
+Const NativeVersion = "10400"
 Dim shell, files, edge, candidate, role, page, profile, url, appData, timestamp, nowTime
 Set shell = CreateObject("WScript.Shell")
 Set files = CreateObject("Scripting.FileSystemObject")
@@ -6,6 +7,7 @@ If WScript.Arguments.Count <> 1 Then WScript.Quit 1
 role = LCase(WScript.Arguments(0))
 Select Case role
     Case "controller": page = "index.html"
+    Case "searcher": page = "searcher.html"
     Case "projection": page = "projection.html"
     Case "book": page = "book.html"
     Case "camera": page = "camera.html"
@@ -29,7 +31,7 @@ End If
 profile = appData & "\Gurbani\Profiles\" & role
 nowTime = Now
 timestamp = Year(nowTime) & "-" & Month(nowTime) & "-" & Day(nowTime) & "-" & Hour(nowTime) & "-" & Minute(nowTime) & "-" & Second(nowTime)
-url = "https://gamesplanet13.github.io/gurbanisearch/" & page & "?desktop=windows&launch=" & timestamp
+url = "https://gamesplanet13.github.io/gurbanisearch/" & page & "?desktop=windows&nativeVersion=" & NativeVersion & "&launch=" & timestamp
 shell.Run "powershell.exe -NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy RemoteSigned -File " & _
     Quote(files.BuildPath(files.GetParentFolderName(WScript.ScriptFullName), "Window.ps1")) & " " & _
     Quote(edge) & " " & Quote(profile) & " " & Quote(url) & " " & Quote(role), 0, False

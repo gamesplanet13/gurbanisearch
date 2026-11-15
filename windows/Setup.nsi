@@ -6,11 +6,11 @@ RequestExecutionLevel user
 SetCompressor /SOLID lzma
 Icon "controller.ico"
 UninstallIcon "controller.ico"
-VIProductVersion "1.0.3.0"
+VIProductVersion "1.0.4.0"
 VIAddVersionKey "ProductName" "Gurbani for Windows"
 VIAddVersionKey "FileDescription" "Gurbani Windows Setup"
 VIAddVersionKey "LegalCopyright" "Copyright Rajinder Singh"
-VIAddVersionKey "FileVersion" "1.0.3.0"
+VIAddVersionKey "FileVersion" "1.0.4.0"
 
 Page instfiles
 UninstPage uninstConfirm
@@ -35,6 +35,8 @@ Section "Gurbani"
   Delete "$DESKTOP\Gurbani Controller.lnk"
   Delete "$SMPROGRAMS\Gurbani\Gurbani Controller.lnk"
   !insertmacro AddShortcut "Gurbani Searching Control" "controller"
+  CreateShortCut "$DESKTOP\Gurbani Searcher.lnk" "$SYSDIR\wscript.exe" '"$INSTDIR\Launch.vbs" searcher' "$INSTDIR\controller.ico"
+  CreateShortCut "$SMPROGRAMS\Gurbani\Gurbani Searcher.lnk" "$SYSDIR\wscript.exe" '"$INSTDIR\Launch.vbs" searcher' "$INSTDIR\controller.ico"
   Delete "$DESKTOP\Gurbani Projection.lnk"
   Delete "$SMPROGRAMS\Gurbani\Gurbani Projection.lnk"
   !insertmacro AddShortcut "Gurbani Searching Projection" "projection"
@@ -47,7 +49,7 @@ Section "Gurbani"
   WriteUninstaller "$INSTDIR\Uninstall.exe"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Gurbani" "DisplayName" "Gurbani for Windows"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Gurbani" "UninstallString" '"$INSTDIR\Uninstall.exe"'
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Gurbani" "DisplayVersion" "1.0.3"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Gurbani" "DisplayVersion" "1.0.4"
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Gurbani" "NoModify" 1
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Gurbani" "NoRepair" 1
 SectionEnd
@@ -60,6 +62,8 @@ SectionEnd
 
 Section "Uninstall"
   SetShellVarContext current
+  Delete "$DESKTOP\Gurbani Searcher.lnk"
+  Delete "$SMPROGRAMS\Gurbani\Gurbani Searcher.lnk"
   !insertmacro RemoveShortcut "Gurbani Searching Control" "controller"
   !insertmacro RemoveShortcut "Gurbani Searching Projection" "projection"
   !insertmacro RemoveShortcut "Gurbani Granth View" "book"

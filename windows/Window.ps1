@@ -31,7 +31,7 @@ public static class GurbaniWindow {
             $codeMutex.Dispose()
         }
     }
-    $edgeArguments = '--user-data-dir="' + $Profile + '" --no-first-run --start-fullscreen --new-window "' + $Url + '"'
+    $edgeArguments = '--user-data-dir="' + $Profile + '" --no-first-run --start-fullscreen --disable-background-timer-throttling --disable-renderer-backgrounding --new-window "' + $Url + '"'
     $process = Start-Process -FilePath $Edge -ArgumentList $edgeArguments -PassThru
     for ($i=0; $i -lt 80 -and !$process.HasExited -and $process.MainWindowHandle -eq 0; $i++) {
         Start-Sleep -Milliseconds 125
@@ -88,8 +88,27 @@ public static class GurbaniWindow {
         [void][GurbaniWindow]::GetWindowThreadProcessId($foreground,[ref]$owner)
         if ($process.MainWindowTitle -like 'Gurbani Windows Close*' -and $window -ne 0) {
             [void][GurbaniWindow]::PostMessage($window,0x10,[IntPtr]::Zero,[IntPtr]::Zero)
-        } elseif ($Role -ne 'projection' -and $owner -eq $process.Id -and ([GurbaniWindow]::GetAsyncKeyState(27) -band 0x8000)) {
-            [void][GurbaniWindow]::PostMessage($foreground,0x10,[IntPtr]::Zero,[IntPtr]::Zero)
+        } elseif ($process.MainWindowTitle -match '^Gurbani Windows Install ([0-9]+)' -and $window -ne 0) {
+            $wanted = [int]$Matches[1]
+            if ($wanted -ne $seenUpdate) {
+                $seenUpdate = $wanted
+                try {
+                    $base = 'https://gamesplanet13.github.io/gurbanisearch/windows/'
+                    $manifest = Invoke-RestMethod -Uri ($base + 'update.json') -TimeoutSec 10
+                    if ($manifest.version -eq $wanted -and $wanted -gt 10400 -and
+                        $manifest.sha256 -match '^[a-fA-F0-9]{64}$') {
+                        $installer = Join-Path $env:TEMP ("Gurbani-Windows-$wanted.exe")
+                        Invoke-WebRequest -UseBasicParsing -Uri ($base + 'Gurbani-Windows-Setup.exe') -OutFile $installer -TimeoutSec 45
+                        if ((Get-FileHash $installer -Algorithm SHA256).Hash -eq $manifest.sha256) {
+                            $installed = Start-Process -FilePath $installer -ArgumentList '/S' -Wait -PassThru
+                            if ($installed.ExitCode -eq 0) {
+                                $relaunch = $true
+                                [void][GurbaniWindow]::PostMessage($window,0x10,[IntPtr]::Zero,[IntPtr]::Zero)
+                            }
+                        }
+                    }
+                } catch { }
+            }
         }
         if ($window -eq 0) { break }
         if ($discoveryRecord) {
@@ -110,4 +129,8 @@ public static class GurbaniWindow {
     if ($shortcutUpdate) { Remove-Job -Job $shortcutUpdate -Force -ErrorAction SilentlyContinue }
     $mutex.ReleaseMutex()
     $mutex.Dispose()
+}
+
+if ($relaunch) {
+    Start-Process wscript.exe -ArgumentList ('"' + (Join-Path $PSScriptRoot 'Launch.vbs') + '" ' + $Role)
 }

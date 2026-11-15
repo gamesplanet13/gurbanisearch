@@ -504,14 +504,33 @@ function renderDevices(){
   if(openDeviceSettingsKey===key)box.append(renderDeviceSettingsPanel(key))
  }
 }
+const pendingUnpairs=stored('gb-pending-device-unpairs',{}),unpairAttempts=new Map();
+function retryUnpairs(){
+ if(!peer?.open||peer.disconnected)return;
+ for(const [key,code] of Object.entries(pendingUnpairs)){
+  if(unpairAttempts.has(key))continue;
+  const c=peer.connect(peerPrefix+code,{reliable:true});
+  unpairAttempts.set(key,c);
+  const done=()=>{if(unpairAttempts.get(key)===c)unpairAttempts.delete(key)};
+  c.on('open',()=>send(c,{type:'remove-pairing',token:myToken}));
+  c.on('data',m=>{
+   if(m?.type!=='unpaired'||unpairAttempts.get(key)!==c)return;
+   delete pendingUnpairs[key];put('gb-pending-device-unpairs',pendingUnpairs);
+   done();c.close();status('Screen confirmed removal');
+  });
+  c.on('close',done);c.on('error',()=>{done();c.close()});
+  setTimeout(()=>{if(unpairAttempts.get(key)===c){done();c.close()}},12000);
+ }
+}
 function removeDevice(key){
- const c=connections.get(key),online=!!c?.open;
- if(online)send(c,{type:'remove-pairing',token:myToken});
+ const c=connections.get(key),code=known[key]?.code;
+ if(/^\d{5}$/.test(code||'')&&known[key]?.kind!=='obs'){pendingUnpairs[key]=code;put('gb-pending-device-unpairs',pendingUnpairs)}
+ else if(c?.open)send(c,{type:'remove-pairing',token:myToken});
  delete known[key];selected.delete(key);connections.delete(key);delete autoReconnect[key];delete deviceView[key];delete perDeviceSettings[key];if(openDeviceSettingsKey===key)openDeviceSettingsKey=null;persistDeviceSettings();put('gb-auto-reconnect',autoReconnect);
  put('gb-known-devices',known);put('gb-selected-devices',[...selected]);
  if(pendingPair?.key===key)pendingPair=null;
  if(c)setTimeout(()=>{try{c.close()}catch(_){}},250);
- renderDevices();status(online?'Display removed and unpaired.':'Display removed. If paired to another controller, reset pairing on that display.');
+ renderDevices();retryUnpairs();status('Display removed. The screen will confirm when it is reachable.');
 }
 function send(conn,payload){if(conn?.open){try{conn.send(payload);return true}catch{}}return false}
 function announce(conn){send(conn,{type:'auth',token:myToken,code:myCode})}
@@ -553,6 +572,10 @@ if(m.type==='identify'){known[key]={code:m.code||codeValue,name:m.name||'Project
 });
 conn.on('close',()=>{if(connections.get(key)===conn){connections.delete(key);const route=activeCameraRoutes.get(String(codeValue));if(route?.call)route.call.close();activeCameraRoutes.delete(String(codeValue))}renderDevices()});conn.on('error',e=>{if(connections.get(key)===conn)connections.delete(key);status('Connection failed: '+(e.message||'try again'));renderDevices()});}
 function connectProjection(key,codeValue){
+ if(pendingUnpairs[key]){
+  delete pendingUnpairs[key];put('gb-pending-device-unpairs',pendingUnpairs);
+  const old=unpairAttempts.get(key);unpairAttempts.delete(key);if(old)old.close();
+ }
  if(!peer||peer.destroyed||peer.disconnected||!peer.open){pendingPair={key,codeValue};$('connStatus').textContent='Offline — reconnecting';status('Waiting for internet connection; pairing will retry');return}
  const existing=connections.get(key);if(existing&&existing.open)return;if(existing){connections.delete(key);try{existing.close()}catch(_){}}
  status('Connecting to screen '+codeValue+'…');
@@ -767,7 +790,7 @@ function start(){
  if(typeof GurbaniPeer==='undefined'){ $('connStatus').textContent='Connection library unavailable';return }
  GurbaniPeer.start({id:()=>controlPrefix+myCode,onPeer:p=>{peer=p;p.on('call',showCameraStream)},
  onStatus:message=>{$('connStatus').textContent=message;status(message)},
- onOpen:()=>{searcherSync.connect();$('connStatus').textContent='Online';status('Ready to connect');if(pendingCameraCode){const code=pendingCameraCode;pendingCameraCode='';connectCamera(code)}Object.entries(known).forEach(([key,d])=>{if(autoReconnect[key]!==false)connectProjection(key,d.code)});if(pendingPair){const p=pendingPair;pendingPair=null;connectProjection(p.key,p.codeValue)}},
+ onOpen:()=>{searcherSync.connect();retryUnpairs();$('connStatus').textContent='Online';status('Ready to connect');if(pendingCameraCode){const code=pendingCameraCode;pendingCameraCode='';connectCamera(code)}Object.entries(known).forEach(([key,d])=>{if(autoReconnect[key]!==false)connectProjection(key,d.code)});if(pendingPair){const p=pendingPair;pendingPair=null;connectProjection(p.key,p.codeValue)}},
  onConnection:c=>{if(searcherSync.accept(c))return;if(c.peer.startsWith(cameraPrefix)){handleCameraConnection(c,c.peer.slice(cameraPrefix.length));return}const peerCode=String(c.metadata?.code||c.peer.replace(peerPrefix,''));setupConn(c,peerCode,peerCode)},
  onCollision:()=>status('Controller code is busy. Retrying the same code; change it manually if another device uses it.'),
  onTargetUnavailable:error=>{
@@ -792,8 +815,8 @@ window.gbWifiFound=(code,name,kind)=>{if(!/^\d{5}$/.test(code)||typeof name!=='s
 window.gbWifiFinished=(error)=>{if(error){$('wifiStatus').textContent=error;return}$('wifiStatus').textContent=wifiDevices.size?'ਜੋੜਨ ਲਈ ਸਕ੍ਰੀਨ ਚੁਣੋ। · Select a screen to connect.':'ਕੋਈ ਸਕ੍ਰੀਨ ਨਹੀਂ ਮਿਲੀ। ਪ੍ਰੋਜੈਕਸ਼ਨ ਜਾਂ ਗ੍ਰੰਥ ਵਿਊ ਇੱਕੋ ਵਾਈ-ਫਾਈ ’ਤੇ ਖੁੱਲ੍ਹਾ ਰੱਖੋ। · No screens found. Keep the updated Projection or Granth View app open on the same Wi-Fi.'};
 $('searchWifi').onclick=()=>{wifiDevices.clear();renderWifiDevices();if(!window.GurbaniWifi||typeof window.GurbaniWifi.search!=='function'){$('wifiStatus').textContent='Wi-Fi search is available in the Gurbani Android app. You can still enter a code.';return}$('wifiStatus').textContent='ਵਾਈ-ਫਾਈ ’ਤੇ ਲੱਭ ਰਹੇ ਹਾਂ… · Searching the same Wi-Fi…';try{window.GurbaniWifi.search()}catch(e){$('wifiStatus').textContent='Wi-Fi search unavailable. Use the code.'}};
 $('pair').onclick=()=>{const c=$('pairCode').value.trim();if(!/^\d{5}$/.test(c))return status('ਪੰਜ ਅੰਕ ਪਾਓ। · Enter five digits.');connectProjection(c,c)};
-function reconnectSaved(){searcherSync.connect();if(peer&&peer.open&&!peer.disconnected){for(const [key,d] of Object.entries(known))if(autoReconnect[key]!==false&&!connections.has(key))connectProjection(key,d.code)}}
-setInterval(()=>{for(const [key,c] of connections){if(!c?.open)continue;const last=health.get(c)||Date.now();if(Date.now()-last>60000){connections.delete(key);try{c.close()}catch(_){}status('Reconnecting unresponsive display '+key);continue}send(c,{type:'ping',id:Date.now(),token:myToken})}renderDevices()},12000);
+function reconnectSaved(){searcherSync.connect();retryUnpairs();if(peer&&peer.open&&!peer.disconnected){for(const [key,d] of Object.entries(known))if(autoReconnect[key]!==false&&!connections.has(key))connectProjection(key,d.code)}}
+setInterval(()=>{retryUnpairs();for(const [key,c] of connections){if(!c?.open)continue;const last=health.get(c)||Date.now();if(Date.now()-last>60000){connections.delete(key);try{c.close()}catch(_){}status('Reconnecting unresponsive display '+key);continue}send(c,{type:'ping',id:Date.now(),token:myToken})}renderDevices()},12000);
 setInterval(reconnectSaved,10000);
 window.addEventListener('online',reconnectSaved);function probeAfterResume(){reconnectSaved();const sentAt=Date.now();for(const [key,c] of connections){if(!c?.open)continue;send(c,{type:'ping',id:sentAt,token:myToken});setTimeout(()=>{if(connections.get(key)===c&&(health.get(c)||0)<sentAt){connections.delete(key);try{c.close()}catch(_){}reconnectSaved()}},15000)}}window.addEventListener('focus',probeAfterResume);window.addEventListener('pageshow',probeAfterResume);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)reconnectSaved()});
@@ -2243,7 +2266,7 @@ if(isSearcher){
 }
 renderHistory();
 renderDevices();start();
-</script><script src="gurbani-desktop-fullscreen.js?v=2" defer></script></body></html>
+</script><script src="gurbani-desktop-fullscreen.js?v=4" defer></script></body></html>
 
 
 

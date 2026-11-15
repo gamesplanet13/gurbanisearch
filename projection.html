@@ -391,8 +391,9 @@ if(m.type==='camera-hide'&&authorized){allowedCameraCode=null;allowedCameraContr
 if(m.type==='sahibzaade-show'&&authorized){openSahibzaade();return}
 if(m.type==='sahibzaade-close'&&authorized){closeSahibzaade();return}
 if((typeof m.type==='string'&&m.type.startsWith('photo-'))&&authorized){remotePhoto(m);return}
-if(m.type==='remove-pairing'&&authorized){
+if(m.type==='remove-pairing'&&typeof m.token==='string'&&m.token.length>0&&m.token.length<=128&&(!authorization.has(c)||authorized)){
   controllers.delete(m.token);saveControllers();updateMainPairing();
+  for(const [old,token] of authorization)if(old!==c&&token===m.token){disconnectController(old);old.close()}
   send(c,{type:'unpaired'});disconnectController(c);setTimeout(()=>c.close(),200);return;
  }
  if(m.type==='auth'&&typeof m.token==='string'&&m.token.length>0&&m.token.length<=128&&(!authorization.has(c)||authorized)){
@@ -471,7 +472,7 @@ $('stage').addEventListener('pointerdown',()=>menu(false));
 document.addEventListener('keydown',e=>{if(e.key==='Escape')menu(false)});
 setInterval(()=>{$('clock').textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})},1000);
 updateMainPairing();render();advertiseWifi();start();window.addEventListener('resize',scheduleProjectionFit);
-</script><script src="gurbani-display-power.js"></script><script src="gurbani-desktop-fullscreen.js?v=3" defer></script></body></html>
+</script><script src="gurbani-display-power.js"></script><script src="gurbani-desktop-fullscreen.js?v=4" defer></script></body></html>
 
 
 

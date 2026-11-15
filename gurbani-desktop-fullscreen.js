@@ -1,72 +1,74 @@
-/* Desktop-only window controls. */
+/* Window actions for the Windows launcher. */
 (function () {
- if (!/[?&]desktop=windows(?:&|$)/.test(location.search)) return;
- const root = document.documentElement;
- const button = document.createElement('button');
- button.type = 'button';
- button.textContent = 'Full Screen';
- button.style.cssText = 'position:fixed;top:8px;left:10px;z-index:50;padding:6px 10px;background:#19243a;color:white;border:1px solid #71839e;border-radius:6px;cursor:pointer';
- function refresh() {
-  button.hidden = !root.requestFullscreen || !!document.fullscreenElement || (Math.abs(window.outerHeight - window.innerHeight) <= 3 && Math.abs(screen.height - window.innerHeight) <= 3);
- }
- button.onclick = () => root.requestFullscreen().catch(() => {button.textContent = 'Full Screen · F11';});
- document.body.appendChild(button);
- document.addEventListener('fullscreenchange', refresh);
- window.addEventListener('resize', refresh);
- refresh();
+  const params = new URLSearchParams(location.search);
+  if (params.get('desktop') !== 'windows') return;
 
- const close = document.createElement('button');
- close.type = 'button';
- close.textContent = 'Close App';
- const menu = document.getElementById('menuOptions') || document.getElementById('setup') || document.getElementById('panel');
- if (menu) menu.appendChild(close);
- else {
-  const controls = document.createElement('details');
-  controls.style.cssText = 'position:fixed;top:10px;right:10px;z-index:50;background:#19243a;color:white;padding:8px';
-  const label = document.createElement('summary');
-  label.textContent = '☰';
-  label.setAttribute('aria-label','App menu');
-  controls.append(label,close);
-  document.body.appendChild(controls);
- }
- function exitApp() {
-  document.title = 'Gurbani Windows Close';
-  window.close();
- }
- // Only Projection needs an explicit exit confirmation on Windows.
- const isProjection = location.pathname.endsWith('/projection.html');
- let exitDialog = null;
- if (isProjection) {
-  exitDialog = document.createElement('dialog');
-  exitDialog.setAttribute('aria-label', 'Exit Projection');
-  exitDialog.style.cssText = 'background:#17243a;color:#fff;border:1px solid #e5c77f;border-radius:12px;padding:20px;max-width:90vw;z-index:2147483647';
-  const title = document.createElement('strong');
-  title.textContent = 'Exit Projection?';
-  const note = document.createElement('p');
-  note.textContent = 'Close Gurbani Projection?';
-  const no = document.createElement('button');
-  no.textContent = 'Cancel';
-  const yes = document.createElement('button');
-  yes.textContent = 'Exit';
-  no.onclick = () => exitDialog.close();
-  yes.onclick = exitApp;
-  for (const b of [no,yes]) b.style.cssText = 'min-width:78px;padding:9px;margin:6px;background:#263d5b;color:white;border:1px solid #7089a8;border-radius:7px';
-  exitDialog.append(title,note,no,yes);
-  document.body.appendChild(exitDialog);
-  exitDialog.addEventListener('close', () => close.focus({preventScroll:true}));
- }
- function requestExit() {
-  if (!isProjection) return exitApp();
-  if (exitDialog.open) return;
-  exitDialog.showModal();
-  exitDialog.querySelector('button')?.focus();
- }
- close.onclick = requestExit;
- window.addEventListener('keydown', event => {
-  if (event.key !== 'Escape') return;
-  if (isProjection && exitDialog?.open) return; // Escape closes dialog without exiting.
-  event.preventDefault();
-  event.stopImmediatePropagation();
-  requestExit();
- }, true);
+  const controls = document.createElement('div');
+  controls.style.cssText = 'position:fixed;top:8px;right:10px;z-index:1000;display:flex;gap:8px';
+  const style = 'padding:7px 11px;background:#19243a;color:white;border:1px solid #71839e;border-radius:6px;cursor:pointer';
+  const button = (label, action) => {
+    const el = document.createElement('button');
+    el.type = 'button';
+    el.textContent = label;
+    el.style.cssText = style;
+    el.onclick = action;
+    return el;
+  };
+  const exit = button('Exit', () => {
+    if (dialog.open) return;
+    prompt('Exit', 'Close this Gurbani window?', 'Exit', () => {
+      document.title = 'Gurbani Windows Close';
+      window.close();
+    });
+  });
+  const fullscreen = button('Full Screen', () => document.documentElement.requestFullscreen().catch(() => {}));
+  controls.append(fullscreen, exit);
+  document.body.append(controls);
+  const dialog = document.createElement('dialog');
+  dialog.style.cssText = 'background:#17243a;color:#fff;border:1px solid #e5c77f;border-radius:12px;padding:20px;max-width:90vw';
+  document.body.append(dialog);
+  function prompt(title, message, action, callback) {
+    if (dialog.open) return;
+    const heading = document.createElement('strong');
+    heading.textContent = title;
+    const text = document.createElement('p');
+    text.textContent = message;
+    const cancel = button('Cancel', () => dialog.close());
+    const confirm = button(action, () => { dialog.close(); callback(); });
+    dialog.replaceChildren(heading, text, cancel, confirm);
+    dialog.setAttribute('aria-label', title);
+    dialog.showModal();
+    cancel.focus();
+  }
+  window.addEventListener('keydown', event => {
+    if (event.key !== 'Escape' && event.key !== 'BrowserBack' &&
+        !(event.altKey && (event.key === 'ArrowLeft' || event.key === 'F4'))) return;
+    if (dialog.open && event.key === 'Escape') return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    exit.click();
+  }, true);
+  window.addEventListener('auxclick', event => {
+    if (event.button !== 3) return;
+    event.preventDefault();
+    exit.click();
+  }, true);
+  const version = Number(params.get('nativeVersion'));
+  let offered = 0;
+  async function checkUpdate() {
+    if (!version || document.hidden || dialog.open) return;
+    try {
+      const response = await fetch('windows/update.json', {cache:'no-store'});
+      if (!response.ok) return;
+      const update = await response.json();
+      if (!Number.isSafeInteger(update.version) || update.version <= Math.max(version, offered)) return;
+      offered = update.version;
+      prompt('Update available', 'Install the Gurbani Windows update?', 'Update', () => {
+        document.title = 'Gurbani Windows Install ' + update.version;
+      });
+    } catch (_) {}
+  }
+  checkUpdate();
+  setInterval(checkUpdate, 300000);
+  document.addEventListener('visibilitychange', checkUpdate);
 })();

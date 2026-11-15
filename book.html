@@ -172,8 +172,9 @@ function connection(c){
   if(m.type==='screen-preview'&&authorized&&window.GurbaniScreenPreview){GurbaniScreenPreview.request(c,m.enabled===true);return}
   if(m.type==='ping'){send(c,{type:'pong',id:m.id});return}
   if(m.type==='display-mode'&&authorized){const next=m.mode==='projection'?'projection':'book';if(next!==displayMode){displayMode=next;window.scrollTo(0,0);render()}if(m.rev!==undefined)send(c,{type:'applied',rev:m.rev});return}
-  if(m.type==='remove-pairing'&&authorized){
+  if(m.type==='remove-pairing'&&typeof m.token==='string'&&m.token.length>0&&m.token.length<=128&&(!authorization.has(c)||authorized)){
   controllers.delete(m.token);saveControllers();updateMainPairing();
+  for(const [old,token] of authorization)if(old!==c&&token===m.token){disconnectController(old);old.close()}
   send(c,{type:'unpaired'});disconnectController(c);setTimeout(()=>c.close(),200);return;
  }
  if(m.type==='auth'&&typeof m.token==='string'&&m.token.length>0&&m.token.length<=128&&(!authorization.has(c)||authorized)){
@@ -219,7 +220,7 @@ $('fullscreen').onclick=()=>document.documentElement.requestFullscreen && docume
 $('fontSize').oninput=()=>applyBookSettings($('fontSize').value,spacing,true);
 $('lineSpacing').oninput=()=>applyBookSettings(size,$('lineSpacing').value,true);
 updateMainPairing();applyBookSettings(size,spacing,false);setBookLayout(bookLayout,false);render();advertiseWifi();start();
-</script><script src="gurbani-desktop-fullscreen.js?v=2" defer></script></body></html>
+</script><script src="gurbani-desktop-fullscreen.js?v=4" defer></script></body></html>
 
 
 
