@@ -367,7 +367,20 @@ function acceptCameraCall(call){
  call.on('error',e=>{if(cameraCall===call){$('status').textContent='Camera video failed: '+(e.message||e.type||'WebRTC unavailable');clearCamera()}})
 }
 
+const reversePairFallbacks=new Set();
 function handle(c){
+ // A Controller-initiated Internet offer includes its code. If that WebRTC
+ // direction fails to authorize, try the reverse path automatically.
+ const callerCode=String(c.metadata?.controller||'');
+ if(callerCode&&/^\\d{5}$/.test(callerCode)&&!reversePairFallbacks.has(callerCode)){
+  reversePairFallbacks.add(callerCode);
+  setTimeout(()=>{
+   reversePairFallbacks.delete(callerCode);
+   if(authorization.has(c)||!peer?.open||peer.disconnected)return;
+   if([...authorization].some(([link])=>link.open))return;
+   connectController(callerCode);
+  },5500);
+ }
  c.on('open',()=>hello(c));
  const authTimeout=setTimeout(()=>{if(!authorization.has(c))c.close()},30000);
  c.on('data',m=>{
