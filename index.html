@@ -539,6 +539,35 @@ function removeDevice(key){
 function send(conn,payload){if(conn?.open){try{conn.send(payload);return true}catch{}}return false}
 function announce(conn){send(conn,{type:'auth',token:myToken,code:myCode})}
 const health=new WeakMap(),pendingDelivery=new WeakMap(),authorizedDisplays=new WeakSet();let deliveryCounter=0;
+// Same-origin multi-view monitor. Existing authenticated display preview frames
+// are forwarded to an embedded monitor page; never publicly expose the frames.
+const liveMonitor=(()=>{
+ if(isSearcher||typeof BroadcastChannel!=='function')return {receive(){}};
+ const bus=new BroadcastChannel('gurbani-multiview-v1');
+ let lastReady=0;const subscribed=new Set();
+ function online(){return Date.now()-lastReady<14000}
+ function update(){
+  if(!online())return;
+  const devices=Object.entries(known).filter(([id,d])=>d.kind==='book'||d.kind==='projection')
+   .map(([id,d])=>({id,name:d.name||'Screen',code:d.code,mode:preferredView(id),online:!!connections.get(id)?.open}));
+  bus.postMessage({type:'devices',devices});
+  for(const d of devices.slice(0,12))if(d.online){
+   const c=connections.get(d.id);
+   if(!c||!authorizedDisplays.has(c))continue;
+   if(!subscribed.has(c)){subscribed.add(c);send(c,{type:'screen-preview',token:myToken,enabled:true})}
+  }
+ }
+ bus.onmessage=event=>{
+  if(event.data?.type==='monitor-ready'){lastReady=Date.now();update()}
+  if(event.data?.type==='monitor-stop'){lastReady=0;for(const c of subscribed){if(c.open)send(c,{type:'screen-preview',token:myToken,enabled:false})}subscribed.clear()}
+ };
+ setInterval(()=>{if(online())update();else if(subscribed.size){for(const c of subscribed)if(c.open)send(c,{type:'screen-preview',token:myToken,enabled:false});subscribed.clear()}},3500);
+ return {receive(conn,m,key){
+  if(!online()||!subscribed.has(conn))return;
+  if(m.type==='screen-preview-error'){bus.postMessage({type:'error',id:key});return}
+  if(typeof m.frame==='string'&&m.frame.length<=150000)bus.postMessage({type:'frame',id:key,frame:m.frame})
+ }};
+})();
 function setupConn(conn,key,codeValue){
  const open=()=>{health.set(conn,Date.now());announce(conn);$('connStatus').textContent='Online';renderDevices()};
  if(conn.open)open();else conn.on('open',open);
@@ -561,7 +590,7 @@ conn.on('data',m=>{if(!m||typeof m!=='object')return;health.set(conn,Date.now())
  }
  return
 }
-if(m.type==='screen-preview-frame'||m.type==='screen-preview-error'){desktopPreview?.receive(conn,m);return}
+if(m.type==='screen-preview-frame'||m.type==='screen-preview-error'){desktopPreview?.receive(conn,m);liveMonitor.receive(conn,m,key);return}
 if(m.type==='book-line-selected'){
  // Only a paired Granth View may change the Controller reading.
  if(!authorizedDisplays.has(conn)||m.token!==myToken||known[key]?.kind!=='book')return;
@@ -916,6 +945,18 @@ $('projectionSwitch').onclick=()=>{
 refreshProjectionSwitch();
 const sangatPublisher=!isSearcher&&window.setupSangatPublisher?.($('menuOptions'),
  ()=>lastContent);
+if(!isSearcher){
+ const button=document.createElement('button');button.type='button';button.textContent='▦ Multi View Monitor';
+ const overlay=document.createElement('div');
+ overlay.style.cssText='position:fixed;inset:0;background:#090b0e;z-index:999999;display:none;flex-direction:column';
+ const bar=document.createElement('div');bar.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#1b2231;color:white';
+ const title=document.createElement('strong');title.textContent='Multi View Monitor';
+ const close=document.createElement('button');close.textContent='✕ Close';close.onclick=()=>{overlay.style.display='none';frame.src='about:blank'};
+ const frame=document.createElement('iframe');frame.title='Live Multi View Monitor';frame.style.cssText='border:0;flex:1;width:100%;background:#10131a';
+ bar.append(title,close);overlay.append(bar,frame);document.body.append(overlay);
+ button.onclick=()=>{overlay.style.display='flex';frame.src='monitor.html';};
+ $('menuOptions').prepend(button);
+}
 function publish(payload,projectionOnly=false,force=false,fromSync=false){
  // Public Sangat broadcast follows the Controller's current selection independently
  // of the private Projection ON/OFF switch. Viewers never need pairing.
