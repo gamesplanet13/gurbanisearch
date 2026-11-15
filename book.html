@@ -97,6 +97,9 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')setMenu(false)});
 const wideWaheguru=typeof window.GurbaniTvWaheguru==='function'&&((/[?&]desktop=windows(?:&|$)/.test(location.search)||/Windows NT|Macintosh|X11; Linux x86_64/i.test(navigator.userAgent)&&!/Android|iPad/i.test(navigator.userAgent))||/[?&]display=tv(?:&|$)/.test(location.search)||/Android TV|Google TV|SMART-TV|BRAVIA/i.test(navigator.userAgent));
 const bookWaheguruTitle=$('bookWaheguru').firstElementChild;
 let displayMode='book',remoteProjectionSettings={};
+const controllerCodes=read('gb-book-controller-codes',{});
+let reverseSince=Date.now(),reverseAttempts=new Map();
+const recentTraffic=new WeakMap();
 const displaySession=Date.now()+'-'+Math.random();
 function renderAlternateProjection(){
  document.body.classList.toggle('alt-projection',displayMode==='projection');
@@ -169,27 +172,30 @@ function connection(c){
  c.on('data',m=>{
   if(!m||typeof m!=='object')return;
   const authorized=authorization.has(c)&&authorization.get(c)===m.token;
+ if(authorized)recentTraffic.set(c,Date.now());
   if(m.type==='screen-preview'&&authorized&&window.GurbaniScreenPreview){GurbaniScreenPreview.request(c,m.enabled===true);return}
   if(m.type==='ping'){send(c,{type:'pong',id:m.id});return}
   if(m.type==='display-mode'&&authorized){const next=m.mode==='projection'?'projection':'book';if(next!==displayMode){displayMode=next;window.scrollTo(0,0);render()}if(m.rev!==undefined)send(c,{type:'applied',rev:m.rev});return}
   if(m.type==='remove-pairing'&&typeof m.token==='string'&&m.token.length>0&&m.token.length<=128&&(!authorization.has(c)||authorized)){
-  controllers.delete(m.token);saveControllers();updateMainPairing();
+  controllers.delete(m.token);delete controllerCodes[m.token];put('gb-book-controller-codes',controllerCodes);saveControllers();updateMainPairing();
   for(const [old,token] of authorization)if(old!==c&&token===m.token){disconnectController(old);old.close()}
   send(c,{type:'unpaired'});disconnectController(c);setTimeout(()=>c.close(),200);return;
  }
  if(m.type==='auth'&&typeof m.token==='string'&&m.token.length>0&&m.token.length<=128&&(!authorization.has(c)||authorized)){
   clearTimeout(authTimeout);
   authorization.set(c,m.token);connections.add(c);controllers.add(m.token);
+  if(/^\d{5}$/.test(m.code||'')&&c.peer===ctrlPrefix+m.code){controllerCodes[m.token]=m.code;put('gb-book-controller-codes',controllerCodes)}
+  recentTraffic.set(c,Date.now());
   for(const [old,token] of authorization)if(old!==c&&token===m.token){disconnectController(old);old.close()}
   saveControllers();updateMainPairing();
-  send(c,{type:'accepted',deviceId:code,code,name,kind:'book',displaySession,bookSettings:bookState(),multiController:true});
+  send(c,{type:'accepted',deviceId:code,code,name,kind:'book',displaySession,bookSettings:bookState(),multiController:true,hasContent:!!saved.content,lastWriter:saved.lastWriter===m.token?m.token:null});
   setPairingStatus('Connected controls: '+authorization.size);
   return;
  }
   if(m.type==='project'&&authorized){
    if(m.bookSettings&&typeof m.bookSettings==='object'){applyBookSettings(m.bookSettings.fontSize,m.bookSettings.lineSpacing,false);setBookLayout(m.bookSettings,false,false)}
    if(m.settings)remoteProjectionSettings=m.settings;
-   if(Object.prototype.hasOwnProperty.call(m,'content')){saved.content=m.content;put('gb-book-slide',saved);if(m.content&&m.content.verse)markAwaitSelection(false);render()}
+   if(Object.prototype.hasOwnProperty.call(m,'content')){saved.content=m.content;saved.lastWriter=m.token;put('gb-book-slide',saved);if(m.content&&m.content.verse)markAwaitSelection(false);render()}
    else if(m.settings||m.bookSettings)render();
    if(m.rev!==undefined)send(c,{type:'applied',rev:m.rev});
   }
@@ -201,12 +207,30 @@ function connectController(controllerCode){
  if(!peer||peer.destroyed||peer.disconnected||!peer.open){pendingController=controllerCode;setPairingStatus('Offline — reconnecting; pairing will retry');return}
  setPairingStatus('Connecting to controller '+controllerCode+'…');const c=peer.connect(ctrlPrefix+controllerCode,{reliable:true,metadata:{code:code}});let finished=false;c.on('open',()=>{finished=true});c.on('close',()=>{finished=true});c.on('error',()=>{finished=true});setTimeout(()=>{if(!finished&&!c.open){finished=true;try{c.close()}catch(_){}setPairingStatus('Could not connect. Connection timed out. Keep both apps online, check the code and try again.')}},20000);connection(c)
 }
+function resumeDisplay(){
+ if(!peer?.open||peer.disconnected||Date.now()-reverseSince<5500)return;
+ for(const [token,controller] of Object.entries(controllerCodes)){
+  if(!controllers.has(token)||!/^\d{5}$/.test(controller)||reverseAttempts.has(controller))continue;
+  const active=[...authorization].find(([link,owner])=>owner===token&&link.open);
+  if(active&&Date.now()-(recentTraffic.get(active[0])||0)<20000)continue;
+  if(active){disconnectController(active[0]);active[0].close()}
+  const c=peer.connect(ctrlPrefix+controller,{reliable:true,metadata:{code,autoReturn:true}});
+  reverseAttempts.set(controller,c);
+  const clear=()=>{if(reverseAttempts.get(controller)===c)reverseAttempts.delete(controller)};
+  c.on('close',clear);c.on('error',()=>{clear();c.close()});
+  setTimeout(()=>{if(reverseAttempts.get(controller)===c&&!authorization.has(c)){clear();c.close()}},8000);
+  connection(c);
+ }
+}
+window.gbConnectionResume=resumeDisplay;
+setInterval(resumeDisplay,6500);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)resumeDisplay()});
 function setPairingStatus(message){$('status').textContent=message;$('mainPairingStatus').textContent=message}
 function start(){
  if(typeof GurbaniPeer==='undefined'){setPairingStatus('Pairing library failed to load. Reopen the app online.');return}
  GurbaniPeer.start({id:()=>peerPrefix+code,onPeer:p=>{peer=p},
  onStatus:message=>{setPairingStatus(message)},
- onOpen:()=>{setPairingStatus('Online — enter this code on Controller');if(pendingController){const target=pendingController;pendingController=null;connectController(target)}},
+ onOpen:()=>{reverseSince=Date.now();setPairingStatus('Online — enter this code on Controller');if(pendingController){const target=pendingController;pendingController=null;connectController(target)}},
  onConnection:connection,
  onCollision:()=>{setPairingStatus('This code is busy. Retrying automatically.')},
  onTargetUnavailable:()=>{setPairingStatus('Controller not found. Open Controller and check its code.')}});
@@ -215,7 +239,7 @@ $('join').onclick=()=>{const c=$('controllerCode').value.trim();if(!/^\d{5}$/.te
 function advertiseWifi(){if(window.GurbaniWifi&&typeof window.GurbaniWifi.advertise==='function'){try{window.GurbaniWifi.advertise(code,name)}catch(e){}}}
 $('saveName').onclick=()=>{name=$('name').value.trim().slice(0,50)||'Granth View';put('gb-book-name',name);advertiseWifi();for(const c of connections)send(c,{type:'identify',code,name})};
 $('changeCode').onclick=()=>{const v=$('newCode').value.trim();if(!/^\d{5}$/.test(v))return $('status').textContent='Enter a valid 5-digit code';if(v===code)return $('status').textContent='This is already the current code';for(const c of connections)send(c,{type:'code-change',code:v});put('gb-book-code',v);markAwaitSelection(true);setTimeout(()=>location.reload(),300)};
-$('resetPairing').onclick=()=>{controllers.clear();saveControllers();markAwaitSelection(true);updateMainPairing();for(const c of [...connections]){send(c,{type:'unpaired'});setTimeout(()=>{try{c.close()}catch(_){}},250)}connections.clear();authorization.clear();setPairingStatus('Pairing cleared — ready for controls')};
+$('resetPairing').onclick=()=>{controllers.clear();for(const token of Object.keys(controllerCodes))delete controllerCodes[token];put('gb-book-controller-codes',controllerCodes);saveControllers();markAwaitSelection(true);updateMainPairing();for(const c of [...connections]){send(c,{type:'unpaired'});setTimeout(()=>{try{c.close()}catch(_){}},250)}connections.clear();authorization.clear();setPairingStatus('Pairing cleared — ready for controls')};
 $('fullscreen').onclick=()=>document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
 $('fontSize').oninput=()=>applyBookSettings($('fontSize').value,spacing,true);
 $('lineSpacing').oninput=()=>applyBookSettings(size,$('lineSpacing').value,true);

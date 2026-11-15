@@ -38,7 +38,7 @@
           setStatus('No internet — reconnecting automatically');
           schedule(5000); return;
         }
-        if (current && !current.destroyed && current.open) return;
+        if (current && !current.destroyed && current.open && !current.disconnected) return;
         if (current && !current.destroyed && current.disconnected && opened) {
           try { current.reconnect(); setStatus('Reconnecting…'); schedule(12000); return; }
           catch (_) { current.destroy(); }

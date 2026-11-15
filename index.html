@@ -215,8 +215,8 @@ main{width:100%;max-width:none;margin:3px auto;padding:0 4px;gap:4px;align-items
  <video id="desktopPreviewVideo" aria-label="Camera preview" autoplay muted playsinline hidden></video>
  <p id="desktopPreviewStatus" class="small" role="status"></p>
 </aside>
-<script src="gurbani-layout.js?v=2"></script><script src="gurbani-book-motion.js?v=3"></script><script src="gurbani-searcher-sync.js?v=1"></script><script src="gurbani-waheguru-wide.js"></script><script src="gurbani-desktop-preview.js?v=1"></script>
-<script src="sangat-control.js"></script><script src="gurbani-updates.js?v=20261121" defer></script><script src="peerjs-1.5.5.min.js?v=20261118"></script><script src="gurbani-peer-manager.js?v=20261119"></script><script src="gurbani-camera.js?v=20261119"></script><script>
+<script src="gurbani-layout.js?v=2"></script><script src="gurbani-book-motion.js?v=3"></script><script src="gurbani-searcher-sync.js?v=20261133"></script><script src="gurbani-waheguru-wide.js"></script><script src="gurbani-desktop-preview.js?v=1"></script>
+<script src="sangat-control.js?v=20261133"></script><script src="gurbani-updates.js?v=20261121" defer></script><script src="peerjs-1.5.5.min.js?v=20261118"></script><script src="gurbani-peer-manager.js?v=20261133"></script><script src="gurbani-camera.js?v=20261119"></script><script>
 'use strict';
 const $=id=>document.getElementById(id);
 const isSearcher=document.documentElement.classList.contains('searcher');
@@ -534,8 +534,15 @@ function removeDevice(key){
 }
 function send(conn,payload){if(conn?.open){try{conn.send(payload);return true}catch{}}return false}
 function announce(conn){send(conn,{type:'auth',token:myToken,code:myCode})}
-const health=new WeakMap(),pendingDelivery=new WeakMap();let deliveryCounter=0;
-function setupConn(conn,key,codeValue){conn.on('open',()=>{health.set(conn,Date.now());announce(conn);$('connStatus').textContent='Online';renderDevices()});
+const health=new WeakMap(),pendingDelivery=new WeakMap(),authorizedDisplays=new WeakSet();let deliveryCounter=0;
+function setupConn(conn,key,codeValue){
+ const open=()=>{health.set(conn,Date.now());announce(conn);$('connStatus').textContent='Online';renderDevices()};
+ if(conn.open)open();else conn.on('open',open);
+ setTimeout(()=>{
+  if(authorizedDisplays.has(conn))return;
+  if(connections.get(key)===conn)connections.delete(key);
+  conn.close();renderDevices();
+ },10000);
 conn.on('data',m=>{if(!m||typeof m!=='object')return;health.set(conn,Date.now());if(m.type==='camera-display-ready'){
  const route=activeCameraRoutes.get(String(m.code||''));
  if(route&&route.deviceId===key&&route.camera===String(m.cameraCode||'')){
@@ -549,8 +556,19 @@ if(m.type==='pong'){return}if(m.type==='applied'){const p=pendingDelivery.get(co
 if(m.type==='hello'){if(m.owner && m.owner!==myToken){status('Screen is paired to another controller. On that screen choose Reset pairing.');conn.close();return}if(m.code){if(m.deviceId&&m.deviceId!==key){connections.delete(key);key=m.deviceId}if(m.displaySession&&displaySessions.get(key)!==m.displaySession){displaySessions.set(key,m.displaySession);delete deviceView[key]}
  if(m.projectionSettings&&typeof m.projectionSettings==='object')adoptProjectionSettings(key,m.projectionSettings,true);
  known[key]={code:m.code,name:m.name||'Projection',kind:m.kind||'projection',localWaheguru:m.localWaheguru===true};put('gb-known-devices',known);connections.set(key,conn);selected.add(key);put('gb-selected-devices',[...selected]);announce(conn);renderDevices();status('Projection connected')}}
+if(m.type==='accepted'&&authorizedDisplays.has(conn))return;
+if(m.type==='accepted')authorizedDisplays.add(conn);
 if(m.type==='accepted'&&m.kind==='obs')send(conn,{type:'project',token:myToken,obsSettings:obsValues(),...(lastContent&&lastContent.mode!=='waheguru'?{content:lastContent}:{})});
-if(m.type==='accepted'&&m.kind!=='obs'&&!m.multiController)setTimeout(()=>sendOneDeviceSettings(key,true),0);
+if(m.type==='accepted'&&m.kind!=='obs'){
+ if(!m.multiController)setTimeout(()=>{if(connections.get(key)===conn)sendOneDeviceSettings(key,true)},0);
+ else if(m.lastWriter===myToken||(!m.hasContent&&projectionIsOn&&lastContent)){
+  setTimeout(()=>{
+   if(connections.get(key)!==conn)return;
+   const content=projectionIsOn&&lastContent?displayContent(lastContent,key):null;
+   send(conn,{type:'project',token:myToken,content});
+  },0);
+ }
+}
 if(m.type==='accepted'){if(m.deviceId){if(m.deviceId!==key){connections.delete(key);key=m.deviceId}known[key]={code:m.code||codeValue,name:m.name||'Projection',kind:m.kind||known[key]?.kind||'projection',localWaheguru:known[key]?.localWaheguru===true};put('gb-known-devices',known);selected.add(key);put('gb-selected-devices',[...selected]);connections.set(key,conn)}renderDevices();if(!m.multiController)sendDeviceView(key);status('Paired successfully')}
 if((m.type==='hello'||m.type==='accepted')&&m.kind==='book'&&m.bookSettings&&!perDeviceSettings[key]){const saved=deviceSettings(key);saved.book={...saved.book,...m.bookSettings};persistDeviceSettings()}
 if(m.type==='projection-settings'&&m.settings&&connections.get(key)===conn){adoptProjectionSettings(key,m.settings);if(openDeviceSettingsKey===key)renderDevices();return}
@@ -570,7 +588,7 @@ if(m.type==='code-change'&&/^\d{5}$/.test(m.code)&&known[key]){
 }
 if(m.type==='identify'){known[key]={code:m.code||codeValue,name:m.name||'Projection',kind:m.kind||known[key]?.kind||'projection',localWaheguru:known[key]?.localWaheguru===true};put('gb-known-devices',known);renderDevices()}
 });
-conn.on('close',()=>{if(connections.get(key)===conn){connections.delete(key);const route=activeCameraRoutes.get(String(codeValue));if(route?.call)route.call.close();activeCameraRoutes.delete(String(codeValue))}renderDevices()});conn.on('error',e=>{if(connections.get(key)===conn)connections.delete(key);status('Connection failed: '+(e.message||'try again'));renderDevices()});}
+conn.on('close',()=>{if(connections.get(key)===conn){connections.delete(key);const route=activeCameraRoutes.get(String(codeValue));if(route?.call)route.call.close();activeCameraRoutes.delete(String(codeValue))}renderDevices()});conn.on('error',e=>{if(connections.get(key)===conn)connections.delete(key);conn.close();status('Reconnecting: '+(e.message||'screen unavailable'));renderDevices()});}
 function connectProjection(key,codeValue){
  if(pendingUnpairs[key]){
   delete pendingUnpairs[key];put('gb-pending-device-unpairs',pendingUnpairs);
@@ -791,11 +809,30 @@ function start(){
  GurbaniPeer.start({id:()=>controlPrefix+myCode,onPeer:p=>{peer=p;p.on('call',showCameraStream)},
  onStatus:message=>{$('connStatus').textContent=message;status(message)},
  onOpen:()=>{searcherSync.connect();retryUnpairs();$('connStatus').textContent='Online';status('Ready to connect');if(pendingCameraCode){const code=pendingCameraCode;pendingCameraCode='';connectCamera(code)}Object.entries(known).forEach(([key,d])=>{if(autoReconnect[key]!==false)connectProjection(key,d.code)});if(pendingPair){const p=pendingPair;pendingPair=null;connectProjection(p.key,p.codeValue)}},
- onConnection:c=>{if(searcherSync.accept(c))return;if(c.peer.startsWith(cameraPrefix)){handleCameraConnection(c,c.peer.slice(cameraPrefix.length));return}const peerCode=String(c.metadata?.code||c.peer.replace(peerPrefix,''));setupConn(c,peerCode,peerCode)},
+ onConnection:c=>{
+  if(searcherSync.accept(c))return;
+  if(c.peer.startsWith(cameraPrefix)){handleCameraConnection(c,c.peer.slice(cameraPrefix.length));return}
+  const peerCode=String(c.metadata?.code||c.peer.replace(peerPrefix,''));
+  const existing=connections.get(peerCode);
+  if(c.metadata?.autoReturn&&(pendingUnpairs[peerCode]||autoReconnect[peerCode]===false||!known[peerCode]||
+      (existing?.open&&authorizedDisplays.has(existing)&&Date.now()-(health.get(existing)||0)<10000))){
+   c.close();return;
+  }
+  if(c.metadata?.autoReturn&&existing){connections.delete(peerCode);existing.close()}
+  if(!connections.has(peerCode))connections.set(peerCode,c);
+  setupConn(c,peerCode,peerCode)
+ },
  onCollision:()=>status('Controller code is busy. Retrying the same code; change it manually if another device uses it.'),
  onTargetUnavailable:error=>{
   const match=error.message?.match(/gurbani-camera-v1-(\d{5})/);
-  if(!match)return status('Screen not found. Open Projection or Book app, wait for Online, then check its code.');
+  if(!match){
+   const unavailable=error.message?.match(/gurbani-projection-v1-(\d{5})/)?.[1];
+   if(unavailable){
+    const link=connections.get(unavailable);
+    if(link&&!link.open){connections.delete(unavailable);link.close();renderDevices()}
+   }
+   return status('Waiting for the display to reopen. Automatic retry is on.');
+  }
   const code=match[1],link=cameraLinks.get(code);
   if(link&&!link.open){link.close();cameraLinks.delete(code);refreshCameraPhones()}
   cameraStatus('Camera Phone '+code+' is offline. Open the camera app or enter the Controller code there.');
@@ -816,10 +853,24 @@ window.gbWifiFinished=(error)=>{if(error){$('wifiStatus').textContent=error;retu
 $('searchWifi').onclick=()=>{wifiDevices.clear();renderWifiDevices();if(!window.GurbaniWifi||typeof window.GurbaniWifi.search!=='function'){$('wifiStatus').textContent='Wi-Fi search is available in the Gurbani Android app. You can still enter a code.';return}$('wifiStatus').textContent='ਵਾਈ-ਫਾਈ ’ਤੇ ਲੱਭ ਰਹੇ ਹਾਂ… · Searching the same Wi-Fi…';try{window.GurbaniWifi.search()}catch(e){$('wifiStatus').textContent='Wi-Fi search unavailable. Use the code.'}};
 $('pair').onclick=()=>{const c=$('pairCode').value.trim();if(!/^\d{5}$/.test(c))return status('ਪੰਜ ਅੰਕ ਪਾਓ। · Enter five digits.');connectProjection(c,c)};
 function reconnectSaved(){searcherSync.connect();retryUnpairs();if(peer&&peer.open&&!peer.disconnected){for(const [key,d] of Object.entries(known))if(autoReconnect[key]!==false&&!connections.has(key))connectProjection(key,d.code)}}
-setInterval(()=>{retryUnpairs();for(const [key,c] of connections){if(!c?.open)continue;const last=health.get(c)||Date.now();if(Date.now()-last>60000){connections.delete(key);try{c.close()}catch(_){}status('Reconnecting unresponsive display '+key);continue}send(c,{type:'ping',id:Date.now(),token:myToken})}renderDevices()},12000);
-setInterval(reconnectSaved,10000);
-window.addEventListener('online',reconnectSaved);function probeAfterResume(){reconnectSaved();const sentAt=Date.now();for(const [key,c] of connections){if(!c?.open)continue;send(c,{type:'ping',id:sentAt,token:myToken});setTimeout(()=>{if(connections.get(key)===c&&(health.get(c)||0)<sentAt){connections.delete(key);try{c.close()}catch(_){}reconnectSaved()}},15000)}}window.addEventListener('focus',probeAfterResume);window.addEventListener('pageshow',probeAfterResume);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)reconnectSaved()});
+function probeAfterResume(){
+ searcherSync.probe();
+ reconnectSaved();
+ const sentAt=Date.now();
+ for(const [key,c] of connections){
+  if(!c?.open)continue;
+  send(c,{type:'ping',id:sentAt,token:myToken});
+  setTimeout(()=>{
+   if(connections.get(key)===c&&(health.get(c)||0)<sentAt){
+    connections.delete(key);c.close();reconnectSaved();
+   }
+  },4000);
+ }
+}
+setInterval(probeAfterResume,7000);
+window.gbConnectionResume=probeAfterResume;
+for(const name of ['online','focus','pageshow'])window.addEventListener(name,probeAfterResume);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)probeAfterResume()});
 $('changeControllerCode').onclick=()=>{const v=$('newControllerCode').value.trim();if(!/^\d{5}$/.test(v))return status('Enter a valid 5-digit controller code');if(v===myCode)return status('This is already your controller code');put(isSearcher?'gb-searcher-code':'gb-controller-code',v);location.reload()};
 let projectionIsOn=stored('gb-projection-switch-on',true);
 function refreshProjectionSwitch(){

@@ -2,7 +2,7 @@
 window.GurbaniSearcherSync = function ({isSearcher, peer, savedCode, identity, saveCode, approve, status, receive, current}) {
  const controllerPrefix='gurbani-control-v1-';
  const codePattern=/^[0-9]{5}$/;
- const links=new Map();
+ const links=new Map(), traffic=new WeakMap();
  let target=isSearcher&&codePattern.test(savedCode)?savedCode:'';
  let connecting=null;
 
@@ -12,12 +12,13 @@ window.GurbaniSearcherSync = function ({isSearcher, peer, savedCode, identity, s
    if(links.get(code)===conn)links.delete(code);
    if(connecting===conn)connecting=null;
   };
-  conn.on('open',()=>{
-   if(!isSearcher)return;
-   conn.send({type:'searcher-sync-request',identity});
-  });
+  const onOpen=()=>{if(isSearcher&&conn.open)conn.send({type:'searcher-sync-request',identity})};
+  if(conn.open)onOpen();else conn.on('open',onOpen);
   conn.on('data',message=>{
    if(!message||typeof message!=='object')return;
+   traffic.set(conn,Date.now());
+   if(accepted&&message.type==='searcher-sync-ping'){conn.send({type:'searcher-sync-pong'});return}
+   if(accepted&&message.type==='searcher-sync-pong')return;
    if(!isSearcher&&!accepted&&message.type==='searcher-sync-request'){
     if(typeof message.identity!=='string'||!/^[0-9a-f]{24}$/.test(message.identity)||
        !approve(code,message.identity)){
@@ -49,8 +50,8 @@ window.GurbaniSearcherSync = function ({isSearcher, peer, savedCode, identity, s
    if(content&&conn.open)conn.send({type:'searcher-sync-shabad',content});
   });
   conn.on('close',finish);
-  conn.on('error',finish);
-  setTimeout(()=>{if(!accepted)conn.close()},30000);
+  conn.on('error',()=>{finish();conn.close()});
+  setTimeout(()=>{if(!accepted){finish();conn.close()}},9000);
  }
 
  return {
@@ -68,11 +69,25 @@ window.GurbaniSearcherSync = function ({isSearcher, peer, savedCode, identity, s
     connecting?.close();
     connecting=null;
    }
+   if(code!==target)saveCode(code);
    target=code;
    const p=peer();
+   const link=links.get(code);
+   if(link&&!link.open){links.delete(code);link.close()}
    if(!p?.open||p.disconnected||links.has(code)||connecting)return;
    connecting=p.connect(controllerPrefix+code,{reliable:true,metadata:{type:'gurbani-searcher-sync-v1'}});
    attach(connecting,code);
+  },
+  probe(){
+   const at=Date.now();
+   for(const [code,c] of links){
+    if(c.open)try{c.send({type:'searcher-sync-ping'})}catch(_){}
+    setTimeout(()=>{
+     if(links.get(code)!==c||(traffic.get(c)||0)>=at)return;
+     links.delete(code);c.close();
+     if(isSearcher)this.connect();
+    },4000);
+   }
   },
   disconnect() {
    target='';saveCode('');

@@ -193,6 +193,7 @@ public class MainActivity extends SessionActivity {
     @Override protected void onResume() {
         super.onResume();
         if (updater != null) updater.resume();
+        if(web!=null)web.evaluateJavascript("window.gbConnectionResume?.()",null);
     }
     @Override protected void onPause() {
         if (updater != null) updater.pause();
