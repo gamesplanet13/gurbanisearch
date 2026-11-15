@@ -2016,7 +2016,12 @@ function show(i,mark=true){
  const start=asaStarts.length?asaStarts[activePauri()-1]:0;
  const end=asaStarts[activePauri()]??lines.length;
  const obsData={sg:getScript(lines[i],'gurmukhi'),sh:getScript(lines[i],'hindi'),se:getScript(lines[i],'english'),mp:meaning(lines[i],'punjabi'),mh:meaning(lines[i],'hindi'),me:meaning(lines[i],'english')};
- lastContent={obsData,verse:scripts.gurmukhi||scripts.hindi||scripts.english||'',scripts,meanings,meaning:meanings.english||'',bookLines:lines.slice(start,end).map(x=>verse(x)),activeIndex:i-start,ang,sourceMeta:sourceLabelForLine(lines[i],i,ang),shabadTitle:currentShabad?.title||readingTitle||''};
+ const readingRows=lines.slice(start,end);
+ const lineData=readingRows.map(row=>({
+  scripts:{gurmukhi:getScript(row,'gurmukhi')||verse(row),hindi:getScript(row,'hindi')||'',english:getScript(row,'english')||''},
+  meanings:{punjabi:meaning(row,'punjabi')||'',hindi:meaning(row,'hindi')||'',english:meaning(row,'english')||''}
+ }));
+ lastContent={obsData,verse:scripts.gurmukhi||scripts.hindi||scripts.english||'',scripts,meanings,meaning:meanings.english||'',bookLines:readingRows.map(x=>verse(x)),lineData,activeIndex:i-start,ang,sourceMeta:sourceLabelForLine(lines[i],i,ang),shabadTitle:currentShabad?.title||readingTitle||''};
  put('gb-last-content',lastContent);publish({content:lastContent,settings:settings(),obsSettings:obsValues()})
 }
 $('next').onclick=()=>{if(readingAng&&active>=lines.length-1&&readingAng<1430)loadAng(readingAng+1);else show(active+1)};$('previous').onclick=()=>{if(readingAng&&active<=0&&readingAng>1)loadAng(readingAng-1);else show(active-1)};
