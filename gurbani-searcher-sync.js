@@ -27,6 +27,11 @@ window.GurbaniSearcherSync = function ({isSearcher, peer, savedCode, identity, s
      return;
     }
     conn.send({type:'searcher-sync-accepted'});
+    accepted=true;
+    if(links.has(code)&&links.get(code)!==conn)links.get(code).close();
+    links.set(code,conn);
+    status('ਜੋੜ ਹੋ ਗਿਆ। · Searcher and Control linked.');
+    return;
    }else if(isSearcher&&!accepted&&message.type!=='searcher-sync-accepted'){
     if(message.type==='searcher-sync-rejected'){
      status('ਕੰਟਰੋਲ ਨੇ ਜੋੜ ਮਨਜ਼ੂਰ ਨਹੀਂ ਕੀਤਾ। · Control declined pairing.');
