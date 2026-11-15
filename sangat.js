@@ -60,6 +60,16 @@ function render(content) {
 }
 
 let etag, revision, content = null, timer, loading = false;
+const snapshotKey='gb-sangat-last-live-v1';
+// Public viewers retain the last received Gurbani during temporary internet outages.
+try {
+  const saved=JSON.parse(localStorage.getItem(snapshotKey)||'null');
+  if(saved&&saved.content&&typeof saved.content==='object'){
+    content=saved.content;
+    revision=saved.revision;
+    render(content);
+  }
+} catch (_) {}
 function setLive(online) {
   status.dataset.live = String(online && !!content);
   status.textContent = online ? content ? '● ਲਾਈਵ' : 'ਉਡੀਕ ਜਾਰੀ ਹੈ' : 'ਦੁਬਾਰਾ ਜੁੜ ਰਹੇ ਹਾਂ…';
@@ -80,6 +90,7 @@ async function sync() {
         revision = packet.revision;
         content = packet.content;
         render(content);
+        try{localStorage.setItem(snapshotKey,JSON.stringify({revision,content}))}catch(_){}
       }
     }
     setLive(true);
