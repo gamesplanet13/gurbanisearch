@@ -18,14 +18,46 @@
     .sangat-reader #lines{padding:12px 3px 24px}
     .sangat-reader .searcher-line{scroll-margin-top:80px}
     .sangat-idle{color:#c1bab0;text-align:center;margin:28vh auto 0;font-size:17px}
+    .sangat-menu-button{position:fixed;top:9px;right:12px;z-index:23;border:1px solid #777;background:#222;color:#fff;font-size:24px;border-radius:9px;padding:5px 13px;cursor:pointer}
+    .sangat-settings{position:fixed;right:10px;top:56px;z-index:22;width:min(355px,94vw);max-height:84dvh;overflow:auto;padding:17px;background:#202124;border:1px solid #706956;color:#f5f1e7;border-radius:13px;box-shadow:0 10px 30px #000a}
+    .sangat-settings[hidden]{display:none}
+    .sangat-settings label{display:block;padding:7px 0;font-size:14px}
+    .sangat-settings input{accent-color:#d5ad58;min-height:18px;min-width:18px;vertical-align:middle}
+    .sangat-settings button{padding:7px 12px;background:#343434;color:#fff;border:1px solid #888;border-radius:7px}
+    .sangat-settings h2{font-size:17px;margin:8px 0}
+    .sangat-translation{display:block;font-size:.62em;line-height:1.45;opacity:.88;padding:3px 8px}
+    .sangat-meaning{display:block;font-size:.56em;line-height:1.4;color:#cbaa68;padding:3px 8px}
+    .sangat-larivaar .searcher-verse{word-spacing:-.15em}
+    .sangat-day body{background:#fff9e9!important;color:#292319!important}
+    .sangat-day .sangat-bar{background:#f2e7cc;color:#292319;border-color:#e0cead}
+    .sangat-day .sangat-bar .state,.sangat-day .sangat-bar .details{color:#705630}
+    .sangat-day .sangat-reader .searcher-line{color:#302418}
+    .sangat-day .sangat-meaning{color:#754c17}
     .sangat-waheguru{color:#efcf88;text-align:center;margin:28vh auto 0;font-size:var(--searcher-font,clamp(34px,11vw,90px))}
   </style>
   <script src="gurbani-book-motion.js" defer></script>
   <script src="peerjs-1.5.5.min.js?v=20261118" defer></script>
   <script src="gurbani-peer-manager.js?v=20261133" defer></script>
-  <script src="sangat.js?v=2026111602" defer></script>
+  <script src="sangat.js?v=2026111603" defer></script>
 </head>
 <body>
+  <button id="sangatMenuButton" class="sangat-menu-button" aria-label="Sangat View settings" aria-expanded="false" aria-controls="sangatSettings">☰</button>
+  <aside id="sangatSettings" class="sangat-settings" hidden>
+    <h2>ਸੰਗਤ ਵਿਊ · Display Settings</h2>
+    <strong>Shabad · ਸ਼ਬਦ</strong>
+    <label><input type="checkbox" data-field="sg" checked> Gurmukhi · ਗੁਰਮੁਖੀ</label>
+    <label><input type="checkbox" data-field="sh"> Hindi · हिन्दी</label>
+    <label><input type="checkbox" data-field="se"> English / Roman</label>
+    <strong>Arth · ਅਰਥ</strong>
+    <label><input type="checkbox" data-field="mp"> Punjabi / Gurmukhi</label>
+    <label><input type="checkbox" data-field="mh"> Hindi · हिन्दी</label>
+    <label><input type="checkbox" data-field="me"> English</label>
+    <h2>Reading</h2>
+    <label><input type="checkbox" id="sangatLari"> ਲੜੀਵਾਰ · Ladisaar</label>
+    <label><input type="checkbox" id="sangatDay"> Day theme · ਰੋਸ਼ਨੀ</label>
+    <p>Only this viewer's display changes. The Controller remains in charge of the live shabad.</p>
+    <button id="sangatClose" type="button">Close</button>
+  </aside>
   <div class="sangat-bar">
     <h1>ਸੰਗਤ ਵਿਊ</h1>
     <span class="state" id="liveStatus" role="status">ਉਡੀਕ ਜਾਰੀ ਹੈ</span>
