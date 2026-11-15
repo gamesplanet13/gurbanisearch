@@ -150,6 +150,20 @@ window.setupSangatPublisher = function (menu, currentContent) {
         bookLines:rows.slice(first,first + 400).map(line => String(line).slice(0,500)),
         activeIndex:Math.max(0,index - first), ang:content.ang,
         shabadTitle:String(content.shabadTitle || '').slice(0,180),
+        scripts:{
+          gurmukhi:String(content.scripts?.gurmukhi||'').slice(0,500),
+          hindi:String(content.scripts?.hindi||'').slice(0,500),
+          english:String(content.scripts?.english||'').slice(0,500)
+        },
+        meanings:{
+          punjabi:String(content.meanings?.punjabi||'').slice(0,500),
+          hindi:String(content.meanings?.hindi||'').slice(0,500),
+          english:String(content.meanings?.english||'').slice(0,500)
+        },
+        lineData:Array.isArray(content.lineData)?content.lineData.slice(first,first+400).map(item=>({
+          scripts:Object.fromEntries(['gurmukhi','hindi','english'].map(k=>[k,String(item?.scripts?.[k]||'').slice(0,500)])),
+          meanings:Object.fromEntries(['punjabi','hindi','english'].map(k=>[k,String(item?.meanings?.[k]||'').slice(0,500)]))
+        })):[]
       };
     }
     latestSelection=selection;
