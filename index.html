@@ -894,8 +894,10 @@ refreshProjectionSwitch();
 const sangatPublisher=!isSearcher&&window.setupSangatPublisher?.($('menuOptions'),
  ()=>projectionIsOn ? lastContent : null);
 function publish(payload,projectionOnly=false,force=false,fromSync=false){
+ // Public Sangat broadcast follows the Controller's current selection independently
+ // of the private Projection ON/OFF switch. Viewers never need pairing.
+ if(!isSearcher&&sangatPublisher&&Object.hasOwn(payload,'content'))sangatPublisher.send(payload.content);
  if(!projectionIsOn&&!force&&payload.content!==null)return 0;
- if(sangatPublisher&&Object.hasOwn(payload,'content'))sangatPublisher.send(payload.content);
  const synced=!fromSync&&Object.hasOwn(payload,'content')&&(!payload.content||payload.content.mode==='waheguru'||Array.isArray(payload.content.bookLines))&&searcherSync.send(payload.content);
  let sent=0;const rev=++deliveryCounter;
  for(const id of (isSearcher?connections.keys():selected)){
