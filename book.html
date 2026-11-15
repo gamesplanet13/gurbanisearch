@@ -171,7 +171,7 @@ function connection(c){
  // A Controller-initiated Internet offer includes its code. If that WebRTC
  // direction fails to authorize, try the reverse path automatically.
  const callerCode=String(c.metadata?.controller||'');
- if(callerCode&&/^\\d{5}$/.test(callerCode)&&!reversePairFallbacks.has(callerCode)){
+ if(callerCode&&/^\d{5}$/.test(callerCode)&&!reversePairFallbacks.has(callerCode)){
   reversePairFallbacks.add(callerCode);
   setTimeout(()=>{
    reversePairFallbacks.delete(callerCode);
