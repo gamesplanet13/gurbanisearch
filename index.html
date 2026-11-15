@@ -938,7 +938,7 @@ $('clear').onclick=()=>{lastContent=null;put('gb-last-content',null);publish({co
 $('closeReading').onclick=()=>{
  if(isSearcher&&window.history.state?.searcherReading){toggleHistory(false);searcherClearOnBack=true;window.history.back();return}
  ++searchNonce;
- lines=[];active=-1;readingAng=null;readingTitle='';asaStarts=[];renderReadingNavigator();shabadAng=null;
+ lineVisits.clear();lines=[];active=-1;readingAng=null;readingTitle='';asaStarts=[];renderReadingNavigator();shabadAng=null;
  currentShabad=null;shabadSourceInfo=null;sukhmaniSalokStarts=[];
  $('lines').replaceChildren();$('results').hidden=true;$('results').replaceChildren();
  $('readingNavigator').hidden=true;$('historyCard').hidden=true;
@@ -1471,6 +1471,7 @@ $('offlineRefresh').onclick=refreshOfflineProgress;
 $('search').onclick=async()=>{
  const q=$('query').value.trim();if(!q)return;
  if(isSearcher){toggleVirtualKeyboard(false);$('query').blur()}
+ else if(lineVisits.size){lineVisits.clear();renderLines()}
  status('Searching Gurbani…');$('results').hidden=false;$('results').replaceChildren();
  const type=$('searchType').value;
  if(isSearcher&&type==='ang')return loadAng(q.replace(/[੦-੯]/g,d=>String('੦੧੨੩੪੫੬੭੮੯'.indexOf(d))));
@@ -1740,7 +1741,7 @@ function markAng(n){
  el.textContent=label?(isSearcher?'ਅੰਗ: '+label.replace(/[0-9]/g,n=>'੦੧੨੩੪੫੬੭੮੯'[n]):'(Ang '+label+')'):''
 }
 function unpackBaniLine(x){return x?.verse?.verse?{...x,...x.verse}:x}
-function setReading(items,title,ang,sections=[]){if(!Array.isArray(items)||!items.length)throw Error('No verses returned');if(isSearcher)enterSearcherReading();lines=items;asaStarts=sections;active=-1;currentShabad=null;readingAng=ang||null;readingTitle=title;shabadAng=ang||null;shabadSourceInfo=null;sukhmaniSalokStarts=title.startsWith('ਸੁਖਮਨੀ')?salokIndices(lines):[];$('results').hidden=true;renderReadingNavigator();renderLines();show(0,false);$('shabadCard').scrollIntoView({behavior:'smooth',block:'start'})}
+function setReading(items,title,ang,sections=[]){if(!Array.isArray(items)||!items.length)throw Error('No verses returned');if(isSearcher)enterSearcherReading();lineVisits.clear();lines=items;asaStarts=sections;active=-1;currentShabad=null;readingAng=ang||null;readingTitle=title;shabadAng=ang||null;shabadSourceInfo=null;sukhmaniSalokStarts=title.startsWith('ਸੁਖਮਨੀ')?salokIndices(lines):[];$('results').hidden=true;renderReadingNavigator();renderLines();show(0,false);$('shabadCard').scrollIntoView({behavior:'smooth',block:'start'})}
 async function loadAng(value){const n=Number(value);if(!Number.isInteger(n)||n<1||n>1430)return status('Enter an Ang from 1 to 1430');const nonce=++searchNonce;status('Loading Ang '+n+'…');try{const d=await loadJson('https://api.banidb.com/v2/angs/'+n+'/G');if(nonce!==searchNonce)return;const arr=Array.isArray(d.page)?d.page:verses(d);setReading(arr,'ਅੰਗ / Ang '+n,n);$('angInput').value=n;put('gb-sehaj-ang',n);status('Ang '+n+' loaded · '+arr.length+' lines')}catch(e){status('Could not load Ang '+n+': '+e.message)}}
 // BaniDB reference routes. The source verses remain unmodified; no Gurbani is invented.
 const BANI_SOURCE={
@@ -1906,7 +1907,7 @@ async function openShabad(x,fromHistory=false,savedEntry=null){
  try{
   const d=await loadJson('https://api.banidb.com/v2/shabads/'+encodeURIComponent(n));
   if(nonce!==searchNonce)return;
-  const fetched=verses(d);if(isSearcher&&(!Array.isArray(fetched)||!fetched.length))throw Error('No verses returned');lines=Array.isArray(fetched)?fetched:[];active=-1;readingAng=null;readingTitle='';asaStarts=[];sukhmaniSalokStarts=[];renderReadingNavigator();shabadAng=d?.shabadInfo?.source?.pageNo??null;
+  const fetched=verses(d);if(isSearcher&&(!Array.isArray(fetched)||!fetched.length))throw Error('No verses returned');lineVisits.clear();lines=Array.isArray(fetched)?fetched:[];active=-1;readingAng=null;readingTitle='';asaStarts=[];sukhmaniSalokStarts=[];renderReadingNavigator();shabadAng=d?.shabadInfo?.source?.pageNo??null;
   const rawSource=d?.shabadInfo?.source||{};
   const sourceId=String(rawSource.sourceId??rawSource.id??rawSource.source??'');
   const rawName=rawSource.name?.english??rawSource.name??rawSource.englishName??rawSource.title??'';
@@ -1927,7 +1928,8 @@ async function openShabad(x,fromHistory=false,savedEntry=null){
  }catch(e){status('Could not load shabad: '+e.message)}
 }
 function setMain(i){if(!currentShabad||!lines[i])return;currentShabad.mainIndex=i;saveHistory();renderHistory();renderLines();status('Main Line set to '+(i+1))}
-let lineVisits=stored('gb-line-visits',{});function visitKey(x){return String(currentShabad?.id||readingTitle||'reading')+'|'+String(x?.verseId||x?.verse?.verseId||verse(x))}
+const lineVisits=new Map();
+try{localStorage.removeItem('gb-line-visits')}catch(_){}
 let searcherRenderedLines=null;
 function renderLines(){
  const box=$('lines');
@@ -1970,10 +1972,10 @@ function renderLines(){
   const b=document.createElement('button');b.style.border='none';b.style.background='transparent';b.style.textAlign='left';b.style.width='calc(100% - 50px)';b.style.padding='4px';b.style.float='left';
   const v=document.createElement('div');v.className='verse';v.textContent=getText(x)||'Script unavailable';b.append(v);
   if(i===active){
-   const details=GurbaniLayout.bookDetails({scripts:selectedScripts(x),meanings:selectedMeanings(x)});
-   if(details){details.removeAttribute('id');b.append(details);}
+   const scripts=GurbaniLayout.bookDetails({scripts:selectedScripts(x)});
+   if(scripts){scripts.removeAttribute('id');b.append(scripts)}
   }
-  const visited=lineVisits[visitKey(x)];if(visited){row.style.borderLeft='5px solid #dca94a';const note=document.createElement('span');note.className='small';note.textContent=' ✓ '+new Date(visited).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});b.append(note)}
+  const visited=lineVisits.get(i);if(visited){row.style.borderLeft='5px solid #dca94a';const note=document.createElement('span');note.className='small';note.textContent=' ✓ '+new Date(visited).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});b.append(note)}
   if(i===currentShabad?.mainIndex){const note=document.createElement('span');note.className='mainNote';note.textContent=' ★ MAIN';b.append(note)}
   b.onclick=()=>show(i);
   const star=document.createElement('button');star.className='markMain';star.textContent=i===currentShabad?.mainIndex?'★':'☆';star.title='Set Main Line';star.setAttribute('aria-label','Set line '+(i+1)+' as main');star.onclick=()=>setMain(i);
@@ -1983,7 +1985,7 @@ function renderLines(){
 function show(i,mark=true){
  if(!lines[i])return;
  const scripts=selectedScripts(lines[i]);
- active=i;renderReadingNavigator();if(mark){lineVisits[visitKey(lines[i])]=Date.now();const keys=Object.keys(lineVisits);if(keys.length>1500)delete lineVisits[keys[0]];put('gb-line-visits',lineVisits)}
+ active=i;renderReadingNavigator();if(mark&&!isSearcher)lineVisits.set(i,Date.now());
  if(currentShabad){currentShabad.lastIndex=i;saveHistory();renderHistory()}
  renderLines();
  const meanings=selectedMeanings(lines[i]);const ang=getAng(lines[i]);markAng(ang);
@@ -2115,7 +2117,7 @@ if(isSearcher){
   if(window.history.state?.searcherReading||!lines.length)return;
   toggleHistory(false);
   ++searchNonce;
-  lines=[];active=-1;readingAng=null;readingTitle='';asaStarts=[];sukhmaniSalokStarts=[];
+  lineVisits.clear();lines=[];active=-1;readingAng=null;readingTitle='';asaStarts=[];sukhmaniSalokStarts=[];
   shabadAng=null;currentShabad=null;shabadSourceInfo=null;
   renderReadingNavigator();renderLines();markAng(null);
   $('results').hidden=!$('results').hasChildNodes();
