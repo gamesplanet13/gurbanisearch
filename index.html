@@ -215,7 +215,7 @@ main{width:100%;max-width:none;margin:3px auto;padding:0 4px;gap:4px;align-items
  <video id="desktopPreviewVideo" aria-label="Camera preview" autoplay muted playsinline hidden></video>
  <p id="desktopPreviewStatus" class="small" role="status"></p>
 </aside>
-<script src="gurbani-layout.js?v=2"></script><script src="gurbani-book-motion.js?v=3"></script><script src="gurbani-searcher-sync.js?v=20261133"></script><script src="gurbani-waheguru-wide.js"></script><script src="gurbani-desktop-preview.js?v=1"></script>
+<script src="gurbani-layout.js?v=3"></script><script src="gurbani-book-motion.js?v=3"></script><script src="gurbani-searcher-sync.js?v=20261133"></script><script src="gurbani-waheguru-wide.js"></script><script src="gurbani-desktop-preview.js?v=1"></script>
 <script src="sangat-control.js?v=2026111602"></script><script src="gurbani-updates.js?v=20261121" defer></script><script src="peerjs-1.5.5.min.js?v=20261118"></script><script src="gurbani-peer-manager.js?v=20261133"></script><script src="gurbani-camera.js?v=20261119"></script><script>
 'use strict';
 const $=id=>document.getElementById(id);
@@ -227,6 +227,7 @@ const randomId=()=>{let a=new Uint8Array(12);crypto.getRandomValues(a);return [.
 const peerPrefix='gurbani-projection-v1-',controlPrefix='gurbani-control-v1-';
 let pendingPair=null, myCode=stored(isSearcher?'gb-searcher-code':'gb-controller-code',null)||code(), myToken=stored('gb-controller-token',null)||randomId(),peer,connections=new Map(),known=stored('gb-known-devices',{}),selected=new Set(stored('gb-selected-devices',[])),lines=[],active=-1,lastContent=stored('gb-last-content',null);
 let autoReconnect=stored('gb-auto-reconnect',{});
+ let lastSelection=stored('gb-last-selection-v1',null);
 put(isSearcher?'gb-searcher-code':'gb-controller-code',myCode);put('gb-controller-token',myToken);$('code').textContent=myCode;
 const status=s=>{$('status').textContent=s;$('pairStatus').textContent=s;if(isSearcher)$('searcherMessage').textContent=/^(Ready to connect|Connecting…)$/.test(s)?'':s};
 const extract=v=>typeof v==='string'?v:(v?.unicode||v?.gurmukhi||v?.text||v?.translation||'');
@@ -382,19 +383,26 @@ function adoptProjectionSettings(key,values,initial=false){
  }
  persistDeviceSettings();
 }
-const displayLanguages=[
- ['sg','Gurmukhi Shabad','gurmukhiCheck'],['sh','Hindi Shabad','hindiShabadCheck'],['se','Roman Shabad','englishShabadCheck'],
- ['mp','Punjabi Arth','paCheck'],['mh','Hindi Arth','hiCheck'],['me','English Arth','enCheck']
-];
+const displayLanguages=GurbaniLayout.languageOptions;
+function deviceLanguages(key){
+ const saved=deviceSettings(key).languages;
+ return Object.fromEntries(displayLanguages.map(([lang,,,id])=>[lang,saved?.[lang]??$(id).checked]));
+}
 function displayContent(content,key){
- if(!content?.obsData)return content;
- const options=deviceSettings(key).languages;
- if(!options)return {...content,bookLineDetails:true};
- const allowed=(lang,id)=>options[lang]??$(id).checked;
- const [sg,sh,se,mp,mh,me]=displayLanguages.map(([lang,,id])=>allowed(lang,id)?content.obsData[lang]:'');
- const scripts={gurmukhi:sg||'',hindi:sh||'',english:se||''};
- const meanings={punjabi:mp||'',hindi:mh||'',english:me||''};
- return {...content,bookLineDetails:true,scripts,meanings,meaning:meanings.english,verse:sg||sh||se||mp||mh||me||''};
+ return GurbaniLayout.languageContent(content,deviceLanguages(key));
+}
+function adoptDisplayLanguages(key,conn,message){
+ if(!authorizedDisplays.has(conn)||connections.get(key)!==conn||message.token!==myToken)return;
+ const patch=GurbaniLayout.languagePatch(message.languages);
+ if(!Object.keys(patch).length)return;
+ const device=deviceSettings(key);
+ device.languages={...device.languages,...patch};
+ persistDeviceSettings();
+ if(selected.size===1&&selected.has(key)){
+  for(const [lang,,,id] of displayLanguages)if(lang in patch)$(id).checked=patch[lang];
+  renderLines();
+ }
+ if(openDeviceSettingsKey===key)renderDevices();
 }
 function makeAlignment(container,key,config){
  const label=document.createElement('label');label.textContent='Text position ';
@@ -409,8 +417,11 @@ function sendOneDeviceSettings(key,includeContent=false){
  if(!c?.open){status('Settings saved for '+(known[key]?.name||key)+'; will apply when it reconnects');return}
  const v=deviceSettings(key),rev=++deliveryCounter;
  send(c,{type:'display-mode',token:myToken,mode:preferredView(key)});
- const packet={type:'project',token:myToken,rev,settings:v.projection,bookSettings:v.book};
- if(includeContent&&lastContent&&projectionIsOn)packet.content=displayContent(lastContent,key);
+ const packet={type:'project',token:myToken,rev,settings:v.projection,bookSettings:v.book,languages:deviceLanguages(key)};
+ if(includeContent&&lastContent&&projectionIsOn){
+  packet.content=displayContent(lastContent,key);
+  if(lastSelection)packet.selection=lastSelection;
+ }
  if(send(c,packet)){pendingDelivery.set(c,{rev,time:Date.now()});status('Settings sent to '+(known[key]?.name||key))}
 }
 function editDeviceSettings(key){
@@ -474,7 +485,7 @@ function renderDeviceSettingsPanel(key){
  makeAlignment(area,key,isBook?v.book:v.projection);
  const languages=document.createElement('details');
  const summaryLabel=document.createElement('summary');summaryLabel.textContent='Languages and Arth for this display';languages.append(summaryLabel);
- for(const [lang,label,id] of displayLanguages){
+ for(const [lang,label,,id] of displayLanguages){
   const field=document.createElement('label');field.className='device-setting-checkbox';
   const check=document.createElement('input');check.type='checkbox';check.checked=v.languages?.[lang]??$(id).checked;
   check.onchange=()=>{(v.languages??={})[lang]=check.checked;persistDeviceSettings();queueDeviceSettings(key)};
@@ -623,12 +634,18 @@ if(m.type==='accepted'&&m.kind!=='obs'){
   setTimeout(()=>{
    if(connections.get(key)!==conn)return;
    const content=projectionIsOn&&lastContent?displayContent(lastContent,key):null;
-   send(conn,{type:'project',token:myToken,content});
+   send(conn,{type:'project',token:myToken,content,languages:deviceLanguages(key),...(lastSelection?{selection:lastSelection}:{})});
   },0);
  }
 }
 if(m.type==='accepted'){if(m.deviceId){if(m.deviceId!==key){connections.delete(key);key=m.deviceId}known[key]={code:m.code||codeValue,name:m.name||'Projection',kind:m.kind||known[key]?.kind||'projection',localWaheguru:known[key]?.localWaheguru===true};put('gb-known-devices',known);selected.add(key);put('gb-selected-devices',[...selected]);connections.set(key,conn)}renderDevices();if(!m.multiController)sendDeviceView(key);status('Paired successfully')}
 if((m.type==='hello'||m.type==='accepted')&&m.kind==='book'&&m.bookSettings&&!perDeviceSettings[key]){const saved=deviceSettings(key);saved.book={...saved.book,...m.bookSettings};persistDeviceSettings()}
+if(m.type==='control-selection'){
+ if(!isSearcher&&authorizedDisplays.has(conn)&&connections.get(key)===conn&&m.token===myToken)
+  receiveControlSelection(m.selection,m.content,key);
+ return;
+}
+if(m.type==='display-languages'){adoptDisplayLanguages(key,conn,m);return}
 if(m.type==='projection-settings'&&m.settings&&connections.get(key)===conn){adoptProjectionSettings(key,m.settings);if(openDeviceSettingsKey===key)renderDevices();return}
 if(m.type==='book-settings'){const saved=deviceSettings(key);saved.book={...saved.book,...Object.fromEntries(['fontSize','lineSpacing','nightMode','larrivaar','flow','pause','alignment','marginLeft','marginRight','marginTop','marginBottom'].filter(k=>m[k]!==undefined).map(k=>[k,m[k]]))};persistDeviceSettings();if(openDeviceSettingsKey===key)renderDevices()}
 if(m.type==='rejected'){status('Screen is paired to another controller. On that screen choose Reset pairing.');conn.close()}
@@ -880,7 +897,12 @@ function start(){
   if(!connections.has(peerCode))connections.set(peerCode,c);
   setupConn(c,peerCode,peerCode)
  },
- onCollision:()=>status('Controller code is busy. Retrying the same code; change it manually if another device uses it.'),
+ onCollision:()=>{
+  myCode=code();
+  put(isSearcher?'gb-searcher-code':'gb-controller-code',myCode);
+  $('code').textContent=myCode;
+  status('This control is reconnecting with its own code.');
+ },
  onTargetUnavailable:error=>{
   const match=error.message?.match(/gurbani-camera-v1-(\d{5})/);
   if(!match){
@@ -901,13 +923,30 @@ function renderWifiDevices(){
  const box=$('wifiResults');box.replaceChildren();
  for(const [key,device] of wifiDevices){
   const row=document.createElement('div');row.className='device';
-  const label=document.createElement('label');label.textContent=device.name+' · '+(device.kind==='book'?'Granth View':'Projection')+' · '+device.code;
-  const button=document.createElement('button');button.textContent='ਜੋੜੋ · Connect';button.onclick=()=>{status('Connecting to '+device.name+'…');connectProjection(device.code,device.code)};
+  const label=document.createElement('label');
+  const role={book:'Granth View',camera:'Camera',projection:'Projection',qr:'QR Payment Projection'}[device.kind];
+  label.textContent=device.name+' · '+role+' · '+device.code;
+  if(device.kind==='qr'){
+   row.append(label,document.createTextNode(' · Connect in QR Payment Control'));
+   box.append(row);
+   continue;
+  }
+  const button=document.createElement('button');button.textContent='ਜੋੜੋ · Connect';button.onclick=()=>{if(device.kind==='camera'){
+   $('cameraCodeInput').value=device.code;
+   connectCamera(device.code);
+  }else{
+   status('Connecting to '+device.name+'…');
+   connectProjection(device.code,device.code);
+  }};
   row.append(label,button);box.append(row)
  }
 }
-window.gbWifiFound=(code,name,kind)=>{if(!/^\d{5}$/.test(code)||typeof name!=='string'||!['projection','book'].includes(kind))return;wifiDevices.set(kind+':'+code,{code,name:name.slice(0,80),kind});renderWifiDevices();$('wifiStatus').textContent='ਜੋੜਨ ਲਈ ਸਕ੍ਰੀਨ ਚੁਣੋ। · Select a screen to connect.'};
-window.gbWifiFinished=(error)=>{if(error){$('wifiStatus').textContent=error;return}$('wifiStatus').textContent=wifiDevices.size?'ਜੋੜਨ ਲਈ ਸਕ੍ਰੀਨ ਚੁਣੋ। · Select a screen to connect.':'ਕੋਈ ਸਕ੍ਰੀਨ ਨਹੀਂ ਮਿਲੀ। ਪ੍ਰੋਜੈਕਸ਼ਨ ਜਾਂ ਗ੍ਰੰਥ ਵਿਊ ਇੱਕੋ ਵਾਈ-ਫਾਈ ’ਤੇ ਖੁੱਲ੍ਹਾ ਰੱਖੋ। · No screens found. Keep the updated Projection or Granth View app open on the same Wi-Fi.'};
+window.gbWifiFound=(code,name,kind)=>{
+ if(!/^\d{5}$/.test(code)||typeof name!=='string'||!['projection','book','camera','qr'].includes(kind))return;
+ if(kind==='projection'&&name.startsWith('Camera - ')){kind='camera';name=name.slice(9)}
+ if(kind==='projection'&&name.startsWith('QR Payment - ')){kind='qr';name=name.slice(13)}
+ wifiDevices.set(kind+':'+code,{code,name:name.slice(0,80),kind});renderWifiDevices();$('wifiStatus').textContent='ਜੋੜਨ ਲਈ ਸਕ੍ਰੀਨ ਚੁਣੋ। · Select a screen to connect.'};
+window.gbWifiFinished=(error)=>{if(error){$('wifiStatus').textContent=error;return}$('wifiStatus').textContent=wifiDevices.size?'ਜੋੜਨ ਲਈ ਸਕ੍ਰੀਨ ਚੁਣੋ। · Select a screen to connect.':'ਕੋਈ ਸਕ੍ਰੀਨ ਨਹੀਂ ਮਿਲੀ। ਪ੍ਰੋਜੈਕਸ਼ਨ ਜਾਂ ਗ੍ਰੰਥ ਵਿਊ ਇੱਕੋ ਵਾਈ-ਫਾਈ ’ਤੇ ਖੁੱਲ੍ਹਾ ਰੱਖੋ। · No devices found. Keep Projection, Granth View, Camera or QR Payment open on the same Wi-Fi.'};
 $('searchWifi').onclick=()=>{wifiDevices.clear();renderWifiDevices();if(!window.GurbaniWifi||typeof window.GurbaniWifi.search!=='function'){$('wifiStatus').textContent='Wi-Fi search is available in the Gurbani Android app. You can still enter a code.';return}$('wifiStatus').textContent='ਵਾਈ-ਫਾਈ ’ਤੇ ਲੱਭ ਰਹੇ ਹਾਂ… · Searching the same Wi-Fi…';try{window.GurbaniWifi.search()}catch(e){$('wifiStatus').textContent='Wi-Fi search unavailable. Use the code.'}};
 $('pair').onclick=()=>{const c=$('pairCode').value.trim();if(!/^\d{5}$/.test(c))return status('ਪੰਜ ਅੰਕ ਪਾਓ। · Enter five digits.');connectProjection(c,c)};
 function reconnectSaved(){searcherSync.connect();retryUnpairs();if(peer&&peer.open&&!peer.disconnected){for(const [key,d] of Object.entries(known))if(autoReconnect[key]!==false&&!connections.has(key))connectProjection(key,d.code)}}
@@ -957,12 +996,58 @@ if(!isSearcher){
  button.onclick=()=>{overlay.style.display='flex';frame.src='monitor.html';};
  $('menuOptions').prepend(button);
 }
+function receiveControlSelection(selection,content,source){
+ if(GurbaniLayout.compareSelections(selection,lastSelection)<=0) return;
+ if(content!==null&&(!content||typeof content.verse!=='string'))return;
+ lastSelection=selection;
+ put('gb-last-selection-v1',lastSelection);
+ lastContent=content;
+ put('gb-last-content',lastContent);
+ if(content?.mode==='waheguru'||content?.mode==='custom'){
+  status(content.verse);
+ }else if(content&&Array.isArray(content.bookLines)&&content.bookLines.length){
+  const index=Math.min(content.bookLines.length-1,Math.max(0,Number(content.activeIndex)||0));
+  const position=lines.findIndex((line,i)=>getText(line)===content.bookLines[0]&&content.bookLines.every((text,n)=>getText(lines[i+n])===text));
+  if(position>=0){
+   active=position+index;
+  }else{
+   ++searchNonce;
+   lineVisits.clear();currentShabad=null;readingAng=null;shabadAng=null;asaStarts=[];sukhmaniSalokStarts=[];
+   readingTitle=content.shabadTitle||'';shabadSourceInfo=content.sourceMeta||null;
+   lines=content.bookLines.map((text,i)=>{
+    const row=content.lineData?.[i]||{};
+    return {verse:text,transliteration:row.scripts,translation:row.meanings,pageNo:content.ang};
+   });
+   active=index;
+  }
+  renderReadingNavigator();renderLines();markAng(getAng(lines[active])||content.ang);
+  status('Synced: '+(content.obsData?.sg||content.verse));
+ }else if(!content){
+  active=-1;renderReadingNavigator();renderLines();status('Projection cleared on linked Control');
+ }
+ sangatPublisher?.send(content);
+ if(projectionIsOn||content===null){
+  for(const key of selected){
+   if(key===source||known[key]?.kind==='obs')continue;
+   const link=connections.get(key);
+   if(!authorizedDisplays.has(link))continue;
+   send(link,{type:'project',token:myToken,selection,
+    content:displayContent(content,key),languages:deviceLanguages(key)});
+  }
+ }
+}
 function publish(payload,projectionOnly=false,force=false,fromSync=false){
  // Public Sangat broadcast follows the Controller's current selection independently
  // of the private Projection ON/OFF switch. Viewers never need pairing.
  if(!isSearcher&&sangatPublisher&&Object.hasOwn(payload,'content'))sangatPublisher.send(payload.content);
  if(!projectionIsOn&&!force&&payload.content!==null)return 0;
  const synced=!fromSync&&Object.hasOwn(payload,'content')&&(!payload.content||payload.content.mode==='waheguru'||Array.isArray(payload.content.bookLines))&&searcherSync.send(payload.content);
+ const syncSelection=Object.hasOwn(payload,'content')&&
+  (payload.content===null||payload.content.mode==='waheguru'||payload.content.mode==='custom'||Array.isArray(payload.content.bookLines));
+ if(syncSelection){
+  lastSelection={time:Math.max(Date.now(),(lastSelection?.time||0)+1),id:randomId()};
+  put('gb-last-selection-v1',lastSelection);
+ }
  let sent=0;const rev=++deliveryCounter;
  for(const id of (isSearcher?connections.keys():selected)){
   if(projectionOnly&&['book','obs'].includes(known[id]?.kind))continue;
@@ -971,13 +1056,10 @@ function publish(payload,projectionOnly=false,force=false,fromSync=false){
   const isObs=known[id]?.kind==='obs';
   const personal=isObs?null:deviceSettings(id);
   const packet={type:'project',token:myToken,rev,...payload};
-  if(!isObs&&packet.content)packet.content=displayContent(packet.content,id);
-  if(!isObs&&preferredView(id)==='projection'&&!personal.projection.flow&&Array.isArray(packet.content?.bookLines)){
-   const {bookLines,...singleLine}=packet.content;
-   packet.content=singleLine;
-  }
+  if(!isObs&&packet.content){packet.languages=deviceLanguages(id);packet.content=displayContent(packet.content,id);}
+  if(!isObs&&syncSelection)packet.selection=lastSelection;
   if(personal){delete packet.settings;delete packet.bookSettings;}
-  const update=known[id]?.kind==='projection'&&known[id]?.localWaheguru&&packet.content?.mode==='waheguru'?{type:'waheguru-show',token:myToken,rev}:packet;
+  const update=known[id]?.kind==='projection'&&known[id]?.localWaheguru&&packet.content?.mode==='waheguru'?{type:'waheguru-show',token:myToken,rev,selection:packet.selection}:packet;
   if(send(c,update)){sent++;pendingDelivery.set(c,{rev,time:Date.now()})}
  }
  if(isSearcher)$('searcherMessage').textContent=sent?sent+' ਸਕ੍ਰੀਨਾਂ · Screens updated':synced?'ਕੰਟਰੋਲ ਨੂੰ ਭੇਜਿਆ · Sent to Control':'ਸਕ੍ਰੀਨ ਜੋੜੋ · Connect a display';
@@ -2074,7 +2156,18 @@ function show(i,mark=true){
 }
 $('next').onclick=()=>{if(readingAng&&active>=lines.length-1&&readingAng<1430)loadAng(readingAng+1);else show(active+1)};$('previous').onclick=()=>{if(readingAng&&active<=0&&readingAng>1)loadAng(readingAng-1);else show(active-1)};
 $('mainLine').onclick=()=>{if(currentShabad)show(currentShabad.mainIndex)};
-for(const id of ['gurmukhiCheck','hindiShabadCheck','englishShabadCheck','enCheck','paCheck','hiCheck'])$(id).onchange=()=>{renderLines();if(active>=0)show(active,false)};
+for(const [lang,,,id] of displayLanguages)$(id).onchange=()=>{
+ for(const key of selected){
+  if(known[key]?.kind==='obs')continue;
+  const device=deviceSettings(key);
+  (device.languages??={})[lang]=$(id).checked;
+  const connection=connections.get(key);
+  if(authorizedDisplays.has(connection))send(connection,{type:'project',token:myToken,languages:{[lang]:$(id).checked}});
+ }
+ persistDeviceSettings();
+ renderLines();
+ if(active>=0)show(active,false);
+};
 const obsLabels={sg:'Gurmukhi Shabad',sh:'Hindi Shabad',se:'English Shabad',mp:'Punjabi Arth',mh:'Hindi Arth',me:'English Arth'};
 let obsConfig=stored('gb-obs-options',{order:Object.keys(obsLabels),enabled:['sg','mh'],slots:{sg:'top',sh:'top',se:'top',mp:'bottom',mh:'bottom',me:'bottom'},sizes:{sg:70,sh:62,se:62,mp:38,mh:38,me:38}}),obsCode=stored('gb-obs-code',null)||code();
 obsConfig.slots??={sg:'top',sh:'top',se:'top',mp:'bottom',mh:'bottom',me:'bottom'};obsConfig.sizes??={sg:70,sh:62,se:62,mp:38,mh:38,me:38};put('gb-obs-code',obsCode);
@@ -2399,7 +2492,7 @@ if(isSearcher){
 }
 renderHistory();
 renderDevices();start();
-</script><script src="gurbani-desktop-fullscreen.js?v=4" defer></script></body></html>
+</script><script src="gurbani-desktop-fullscreen.js?v=5" defer></script></body></html>
 
 
 

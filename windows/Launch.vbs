@@ -1,5 +1,5 @@
 Option Explicit
-Const NativeVersion = "10500"
+Const NativeVersion = "10600"
 Dim shell, files, edge, candidate, role, page, profile, url, appData, timestamp, nowTime
 Set shell = CreateObject("WScript.Shell")
 Set files = CreateObject("Scripting.FileSystemObject")
@@ -34,7 +34,7 @@ timestamp = Year(nowTime) & "-" & Month(nowTime) & "-" & Day(nowTime) & "-" & Ho
 url = "https://gamesplanet13.github.io/gurbanisearch/" & page & "?desktop=windows&nativeVersion=" & NativeVersion & "&launch=" & timestamp
 shell.Run "powershell.exe -NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy RemoteSigned -File " & _
     Quote(files.BuildPath(files.GetParentFolderName(WScript.ScriptFullName), "Window.ps1")) & " " & _
-    Quote(edge) & " " & Quote(profile) & " " & Quote(url) & " " & Quote(role), 0, False
+    Quote(edge) & " " & Quote(profile) & " " & Quote(url) & " " & Quote(role) & " " & NativeVersion, 0, False
 
 Function Quote(value)
     Quote = Chr(34) & value & Chr(34)

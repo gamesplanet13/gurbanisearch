@@ -42,8 +42,8 @@ body.alt-projection #singleProjection{padding-top:max(105px,12vh)!important;padd
 <label class="sliders">Right: <output id="marginRightVal">16</output> px<input id="marginRight" type="range" min="0" max="160" value="16"></label>
 <label class="sliders">Top: <output id="marginTopVal">92</output> px<input id="marginTop" type="range" min="0" max="200" value="92"></label>
 <label class="sliders">Bottom: <output id="marginBottomVal">30</output> px<input id="marginBottom" type="range" min="0" max="200" value="30"></label>
-</fieldset><label><input type="checkbox" id="bookArth"> Show Arth / ਅਰਥ (default OFF)</label><br><label><input type="checkbox" id="bookNight"> Night mode</label><br><label><input type="checkbox" id="bookLari"> ਲੜੀਵਾਰ</label><br><label><input type="checkbox" id="bookFlow"> Continuous shabad lines</label><br><label><input type="checkbox" id="bookPause"> Colour words before punctuation</label><p class="small">Colour marks source punctuation, not verified ਵਿਸਰਾਮ.</p><p class="small">Pinch with two fingers on the page to resize text. Settings are saved automatically.</p><div class="row" id="changeCodeRow"><input id="newCode" class="grow" inputmode="numeric" maxlength="5" placeholder="ਨਵਾਂ ਕੋਡ / New code"><button id="changeCode"><span lang="pa">ਕੋਡ ਬਦਲੋ</span> · <span lang="en">Change code</span></button></div><button id="resetPairing" class="action"><span lang="pa">ਜੋੜ ਹਟਾਓ</span> · <span lang="en">Reset pairing</span></button> <button id="fullscreen" class="action">Fullscreen</button><p class="small">Only Gurbani shabad is displayed. Selected line is highlighted. This page pairs exactly like other projections.</p><div class="developer-menu-foot"><strong>Developed by Rajinder Singh</strong><a href="mailto:harjas.info@gmail.com">✉ harjas.info@gmail.com</a><a href="https://www.youtube.com/results?search_query=HarjasTV" target="_blank" rel="noopener noreferrer">▶ HarjasTV · YouTube</a></div><div class="app-update-menu"><hr><button type="button" id="checkAppUpdate">Check for App Update</button><p id="appUpdateStatus" role="status"></p></div></aside><div id="bookMetaTop" class="book-meta-top" hidden><div id="sourceCredit" class="source-credit" hidden></div><div id="angIndicator" class="ang-indicator" hidden></div></div><footer class="gp-credit">Developed by Rajinder Singh · <a href="mailto:harjas.info@gmail.com">harjas.info@gmail.com</a> · 2026</footer>
-<script src="gurbani-updates.js?v=20261121" defer></script><script src="gurbani-waheguru-wide.js?v=1"></script><script src="gurbani-screen-preview.js?v=1"></script><script src="gurbani-layout.js?v=2"></script><script src="gurbani-book-motion.js?v=3"></script><script src="peerjs-1.5.5.min.js?v=20261118"></script><script src="gurbani-peer-manager.js?v=20261118"></script><script>
+</fieldset><label><input type="checkbox" id="bookArth"> Show Arth / ਅਰਥ</label><fieldset id="bookLanguages"><legend>Languages and Arth / ਅਰਥ</legend></fieldset><label><input type="checkbox" id="bookNight"> Night mode</label><br><label><input type="checkbox" id="bookLari"> ਲੜੀਵਾਰ</label><br><label><input type="checkbox" id="bookFlow"> Continuous shabad lines</label><br><label><input type="checkbox" id="bookPause"> Colour words before punctuation</label><p class="small">Colour marks source punctuation, not verified ਵਿਸਰਾਮ.</p><p class="small">Pinch with two fingers on the page to resize text. Settings are saved automatically.</p><div class="row" id="changeCodeRow"><input id="newCode" class="grow" inputmode="numeric" maxlength="5" placeholder="ਨਵਾਂ ਕੋਡ / New code"><button id="changeCode"><span lang="pa">ਕੋਡ ਬਦਲੋ</span> · <span lang="en">Change code</span></button></div><button id="resetPairing" class="action"><span lang="pa">ਜੋੜ ਹਟਾਓ</span> · <span lang="en">Reset pairing</span></button> <button id="fullscreen" class="action">Fullscreen</button><p class="small">Only Gurbani shabad is displayed. Selected line is highlighted. This page pairs exactly like other projections.</p><div class="developer-menu-foot"><strong>Developed by Rajinder Singh</strong><a href="mailto:harjas.info@gmail.com">✉ harjas.info@gmail.com</a><a href="https://www.youtube.com/results?search_query=HarjasTV" target="_blank" rel="noopener noreferrer">▶ HarjasTV · YouTube</a></div><div class="app-update-menu"><hr><button type="button" id="checkAppUpdate">Check for App Update</button><p id="appUpdateStatus" role="status"></p></div></aside><div id="bookMetaTop" class="book-meta-top" hidden><div id="sourceCredit" class="source-credit" hidden></div><div id="angIndicator" class="ang-indicator" hidden></div></div><footer class="gp-credit">Developed by Rajinder Singh · <a href="mailto:harjas.info@gmail.com">harjas.info@gmail.com</a> · 2026</footer>
+<script src="gurbani-updates.js?v=20261121" defer></script><script src="gurbani-waheguru-wide.js?v=1"></script><script src="gurbani-screen-preview.js?v=1"></script><script src="gurbani-layout.js?v=3"></script><script src="gurbani-book-motion.js?v=3"></script><script src="peerjs-1.5.5.min.js?v=20261118"></script><script src="gurbani-peer-manager.js?v=20261118"></script><script>
 'use strict';
 const $=id=>document.getElementById(id),read=(k,d)=>{try{const value=JSON.parse(localStorage.getItem(k));return value==null?d:value}catch(_){return d}},put=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const code5=()=>String(10000+Math.floor(Math.random()*90000));
@@ -94,7 +94,19 @@ let bookNotifyTimer;
 let bookLayout=read('gb-book-layout',{larrivaar:false,flow:false,pause:false});
 let showArth=read('gb-book-show-arth',false)===true;
 $('bookArth').checked=showArth;
-$('bookArth').onchange=()=>{showArth=$('bookArth').checked;put('gb-book-show-arth',showArth);render()};
+let bookLanguages=read('gb-book-languages',{});
+function updateBookLanguages(patch,notify=false){
+ bookLanguages={...bookLanguages,...GurbaniLayout.languagePatch(patch)};
+ put('gb-book-languages',bookLanguages);
+ if(notify)for(const [c,token] of authorization)send(c,{type:'display-languages',token,languages:patch});
+}
+const syncLanguageMenu=GurbaniLayout.languageMenu($('bookLanguages'),patch=>{updateBookLanguages(patch,true);render()});
+$('bookArth').onchange=()=>{
+ showArth=$('bookArth').checked;
+ put('gb-book-show-arth',showArth);
+ updateBookLanguages({mp:showArth,mh:showArth,me:showArth},true);
+ render();
+};
 const marginDefaults={marginLeft:16,marginRight:16,marginTop:92,marginBottom:30};
 let bookMargins={...marginDefaults,...read('gb-book-margins',{})};
 function applyMargins(v){
@@ -132,7 +144,7 @@ function renderAlternateProjection(){
  $('singleProjection').hidden=displayMode!=='projection';
  $('singleProjection').dataset.alignment=remoteProjectionSettings.alignment==='top'?'top':'center';
  if(displayMode!=='projection')return;
- const c=saved.content||{},scripts=c.scripts||{};
+ const c=GurbaniLayout.languageContent(saved.content||{},bookLanguages),scripts=c.scripts||{};
  const main=c.bookLineDetails?scripts.gurmukhi||'':scripts.gurmukhi||c.verse||'';
  $('singleVerse').textContent=main;$('singleVerse').hidden=!main;
  for(const [id,lang,field] of [['singleHindiVerse','hindi','hindiVerseSize'],['singleEnglishVerse','english','englishVerseSize']]){
@@ -148,7 +160,9 @@ function renderAlternateProjection(){
 }
 let displayedLines=[],displayedStyle='',displayedCurrent=null;
 function render(){
- const content=saved.content||{},box=$('lines');
+ const content=GurbaniLayout.languageContent(saved.content||{},bookLanguages),box=$('lines');
+ syncLanguageMenu(bookLanguages,content);
+ $('bookArth').checked=['mp','mh','me'].some(key=>bookLanguages[key]??showArth);
  $('book').dataset.alignment=bookLayout.alignment==='top'?'top':'center';
  const waheguru=content.mode==='waheguru';
  const waheguruScreen=$('bookWaheguru');
@@ -177,7 +191,7 @@ function render(){
  }
  const line=$('line-'+Math.max(0,Math.min(current,lines.length-1)));
  $('bookLineDetails')?.remove();
- if(line&&content.bookLineDetails&&showArth){
+ if(line&&content.bookLineDetails&&(Object.keys(bookLanguages).length||showArth)){
   const details=GurbaniLayout.bookDetails(content);if(details)line.append(details);
  }
  if(line!==displayedCurrent){
@@ -247,14 +261,29 @@ function connection(c){
   for(const [old,token] of authorization)if(old!==c&&token===m.token){disconnectController(old);old.close()}
   saveControllers();updateMainPairing();
   send(c,{type:'accepted',deviceId:code,code,name,kind:'book',displaySession,bookSettings:bookState(),multiController:true,hasContent:!!saved.content,lastWriter:saved.lastWriter===m.token?m.token:null});
+  if(saved.selection&&saved.lastWriter!==m.token)send(c,{type:'control-selection',token:m.token,selection:saved.selection,content:saved.content});
   setPairingStatus('Connected controls: '+authorization.size);
   return;
  }
   if(m.type==='project'&&authorized){
+ const languages=GurbaniLayout.languagePatch(m.languages);
+ const changed=Object.fromEntries(Object.entries(languages).filter(([key,value])=>bookLanguages?.[key]!==value));
+ if(Object.keys(changed).length)updateBookLanguages(changed);
+ if(Object.keys(changed).length)for(const [link,token] of authorization)if(link!==c)
+  send(link,{type:'display-languages',token,languages:changed});
    if(m.bookSettings&&typeof m.bookSettings==='object'){applyBookSettings(m.bookSettings.fontSize,m.bookSettings.lineSpacing,false);setBookLayout(m.bookSettings,false,false)}
    if(m.settings)remoteProjectionSettings=m.settings;
-   if(Object.prototype.hasOwnProperty.call(m,'content')){saved.content=m.content;saved.lastWriter=m.token;put('gb-book-slide',saved);if(m.content&&m.content.verse)markAwaitSelection(false);render()}
-   else if(m.settings||m.bookSettings)render();
+   if(Object.hasOwn(m,'content')&&(!m.selection||GurbaniLayout.compareSelections(m.selection,saved.selection)>0)){
+    saved.content=m.content;saved.lastWriter=m.token;
+    if(m.selection){
+     saved.selection=m.selection;
+     GurbaniLayout.relaySelection(authorization,c,m.selection,saved.content);
+    }
+    put('gb-book-slide',saved);
+    if(m.content?.verse||m.content?.bookLines?.length)markAwaitSelection(false);
+    render();
+   }
+   else if(m.settings||m.bookSettings||m.languages)render();
    if(m.rev!==undefined)send(c,{type:'applied',rev:m.rev});
   }
  });
@@ -302,7 +331,7 @@ $('fullscreen').onclick=()=>document.documentElement.requestFullscreen && docume
 $('fontSize').oninput=()=>applyBookSettings($('fontSize').value,spacing,true);
 $('lineSpacing').oninput=()=>applyBookSettings(size,$('lineSpacing').value,true);
 updateMainPairing();applyBookSettings(size,spacing,false);setBookLayout(bookLayout,false);render();advertiseWifi();start();
-</script><script src="gurbani-desktop-fullscreen.js?v=4" defer></script></body></html>
+</script><script src="gurbani-desktop-fullscreen.js?v=5" defer></script></body></html>
 
 
 

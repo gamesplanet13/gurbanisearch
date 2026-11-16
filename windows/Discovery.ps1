@@ -3,10 +3,9 @@ function Get-GurbaniDisplayCode($Directory, $Role) {
     $path = Join-Path $Directory "$Role.code"
     $code = if (Test-Path -LiteralPath $path) { [IO.File]::ReadAllText($path).Trim() }
     if ([string]$code -notmatch '^[0-9]{5}$') {
-        $otherRole = if ($Role -eq 'projection') { 'book' } else { 'projection' }
-        $otherPath = Join-Path $Directory "$otherRole.code"
-        $otherCode = if (Test-Path -LiteralPath $otherPath) { [IO.File]::ReadAllText($otherPath).Trim() }
-        do { $code = [string](Get-Random -Minimum 10000 -Maximum 100000) } while ($code -eq $otherCode)
+        $used = Get-ChildItem -LiteralPath $Directory -Filter '*.code' |
+            ForEach-Object { [IO.File]::ReadAllText($_.FullName).Trim() }
+        do { $code = [string](Get-Random -Minimum 10000 -Maximum 100000) } while ($used -contains $code)
         [IO.File]::WriteAllText($path, $code)
     }
     return $code
@@ -31,16 +30,20 @@ function Send-GurbaniDiscoveryReplies($Socket, $Directory) {
         $query = [Text.Encoding]::UTF8.GetString($request)
         if ($query -cnotmatch '^GURBANI_FIND_V1:([a-f0-9-]{36})$') { continue }
         $nonce = $Matches[1]
-        foreach ($role in @('projection', 'book')) {
+        foreach ($role in @('projection', 'book', 'camera', 'qr')) {
             $path = Join-Path $Directory "$role.active"
             try {
                 $record = [IO.File]::ReadAllText($path) | ConvertFrom-Json -ErrorAction Stop
                 $window = Get-Process -Id $record.windowPid -ErrorAction Stop
                 if ($window.StartTime.ToUniversalTime().Ticks.ToString() -ne $record.windowStart -or
                     $window.MainWindowHandle -eq 0 -or $record.code -notmatch '^[0-9]{5}$') { continue }
-                $label = if ($role -eq 'book') { 'Granth View' } else { 'Projection' }
+                # Older Android scanners only accept projection and book. Use a role label
+                # understood by the Controller page for Camera and QR without an APK update.
+                $label = @{projection='Projection'; book='Granth View'; camera='Camera'; qr='QR Payment'}[$role]
+                $name = if ($role -in @('camera','qr')) { "$label - $env:COMPUTERNAME" } else { "$env:COMPUTERNAME - $label" }
+                $wireRole = if ($role -eq 'book') { 'book' } else { 'projection' }
                 $reply = @{type='GURBANI_DISPLAY_V1'; nonce=$nonce; code=$record.code
-                    name="$env:COMPUTERNAME - $label"; role=$role} | ConvertTo-Json -Compress
+                    name=$name; role=$wireRole} | ConvertTo-Json -Compress
                 $bytes = [Text.Encoding]::UTF8.GetBytes($reply)
                 [void]$Socket.Send($bytes, $bytes.Length, $sender)
             } catch { }

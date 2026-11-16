@@ -17,10 +17,13 @@ const $=id=>document.getElementById(id);
 const store=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const read=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}};
 const mkCode=()=>String(10000+Math.floor(Math.random()*90000));
-const savedCode=read('gb-camera-code','');
+const desktopCode=new URLSearchParams(location.search).get('desktop')==='windows'
+ ? new URLSearchParams(location.hash.slice(1)).get('lanCode') : null;
+const savedCode=/^\d{5}$/.test(desktopCode||'')?desktopCode:read('gb-camera-code','');
 const cameraCode=/^\d{5}$/.test(savedCode)?savedCode:mkCode();
 let cameraName=read('gb-camera-name','Camera Phone'),controllerPeer=read('gb-camera-controller-peer',null),peer,stream=null,recording=null,recordChunks=[],allowed=new Set(),calls=new Map(),streamGeneration=0,pendingControllerCode='';
 store('gb-camera-code',cameraCode);$('code').textContent=cameraCode;
+window.GurbaniWifi?.advertise(cameraCode,cameraName);
 const cameraPeerPrefix='gurbani-camera-v1-',controlPrefix='gurbani-control-v1-';
 function status(s){$('status').textContent=s}
 function signal(msg){for(const conn of controlConnections)if(conn.open)conn.send(msg)}
@@ -206,4 +209,4 @@ function startPeer(){
  // Permission prompts are more reliable when triggered by a direct user tap.
  $('cameraPlaceholder').textContent='📷 Tap Start Camera and allow camera access on this phone.';
 })();
-</script><script src="gurbani-desktop-fullscreen.js?v=4" defer></script></body></html>
+</script><script src="gurbani-desktop-fullscreen.js?v=5" defer></script></body></html>

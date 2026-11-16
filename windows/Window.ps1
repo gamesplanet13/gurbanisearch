@@ -1,4 +1,4 @@
-param([string]$Edge, [string]$Profile, [string]$Url, [string]$Role)
+param([string]$Edge, [string]$Profile, [string]$Url, [string]$Role, [int]$NativeVersion = 10500)
 $mutex = New-Object Threading.Mutex($false, "Local\Gurbani-$Role")
 try { $locked = $mutex.WaitOne(0) } catch [Threading.AbandonedMutexException] { $locked = $true }
 if (!$locked) { $mutex.Dispose(); exit }
@@ -7,16 +7,13 @@ try {
 using System;
 using System.Runtime.InteropServices;
 public static class GurbaniWindow {
-    [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
-    [DllImport("user32.dll")] public static extern short GetAsyncKeyState(int key);
-    [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr hwnd, out uint pid);
     [DllImport("user32.dll")] public static extern bool PostMessage(IntPtr hwnd, uint msg, IntPtr w, IntPtr l);
     [DllImport("kernel32.dll", SetLastError=true)] public static extern uint SetThreadExecutionState(uint esFlags);
 }
 '@
     # Keep display and system awake only for the life of this Windows app.
     [void][GurbaniWindow]::SetThreadExecutionState([uint32]2147483651)
-    if ($Role -in @('projection', 'book')) {
+    if ($Role -in @('projection', 'book', 'camera')) {
         . (Join-Path $PSScriptRoot 'Discovery.ps1')
         $discoveryDirectory = Join-Path $env:LOCALAPPDATA 'Gurbani\Discovery'
         $codeMutex = New-Object Threading.Mutex($false, 'Local\Gurbani-DisplayCode')
@@ -80,15 +77,10 @@ public static class GurbaniWindow {
             }
         } catch { }
     }
-    $hadWindow = !$process.HasExited -and $process.MainWindowHandle -ne 0
     while (!$process.HasExited) {
         $process.Refresh()
         $window = $process.MainWindowHandle
-        $foreground = [GurbaniWindow]::GetForegroundWindow()
-        $owner = [uint32]0
-        [void][GurbaniWindow]::GetWindowThreadProcessId($foreground,[ref]$owner)
-        if ($process.MainWindowTitle -like 'Gurbani Windows Close*' -and $window -ne 0) {
-            $confirmedExit = $true
+        if ($window -ne 0 -and $process.MainWindowTitle -match '^Gurbani Windows Close(?:$|[ -])') {
             [void][GurbaniWindow]::PostMessage($window,0x10,[IntPtr]::Zero,[IntPtr]::Zero)
         } elseif ($process.MainWindowTitle -match '^Gurbani Windows Install ([0-9]+)' -and $window -ne 0) {
             $wanted = [int]$Matches[1]
@@ -97,7 +89,7 @@ public static class GurbaniWindow {
                 try {
                     $base = 'https://gamesplanet13.github.io/gurbanisearch/windows/'
                     $manifest = Invoke-RestMethod -Uri ($base + 'update.json') -TimeoutSec 10
-                    if ($manifest.version -eq $wanted -and $wanted -gt 10500 -and
+                    if ($manifest.version -eq $wanted -and $wanted -gt $NativeVersion -and
                         $manifest.sha256 -match '^[a-fA-F0-9]{64}$') {
                         $installer = Join-Path $env:TEMP ("Gurbani-Windows-$wanted.exe")
                         Invoke-WebRequest -UseBasicParsing -Uri ($base + 'Gurbani-Windows-Setup.exe') -OutFile $installer -TimeoutSec 45
@@ -112,7 +104,6 @@ public static class GurbaniWindow {
                 } catch { }
             }
         }
-        if ($window -eq 0) { break }
         if ($discoveryRecord) {
             if (!$discoverySocket -and [DateTime]::UtcNow -ge $nextDiscoveryBind) {
                 $discoverySocket = Open-GurbaniDiscovery
@@ -133,7 +124,7 @@ public static class GurbaniWindow {
     $mutex.Dispose()
 }
 
-if ($relaunch -or ($hadWindow -and !$confirmedExit)) {
+if ($relaunch) {
     Start-Sleep -Milliseconds 300
     Start-Process wscript.exe -ArgumentList ('"' + (Join-Path $PSScriptRoot 'Launch.vbs') + '" ' + $Role)
 }

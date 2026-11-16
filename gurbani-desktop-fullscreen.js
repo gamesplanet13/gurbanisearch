@@ -4,7 +4,7 @@
   if (params.get('desktop') !== 'windows') return;
 
   const controls = document.createElement('div');
-  controls.style.cssText = 'position:fixed;top:8px;right:10px;z-index:1000;display:flex;gap:8px';
+  controls.style.cssText = 'position:fixed;top:8px;left:10px;z-index:2147483000;display:flex;gap:8px';
   const style = 'padding:7px 11px;background:#19243a;color:white;border:1px solid #71839e;border-radius:6px;cursor:pointer';
   const button = (label, action) => {
     const el = document.createElement('button');
@@ -14,9 +14,12 @@
     el.onclick = action;
     return el;
   };
+  let exiting = false;
   const exit = button('Exit', () => {
-    if (dialog.open) return;
-    prompt('Exit', 'Close this Gurbani window?', 'Exit', () => {
+    if (dialog.open || exiting) return;
+    prompt('Exit', 'Close this Gurbani window?', 'Exit', async () => {
+      exiting = true;
+      if (document.fullscreenElement) await document.exitFullscreen().catch(() => {});
       document.title = 'Gurbani Windows Close';
     });
   });

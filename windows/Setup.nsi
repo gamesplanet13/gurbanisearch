@@ -6,11 +6,11 @@ RequestExecutionLevel user
 SetCompressor /SOLID lzma
 Icon "controller.ico"
 UninstallIcon "controller.ico"
-VIProductVersion "1.0.5.0"
+VIProductVersion "1.0.6.0"
 VIAddVersionKey "ProductName" "Gurbani for Windows"
 VIAddVersionKey "FileDescription" "Gurbani Windows Setup"
 VIAddVersionKey "LegalCopyright" "Copyright Rajinder Singh"
-VIAddVersionKey "FileVersion" "1.0.5.0"
+VIAddVersionKey "FileVersion" "1.0.6.0"
 
 Page instfiles
 UninstPage uninstConfirm
@@ -49,7 +49,7 @@ Section "Gurbani"
   WriteUninstaller "$INSTDIR\Uninstall.exe"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Gurbani" "DisplayName" "Gurbani for Windows"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Gurbani" "UninstallString" '"$INSTDIR\Uninstall.exe"'
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Gurbani" "DisplayVersion" "1.0.5"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Gurbani" "DisplayVersion" "1.0.6"
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Gurbani" "NoModify" 1
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Gurbani" "NoRepair" 1
 SectionEnd
