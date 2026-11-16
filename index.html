@@ -167,6 +167,11 @@ main{width:100%;max-width:none;margin:3px auto;padding:0 4px;gap:4px;align-items
     <div id="searcherReaderOptions" hidden>
     <label><input id="searcherFlow" type="checkbox" checked> ਲਗਾਤਾਰ ਪੰਕਤੀਆਂ · Continuous</label>
      <label><input id="searcherPauses" type="checkbox" checked> ਠਹਿਰਾਅ · Pause colour</label>
+     <fieldset><legend>ਅਰਥ · Meanings</legend>
+      <label><input id="searcherArthPa" type="checkbox"> ਪੰਜਾਬੀ</label>
+      <label><input id="searcherArthHi" type="checkbox"> हिन्दी</label>
+      <label><input id="searcherArthEn" type="checkbox"> English</label>
+     </fieldset>
     </div>
     <button id="searcherLibrary" type="button">ਆਫਲਾਈਨ ਬਾਣੀ · Offline library</button>
     <button id="searcherUpdate" type="button">ਅੱਪਡੇਟ · App update</button>
@@ -400,6 +405,11 @@ function adoptDisplayLanguages(key,conn,message){
  persistDeviceSettings();
  if(selected.size===1&&selected.has(key)){
   for(const [lang,,,id] of displayLanguages)if(lang in patch)$(id).checked=patch[lang];
+  if(isSearcher){
+   for(const [id,key] of [['searcherArthPa','mp'],['searcherArthHi','mh'],['searcherArthEn','me']]){
+    if(key in patch)$(id).checked=patch[key];
+   }
+  }
   renderLines();
  }
  if(openDeviceSettingsKey===key)renderDevices();
@@ -641,7 +651,7 @@ if(m.type==='accepted'&&m.kind!=='obs'){
 if(m.type==='accepted'){if(m.deviceId){if(m.deviceId!==key){connections.delete(key);key=m.deviceId}known[key]={code:m.code||codeValue,name:m.name||'Projection',kind:m.kind||known[key]?.kind||'projection',localWaheguru:known[key]?.localWaheguru===true};put('gb-known-devices',known);selected.add(key);put('gb-selected-devices',[...selected]);connections.set(key,conn)}renderDevices();if(!m.multiController)sendDeviceView(key);status('Paired successfully')}
 if((m.type==='hello'||m.type==='accepted')&&m.kind==='book'&&m.bookSettings&&!perDeviceSettings[key]){const saved=deviceSettings(key);saved.book={...saved.book,...m.bookSettings};persistDeviceSettings()}
 if(m.type==='control-selection'){
- if(!isSearcher&&authorizedDisplays.has(conn)&&connections.get(key)===conn&&m.token===myToken)
+ if(authorizedDisplays.has(conn)&&connections.get(key)===conn&&m.token===myToken)
   receiveControlSelection(m.selection,m.content,key);
  return;
 }
@@ -1001,8 +1011,13 @@ function receiveControlSelection(selection,content,source){
  if(content!==null&&(!content||typeof content.verse!=='string'))return;
  lastSelection=selection;
  put('gb-last-selection-v1',lastSelection);
+ const previousContent=lastContent;
  lastContent=content;
  put('gb-last-content',lastContent);
+ if(isSearcher){
+  if(content?.mode==='waheguru'&&$('searcherWaheguru').hidden)beforeSearcherWaheguru=lines[active]?previousContent:null;
+  renderSearcherWaheguru(content?.mode==='waheguru');
+ }
  if(content?.mode==='waheguru'||content?.mode==='custom'){
   status(content.verse);
  }else if(content&&Array.isArray(content.bookLines)&&content.bookLines.length){
@@ -1020,6 +1035,7 @@ function receiveControlSelection(selection,content,source){
    });
    active=index;
   }
+  if(isSearcher)enterSearcherReading();
   renderReadingNavigator();renderLines();markAng(getAng(lines[active])||content.ang);
   status('Synced: '+(content.obsData?.sg||content.verse));
  }else if(!content){
@@ -2112,6 +2128,24 @@ function renderLines(){
   const selectedLine=box.children[active];
   selectedLine?.classList.add('active');
   selectedLine?.setAttribute('aria-current','true');
+  box.querySelector('.searcher-meanings')?.remove();
+  if(selectedLine){
+   const labels={punjabi:'ਪੰਜਾਬੀ',hindi:'हिन्दी',english:'English'};
+   const meanings=Object.entries(selectedMeanings(lines[active]));
+   if(meanings.length){
+    const group=document.createElement('span');
+    group.className='searcher-meanings';
+    group.style.cssText='display:block;font-size:.66em;line-height:1.45;margin-top:.35em';
+    for(const [lang,value] of meanings){
+     const line=document.createElement('span');
+     line.lang={punjabi:'pa',hindi:'hi',english:'en'}[lang];
+     line.style.display='block';
+     line.textContent=labels[lang]+' · '+value;
+     group.append(line);
+    }
+    selectedLine.append(group);
+   }
+  }
   $('searchCard').classList.toggle('searcher-search-open',!lines.length);
   document.documentElement.classList.toggle('searcher-reading',!!lines.length);
   renderReaderFavorite();
@@ -2364,6 +2398,16 @@ if(isSearcher){
   $('searcherSettings').open=false;$('searcherLinkPanel').hidden=!$('searcherLinkPanel').hidden;
   if(!$('searcherLinkPanel').hidden)window.scrollTo(0,0);
  };
+ const arthPreferences=stored('gb-searcher-arth',{});
+ for(const [id,target] of [['searcherArthPa','paCheck'],['searcherArthHi','hiCheck'],['searcherArthEn','enCheck']]){
+  const toggle=$(id);
+  toggle.checked=$(target).checked=arthPreferences[id]===true;
+  toggle.onchange=()=>{
+   $(target).checked=arthPreferences[id]=toggle.checked;
+   put('gb-searcher-arth',arthPreferences);
+   $(target).dispatchEvent(new Event('change'));
+  };
+ }
  $('searcherReaderSettings').onclick=()=>$('searcherReaderOptions').hidden=!$('searcherReaderOptions').hidden;
  $('searcherUpdate').onclick=()=>{
   $('searcherSettings').open=false;$('connectCard').classList.add('searcher-devices');

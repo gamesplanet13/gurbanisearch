@@ -6,6 +6,11 @@ import android.view.View;
 import android.view.WindowManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.PermissionRequest;
@@ -36,6 +41,19 @@ public class MainActivity extends SessionActivity {
             View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
         web = new WebView(this);
         web.setBackgroundColor(Color.BLACK);
+        FrameLayout frame = new FrameLayout(this);
+        frame.addView(web, new FrameLayout.LayoutParams(-1, -1));
+        Button retry = new Button(this);
+        retry.setText("Page unavailable. Tap to retry. / ਪੰਨਾ ਨਹੀਂ ਖੁੱਲ੍ਹਿਆ। ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।");
+        retry.setVisibility(View.GONE);
+        frame.addView(retry, new FrameLayout.LayoutParams(-1, -1));
+        retry.setOnClickListener(v -> {
+            retry.setVisibility(View.GONE);
+            web.setVisibility(View.VISIBLE);
+            if (web.getUrl() != null && web.getUrl().startsWith(SITE)) web.reload();
+            else web.loadUrl(SITE + BuildConfig.START_PAGE + "?app=" + BuildConfig.VERSION_CODE);
+            web.requestFocus();
+        });
         WebSettings settings=web.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
@@ -50,6 +68,17 @@ public class MainActivity extends SessionActivity {
         boolean tvProjection = ("projection".equals(BuildConfig.ROLE) || "book".equals(BuildConfig.ROLE)) && uiMode != null
                 && uiMode.getCurrentModeType() == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION;
         web.setWebViewClient(new WebViewClient() {
+            private void showRetry() {
+                web.setVisibility(View.GONE);
+                retry.setVisibility(View.VISIBLE);
+                retry.requestFocus();
+            }
+            @Override public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                if (request.isForMainFrame()) showRetry();
+            }
+            @Override public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse error) {
+                if (request.isForMainFrame() && error.getStatusCode() >= 400) showRetry();
+            }
             @Override public android.webkit.WebResourceResponse shouldInterceptRequest(
                     WebView view, android.webkit.WebResourceRequest request) {
                 Uri uri = request.getUrl();
@@ -106,7 +135,7 @@ public class MainActivity extends SessionActivity {
         });
         wifiDiscovery = new WifiDiscovery(this, web, BuildConfig.ROLE);
         web.addJavascriptInterface(wifiDiscovery, "GurbaniWifi");
-        setContentView(web);
+        setContentView(frame);
         updater = new Updater(this);
         web.addJavascriptInterface(new UpdateBridge(), "GurbaniUpdates");
         web.setDownloadListener((url, userAgent, contentDisposition, mimeType, contentLength) -> {

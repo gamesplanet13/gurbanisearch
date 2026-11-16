@@ -31,13 +31,16 @@ public final class WifiDiscovery {
 
     WifiDiscovery(Activity activity, WebView web, String role) {
         this.activity = activity; this.web = web; this.role = role;
-        if ("projection".equals(role) || "book".equals(role)) listen();
+        if (advertises(role)) listen();
+    }
+    private static boolean advertises(String role) {
+        return "projection".equals(role) || "book".equals(role) || "camera".equals(role);
     }
     private void callback(String js) {
         activity.runOnUiThread(() -> { if (running && !activity.isFinishing()) web.evaluateJavascript(js, null); });
     }
     @JavascriptInterface public void advertise(String value, String name) {
-        if (!("projection".equals(role) || "book".equals(role)) || value == null || !value.matches("[0-9]{5}")) return;
+        if (!advertises(role) || value == null || !value.matches("[0-9]{5}")) return;
         code = value;
         deviceName = name == null ? "" : name.trim().substring(0, Math.min(name.trim().length(), 50));
     }
@@ -90,9 +93,10 @@ public final class WifiDiscovery {
                         if (!nonce.matches("[a-f0-9-]{36}")) continue;
                         String model = Build.MODEL == null ? "Android" : Build.MODEL;
                         String label = deviceName.isEmpty() ? ("book".equals(role) ? "Book View" : "Projection") : deviceName;
+                        if ("camera".equals(role)) label = "Camera - " + (deviceName.isEmpty() ? model : deviceName);
                         if (!label.toLowerCase().contains(model.toLowerCase())) label += " · " + model;
                         if (label.length() > 80) label = label.substring(0,80);
-                        JSONObject reply = new JSONObject(); reply.put("type", "GURBANI_DISPLAY_V1"); reply.put("nonce", nonce); reply.put("code", currentCode); reply.put("name", label); reply.put("role", role);
+                        JSONObject reply = new JSONObject(); reply.put("type", "GURBANI_DISPLAY_V1"); reply.put("nonce", nonce); reply.put("code", currentCode); reply.put("name", label); reply.put("role", "camera".equals(role) ? "projection" : role);
                         byte[] out = reply.toString().getBytes(StandardCharsets.UTF_8);
                         sock.send(new DatagramPacket(out, out.length, request.getAddress(), request.getPort()));
                     } catch (SocketTimeoutException ignored) {} catch (org.json.JSONException ignored) {}
