@@ -1,5 +1,5 @@
 /* Games Planet Gurbani — offline app shell. Search corpus stored in IndexedDB by Controller. */
-const VERSION='gurbani-shell-2026-11-16-display-sync-v18';
+const VERSION='gurbani-shell-2026-11-16-display-sync-v19';
 const CORE=[
  './','./index.html','./searcher.html','./sangat.html','./sangat.js','./sangat-control.js','./gurbani-searcher.css','./gurbani-searcher-sync.js','./projection.html','./book.html','./obs.html','./camera.html',
  './gurbani-desktop-preview.js','./gurbani-desktop-fullscreen.js','./gurbani-screen-preview.js','./gurbani-waheguru-wide.js','./gurbani-updates.js','./gurbani-camera.js','./gurbani-layout.js','./gurbani-book-motion.js','./gurbani-peer-manager.js','./peerjs-1.5.5.min.js',
@@ -35,6 +35,10 @@ self.addEventListener('fetch',event=>{
   const cache=await caches.open(VERSION);
   try{
    const response=await fetch(request);
+   if(request.mode==='navigate'&&response.status>=500){
+    const cached=await cache.match(request,{ignoreSearch:true});
+    if(cached)return cached;
+   }
    if(response.ok&&response.type==='basic')cache.put(request,response.clone()).catch(()=>{});
    return response
   }catch(error){

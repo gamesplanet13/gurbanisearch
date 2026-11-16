@@ -1041,7 +1041,7 @@ function receiveControlSelection(selection,content,source){
  }else if(!content){
   active=-1;renderReadingNavigator();renderLines();status('Projection cleared on linked Control');
  }
- sangatPublisher?.send(content);
+ if(sangatPublisher)sangatPublisher.send(content);
  if(projectionIsOn||content===null){
   for(const key of selected){
    if(key===source||known[key]?.kind==='obs')continue;
